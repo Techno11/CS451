@@ -204,7 +204,7 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
-void processPid(char *basePath, int pid, int parentPid)
+void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 {
     // Build the path to the PID folder
     char *path = buildPath(basePath, pid, "");
@@ -228,7 +228,7 @@ void processPid(char *basePath, int pid, int parentPid)
 
         // Process PID
         int printPid = pid;
-        if(parentPid > 0)
+        if (parentPid > 0)
         {
             printPid = parentPid;
         }
@@ -254,7 +254,14 @@ void processPid(char *basePath, int pid, int parentPid)
 
         // Process STIME
         char *STIME = malloc(5);
-        strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
+        if (parentPid > 0)
+        {
+            STIME = parentSTIME;
+        }
+        else
+        {
+            strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
+        }
 
         // Process STAT
 
@@ -267,10 +274,6 @@ void processPid(char *basePath, int pid, int parentPid)
         // Print the status row with padding
         printf("%-5s %-16d %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", UID, printPid, 0, LWP, 0, STIME, "S", prettyTime, cmd);
 
-        // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
-        free(prettyTime);
-        free(cmd);
-
         // Find child processes
         if (parentPid == 0)
         {
@@ -282,10 +285,16 @@ void processPid(char *basePath, int pid, int parentPid)
                 if (i != pid)
                 {
                     // Recursively Process a child PID
-                    processPid(childPath, i, pid);
+                    processPid(childPath, i, pid, STIME);
                 }
             }
         }
+
+        
+        // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
+        free(prettyTime);
+        free(cmd);
+        free(STIME);
     }
 }
 
@@ -302,7 +311,7 @@ int main(void)
     for (int i = 0; i < 5; i++)
     {
         // Process a parent PID
-        processPid("/proc", i, 0);
+        processPid("/proc", i, 0, "");
     }
 
     // Exit
