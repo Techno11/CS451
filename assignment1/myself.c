@@ -10,20 +10,14 @@ bool file_exists (char *filename) {
   return (stat (filename, &buffer) == 0);
 }
 
-// Convert an integer to a string
-// @param val The integer to convert
-// @param base The base to convert to (radix)
-char* itoa(int val, int base){
-    // Create a static buffer
-	static char buf[32] = {0};
-    // Initialize the index
-	int i = 30;
-    // Convert the integer to a string
-	for(; val && i ; --i, val /= base) {
-		buf[i] = "0123456789abcdef"[val % base];
-    }
-	// Do some fancy pointer arithmetic to return the string
-	return &buf[i+1];
+// Build a path to a file in the /proc directory
+// @param pid The process ID
+// @param path The path to the file
+char* build_path(int pid, char* path) {
+    // Allocate more than enough space for the path
+    char* str = malloc(strlen("/proc/") + strlen(path) + 1 + 5);
+    sprintf(str, "/proc/%d/%s", pid, path);
+    return str;
 }
 
 // Main method
@@ -33,8 +27,7 @@ int main(void) {
     // Iterate over all possible process IDs
     for(int i = 0; i < 32768; i++) {
         // Check to see if the process exists
-        char path[] = "/proc/";
-        strcat(path, itoa(i, 10));
+        char* path = build_path(i, "");
 
         // Check to see if the file exists
         if(file_exists(path)) {
@@ -42,6 +35,7 @@ int main(void) {
             printf("Process %d exists\n", i);
             processesFound++;
             // TODO: Read and print the processes statistics
+            
         }
     }
 
