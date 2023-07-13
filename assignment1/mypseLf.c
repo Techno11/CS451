@@ -90,23 +90,23 @@ int countIntDigits(long passedInt)
 // Build a path to a file in the /proc directory
 // @param pid The process ID
 // @param path The path to the file
-char *buildPath(int pid, char *path)
+char *buildPath(char *basePath, int pid, char *path)
 {
     // Allocate more than enough space for the path
-    char *str = malloc(strlen("/proc/") + strlen(path) + 1 + 5); // 5 for "/proc/", 1 for '\0'
-    sprintf(str, "/proc/%d/%s", pid, path);                      // write the formatted string to buffer pointed by str
+    char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
+    sprintf(str, "%s/%d/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
     return str;                                                  // return the fully allocated and fully formatted/written path
 }
 
 // Get process TIME value
 // @param pid The process ID
-char *getProcTime(int pid)
+char *getProcTime(char *basePath, int pid)
 {
     // stat file breakdown:
     // https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=ptrace(2).-,/proc/pid/stat,-Status%20information%20about
 
     // Get the path of the stat file
-    char *statPath = buildPath(pid, "/stat");
+    char *statPath = buildPath(basePath, pid, "/stat");
     // Open the stat file
     FILE *statFile = fopen(statPath, "r");
     // Create dummy variables that we don't care about
@@ -142,10 +142,10 @@ char *getProcTime(int pid)
     return prettyTime;
 }
 
-char *getCmd(int pid)
+char *getCmd(char *basePath, int pid)
 {
     // Build path to cmdline file
-    char *cmdlineFile = buildPath(pid, "cmdline");
+    char *cmdlineFile = buildPath(basePath, pid, "cmdline");
     // Open the cmdline file
     FILE *cmdlinePtr = fopen(cmdlineFile, "rb");
 
@@ -204,11 +204,94 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
+void processPid(char *basePath, int pid, int parentPid)
+{
+    // Build the path to the PID folder
+    char *path = buildPath(basePath, pid, "");
+
+    // Check to see if the file exists
+    if (fileExists(path))
+    {
+        // IT'S A VALID PID:
+
+        // Get status file inside PID folder; it has good info we need
+        char *statusFile = buildPath(basePath, pid, "status");
+        int numOfLines = findFileLines(statusFile);
+        FILE *statusPtr = fopen(statusFile, "r");
+
+        struct stat st;
+        stat(path, &st);
+
+        // Process UID
+        struct passwd *pwd = getpwuid(st.st_uid);
+        char *UID = pwd->pw_name;
+
+        // Process PID
+        int printPid = pid;
+        if(parentPid > 0)
+        {
+            printPid = parentPid;
+        }
+
+        // Process PPID
+        // TODO: Read status file (opened above) and find line where 'PPid' is at the start
+        // TODO: Then, extract the 'PPid' value and store it in a char string here for later
+        // (use amtOfCharOnLine() to find total number of characters on each file line)
+        int charsOnLine = 0;
+        for (int lineIndex = 0; lineIndex < numOfLines; lineIndex++)
+        {
+            charsOnLine = amtOfCharOnLine(statusFile, lineIndex);
+            char *fileLine;
+            fileLine = (char *)malloc((sizeof(char) * charsOnLine) + 1 + 1); //+1 for '\0' and + 1 for '\n' in case
+            fgets(fileLine, charsOnLine, statusPtr);
+            // TODO: Check for the PPid!
+        }
+
+        // Process LWP
+        int LWP = pid;
+
+        // Process NLWP
+
+        // Process STIME
+        char *STIME = malloc(5);
+        strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
+
+        // Process STAT
+
+        // Process TIME
+        char *prettyTime = getProcTime(basePath, pid);
+
+        // Process CMD
+        char *cmd = getCmd(basePath, pid);
+
+        // Print the status row with padding
+        printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", printPid, UID, 0, LWP, 0, STIME, "S", prettyTime, cmd);
+
+        // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
+        free(prettyTime);
+        free(cmd);
+
+        // Find child processes
+        if (parentPid > 0)
+        {
+            // Build path to parent's child processes folder
+            char *childPath = buildPath(basePath, parentPid, "task");
+            for (int i = 0; i < 32768; i++)
+            {
+                // If the child process we found is not the parent process, then process it
+                if (i != pid)
+                {
+                    // Recursively Process a child PID
+                    processPid(childPath, i, parentPid);
+                }
+            }
+        }
+    }
+}
+
 // Main method
 int main(void)
 {
-    int processesFound = 0;
-
     // Print the header with padding
     printf("%-5s %-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
 
@@ -218,77 +301,9 @@ int main(void)
     // 32768
     for (int i = 0; i < 5; i++)
     {
-        // Build the path to the PID folder
-        char *path = buildPath(i, "");
-
-        // Check to see if the file exists
-        if (fileExists(path))
-        {
-            // IT'S A VALID PID:
-
-            // Get status file inside PID folder; it has good info we need
-            char *statusFile = buildPath(i, "status");
-            int numOfLines = findFileLines(statusFile);
-            FILE *statusPtr = fopen(statusFile, "r");
-
-            struct stat st;
-            stat(path, &st);
-
-            // Process UID
-            struct passwd *pwd = getpwuid(st.st_uid);
-            char *UID = pwd->pw_name;
-
-            // Process PID
-            int numLength = countIntDigits(i);
-            // char pid[numLength + 1 + 1]; // +1 for (-) and +1 for '\0'
-            char *strPid;
-            strPid = (char *)malloc((sizeof(char) * numLength) + 1 + 1); // +1 for (-) and +1 for '\0'
-            sprintf(strPid, "%d", i);
-
-            // Process PPID
-            // TODO: Read status file (opened above) and find line where 'PPid' is at the start
-            // TODO: Then, extract the 'PPid' value and store it in a char string here for later
-            // (use amtOfCharOnLine() to find total number of characters on each file line)
-            int charsOnLine = 0;
-            for (int lineIndex = 0; lineIndex < numOfLines; lineIndex++)
-            {
-                charsOnLine = amtOfCharOnLine(statusFile, lineIndex);
-                char *fileLine;
-                fileLine = (char *)malloc((sizeof(char) * charsOnLine) + 1 + 1); //+1 for '\0' and + 1 for '\n' in case
-                fgets(fileLine, charsOnLine, statusPtr);
-                // TODO: Check for the PPid!
-            }
-
-            // Process LWP
-
-            // Process NLWP
-
-            // Process STIME
-            char *STIME = malloc(5);
-            strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
-
-            // Process STAT
-
-            // Process TIME
-            char *prettyTime = getProcTime(i);
-
-            // Process CMD
-            char *cmd = getCmd(i);
-
-            // Print the status row with padding
-            printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, cmd);
-
-            // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
-            free(prettyTime);
-            free(cmd);
-
-            // For comparison purposes
-            processesFound++;
-        }
+        // Process a parent PID
+        processPid("/proc", i, 0);
     }
-
-    // Print total # processes found
-    printf("Found %d processes\n", processesFound);
 
     // Exit
     return 0;
