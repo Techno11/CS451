@@ -126,8 +126,11 @@ char *getProcTime(int pid)
     // Calculate num minutes
     unsigned long minutes = (total - (hours * 360000)) / 6000;
 
-    char *prettyTime = malloc(8);
-    sprintf(prettyTime, "%lu:%02lu", hours, minutes);
+    // Calculate num seconds
+    unsigned long seconds = (total - (hours * 360000) - (minutes * 6000)) / 100;
+
+    char *prettyTime = malloc(10);
+    sprintf(prettyTime, "%lu:%02lu:%02lu", hours, minutes, seconds);
 
     // Clean up
     free(a);
@@ -152,8 +155,8 @@ int main(void)
 {
     int processesFound = 0;
 
-    // Print the header
-    printf("%-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
+    // Print the header with padding
+    printf("%-5s %-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
 
     // Iterate over all possible process IDs (PIDs)
     for (int i = 0; i < 32768; i++)
@@ -214,10 +217,10 @@ int main(void)
 
             // Process CMD
 
-            // Print that it exists
-            printf("%-5d %-5s %-5d %-5d %-5d %-5s %-5s %-5s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, "CMD");
+            // Print the status row with padding
+            printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, "CMD");
 
-            // Free up memory
+            // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
             free(prettyTime);
 
             // For comparison purposes
