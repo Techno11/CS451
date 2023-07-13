@@ -265,24 +265,24 @@ void processPid(char *basePath, int pid, int parentPid)
         char *cmd = getCmd(basePath, pid);
 
         // Print the status row with padding
-        printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", printPid, UID, 0, LWP, 0, STIME, "S", prettyTime, cmd);
+        printf("%-5s %-16d %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", UID, printPid, 0, LWP, 0, STIME, "S", prettyTime, cmd);
 
         // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
         free(prettyTime);
         free(cmd);
 
         // Find child processes
-        if (parentPid > 0)
+        if (parentPid == 0)
         {
             // Build path to parent's child processes folder
-            char *childPath = buildPath(basePath, parentPid, "task");
+            char *childPath = buildPath(basePath, pid, "task");
             for (int i = 0; i < 32768; i++)
             {
                 // If the child process we found is not the parent process, then process it
                 if (i != pid)
                 {
                     // Recursively Process a child PID
-                    processPid(childPath, i, parentPid);
+                    processPid(childPath, i, pid);
                 }
             }
         }
@@ -293,7 +293,7 @@ void processPid(char *basePath, int pid, int parentPid)
 int main(void)
 {
     // Print the header with padding
-    printf("%-5s %-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
+    printf("%-5s %-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
 
     // Iterate over all possible process IDs (PIDs)
     // TODO: Make this more efficient by reading files in the /proc directory
