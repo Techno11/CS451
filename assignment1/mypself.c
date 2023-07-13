@@ -142,6 +142,60 @@ char *getProcTime(int pid)
     return prettyTime;
 }
 
+char *getCmd(int pid)
+{
+    // Build path to cmdline file
+    char *cmdlineFile = buildPath(pid, "cmdline");
+    // Open the cmdline file
+    FILE *cmdlinePtr = fopen(cmdlineFile, "rb");
+
+    // Track buffer size
+    int size = 0;
+
+    // Track current and last character
+    unsigned char c = 0;
+    unsigned char last = 0;
+
+    char *buffer = malloc(1);
+    while (true)
+    {
+        // Read next character
+        c = fgetc(cmdlinePtr);
+
+        // Check for EOF
+        if (c == 255 && last == 255 && c != '\0')
+        {
+            break;
+        }
+
+        // Check for null terminator or nbsp
+        if (c == '\0' || c == 255)
+        {
+            // Extend buffer by 1, put space at end of buffer
+            buffer = realloc(buffer, size + 1);
+            buffer[size] = ' ';
+        }
+        else
+        {
+            // Extend buffer by 1, put char at end of buffer
+            buffer = realloc(buffer, size + 1);
+            buffer[size] = c;
+        }
+
+        // Increase size and set last char
+        size++;
+        last = c;
+    }
+
+    buffer[size] = 0;
+
+    // Clean up
+    free(cmdlineFile);
+    fclose(cmdlinePtr);
+
+    return buffer;
+}
+
 // Check to see if a file exists
 // @param filename The name of the file to check
 bool fileExists(char *filepath)
@@ -159,7 +213,10 @@ int main(void)
     printf("%-5s %-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
 
     // Iterate over all possible process IDs (PIDs)
-    for (int i = 0; i < 32768; i++)
+    // TODO: Make this more efficient by reading files in the /proc directory
+
+    // 32768
+    for (int i = 0; i < 5; i++)
     {
         // Build the path to the PID folder
         char *path = buildPath(i, "");
@@ -216,16 +273,17 @@ int main(void)
             char *prettyTime = getProcTime(i);
 
             // Process CMD
+            char *cmd = getCmd(i);
 
             // Print the status row with padding
-            printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, "CMD");
+            printf("%-5d %-16s %-5d %-5d %-5d %-5s %-5s %-10s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, cmd);
 
             // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
             free(prettyTime);
+            free(cmd);
 
             // For comparison purposes
             processesFound++;
-            // TODO: Read and print the processes statistics
         }
     }
 
