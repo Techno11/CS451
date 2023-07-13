@@ -1,7 +1,10 @@
 #include <sys/stat.h>   // stat
 #include <stdbool.h>    // bool type
-#include <stdio.h>    // printf 
-#include <string.h>   // strcat
+#include <stdio.h>      // printf 
+#include <string.h>     // strcat
+#include <time.h>       // ctime
+#include <stdlib.h>     // malloc
+#include <pwd.h>        // getpwuid
 
 // Check to see if a file exists
 // @param filename The name of the file to check
@@ -24,15 +27,43 @@ char* build_path(int pid, char* path) {
 int main(void) {
     int processesFound = 0;
 
+    // Print the header
+    printf("%-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s\n", "PID", "UID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
+
     // Iterate over all possible process IDs
-    for(int i = 0; i < 32768; i++) {
+    // 32768
+    for(int i = 0; i < 2; i++) {
         // Check to see if the process exists
         char* path = build_path(i, "");
 
         // Check to see if the file exists
         if(file_exists(path)) {
+            // Stat the process
+            struct stat st;
+            stat(path, &st);
+
+            // Process UID
+            struct passwd *pwd = getpwuid(st.st_uid);
+            char* UID = pwd->pw_name;
+
+            // Process PPID
+
+            // Process LWP
+
+            // Process NLWP
+
+            // Process STIME
+            char* STIME = malloc(5);
+            strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
+
+            // Process STAT
+
+            // Process TIME
+
+            // Process CMD
+
             // Print that it exists
-            printf("Process %d exists\n", i);
+            printf("%-5d %-5s %-5d %-5d %-5d %-5s %-5s %-5s %-5s\n", i, UID, 0, 0, 0, STIME, "S", "0:00", "CMD");
             processesFound++;
             // TODO: Read and print the processes statistics
             
