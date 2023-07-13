@@ -90,7 +90,7 @@ int countIntDigits(long passedInt)
 // Build a path to a file in the /proc directory
 // @param pid The process ID
 // @param path The path to the file
-char *build_path(int pid, char *path)
+char *buildPath(int pid, char *path)
 {
     // Allocate more than enough space for the path
     char *str = malloc(strlen("/proc/") + strlen(path) + 1 + 5); // 5 for "/proc/", 1 for '\0'
@@ -100,13 +100,13 @@ char *build_path(int pid, char *path)
 
 // Get process TIME value
 // @param pid The process ID
-char *get_proc_time(int pid)
+char *getProcTime(int pid)
 {
     // stat file breakdown:
     // https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=ptrace(2).-,/proc/pid/stat,-Status%20information%20about
 
     // Get the path of the stat file
-    char *statPath = build_path(pid, "/stat");
+    char *statPath = buildPath(pid, "/stat");
     // Open the stat file
     FILE *statFile = fopen(statPath, "r");
     // Create dummy variables that we don't care about
@@ -141,7 +141,7 @@ char *get_proc_time(int pid)
 
 // Check to see if a file exists
 // @param filename The name of the file to check
-bool file_exists(char *filepath)
+bool fileExists(char *filepath)
 {
     struct stat buffer;                    // reference to stat's buffer (will fill next)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
@@ -159,15 +159,15 @@ int main(void)
     for (int i = 0; i < 32768; i++)
     {
         // Build the path to the PID folder
-        char *path = build_path(i, "");
+        char *path = buildPath(i, "");
 
         // Check to see if the file exists
-        if (file_exists(path))
+        if (fileExists(path))
         {
             // IT'S A VALID PID:
 
             // Get status file inside PID folder; it has good info we need
-            char *statusFile = build_path(i, "status");
+            char *statusFile = buildPath(i, "status");
             int numOfLines = findFileLines(statusFile);
             FILE *statusPtr = fopen(statusFile, "r");
 
@@ -210,7 +210,7 @@ int main(void)
             // Process STAT
 
             // Process TIME
-            char *prettyTime = get_proc_time(i);
+            char *prettyTime = getProcTime(i);
 
             // Process CMD
 
