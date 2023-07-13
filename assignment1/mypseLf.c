@@ -8,6 +8,7 @@
 #include <string.h>   // strcat
 #include <time.h>
 #include <pwd.h>
+#include <unistd.h>   // sysconf
 
 //Finds the number of characters on a line in a file:
 //(use this with fgets() to properly declare max char size param)
@@ -86,37 +87,62 @@ int countIntDigits (long passedInt)
     return count;
 }
 
+// Build a path to a file in the /proc directory
+// @param pid The process ID
+// @param path The path to the file
+char *build_path(int pid, char* path) {
+    // Allocate more than enough space for the path
+    char* str = malloc(strlen("/proc/") + strlen(path) + 1 + 5); // 5 for "/proc/", 1 for '\0'
+    sprintf(str, "/proc/%d/%s", pid, path); // write the formatted string to buffer pointed by str
+    return str; // return the fully allocated and fully formatted/written path
+}
+
+// Get process TIME value
+// @param pid The process ID
+char *get_proc_time(int pid)
+{
+    // stat file breakdown:
+    // https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=ptrace(2).-,/proc/pid/stat,-Status%20information%20about
+
+    // Get the path of the stat file
+    char *statPath = build_path(pid, "/stat");
+    // Open the stat file
+    FILE *statFile = fopen(statPath, "r");
+    // Create dummy variables that we don't care about
+    char *a = malloc(128);
+
+    // Get the utime from the stat file
+    unsigned long int *utime = malloc(64);
+    unsigned long int *stime = malloc(64);
+    fscanf(statFile, "%s %s %s %s %s %s %s %s %s %s %s %s %s %lu %lu %s", a, a, a, a, a, a, a, a, a, a, a, a, a, utime, stime, a);
+
+    // Get the total time
+    unsigned long total = (*utime / sysconf(_SC_CLK_TCK)) + (*stime / sysconf(_SC_CLK_TCK));
+
+    // Calculate num hours
+    unsigned long hours = total / 360000;
+
+    // Calculate num minutes
+    unsigned long minutes = (total - (hours * 360000)) / 6000;
+
+    char *prettyTime = malloc(8);
+    sprintf(prettyTime, "%lu:%02lu", hours, minutes);
+
+    // Clean up
+    free(a);
+    free(utime);
+    free(stime);
+    free(statPath);
+    fclose(statFile);
+
+    return prettyTime;
+}
+
 // Check to see if a file exists
 // @param filename The name of the file to check
 bool file_exists (char *filepath) {
     struct stat buffer; //reference to stat's buffer (will fill next)
     return (stat (filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
-}
-
-// Convert an integer to a string (ERR: causes stack smash abort)
-// @param val The integer to convert
-// @param base The base to convert to (radix)
-/*char* itoa(int val, int base){
-    // Create a static buffer
-    static char buf[32] = {0};
-    // Initialize the index
-    int i = 30;
-    // Convert the integer to a string
-    for(; val && i ; --i, val /= base) {
-        buf[i] = "0123456789abcdef"[val % base];
-    }
-    // Do some fancy pointer arithmetic to return the string
-    return &buf[i+1];
-}*/
-
-// Build a path to a file in the /proc directory
-// @param pid The process ID
-// @param path The path to the file
-char* build_path(int pid, char* path) {
-    // Allocate more than enough space for the path
-    char* str = malloc(strlen("/proc/") + strlen(path) + 1 + 5); //5 for "/proc/", 1 for '\0'
-    sprintf(str, "/proc/%d/%s", pid, path); //write the formatted string to buffer pointed by str
-    return str; //return the fully allocated and fully formatted/written path
 }
 
 // Main method
@@ -128,9 +154,7 @@ int main(void) {
 
     // Iterate over all possible process IDs (PIDs)
     for(int i = 0; i < 32768; i++) {
-        // Check to see if the process exists
-        //char path[] = "/proc/";
-        //strcat(path, itoa(i, 10));
+        // Build the path to the PID folder
         char *path = build_path(i, "");
 
         // Check to see if the file exists
@@ -182,14 +206,17 @@ int main(void) {
             // Process STAT
 
             // Process TIME
+            char *prettyTime = get_proc_time(i);
 
             // Process CMD
 
             // Print that it exists
-            printf("%-5d %-5s %-5d %-5d %-5d %-5s %-5s %-5s %-5s\n", i, UID, 0, 0, 0, STIME, "S", "0:00", "CMD");
+            printf("%-5d %-5s %-5d %-5d %-5d %-5s %-5s %-5s %-5s\n", i, UID, 0, 0, 0, STIME, "S", prettyTime, "CMD");
 
-            // Print that it exists
-            //printf("Process %d exists\n", i);
+            // Free up memory
+            free(prettyTime);
+
+            // For comparison purposes
             processesFound++;
             // TODO: Read and print the processes statistics
         }
