@@ -290,11 +290,15 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
             }
         }
 
-        
         // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
         free(prettyTime);
         free(cmd);
-        free(STIME);
+
+        // Only allow parent processes to free STIME, otherwise it will fail for parents with more than one child
+        if (parentPid == 0)
+        {
+            free(STIME);
+        }
     }
 }
 
