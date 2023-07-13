@@ -205,60 +205,68 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // Open the stat file
         FILE *statFile = fopen(statPath, "r");
 
-        // Get the utime from the stat file
+        // Get the utime and stime from the stat file to use to calculate TIME value
         unsigned long int *utime = malloc(64);
         unsigned long int *stime = malloc(64);
+
+        // Get parent process ID (PPID)
         int *PPID = malloc(32);
+
+        // Get number of threads (NLWP)
         unsigned long int *NLWP = malloc(64);
-        fscanf(statFile, "%s %s %s %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s", a, a, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a);
+
+        // Get the state of the process
+        char *stateChar = malloc(32);
+
+        // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
+        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s", a, a, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a);
+
         // Clean up
         free(a);
         free(statPath);
         fclose(statFile);
+        /** Done Reading STAT File **/
 
-        // Get status file inside PID folder; it has good info we need
-        char *statusFile = buildPath(basePath, pid, "status");
-        int numOfLines = findFileLines(statusFile);
-        FILE *statusPtr = fopen(statusFile, "r");
-
+        // STAT the PID directory, allows us to get the UID of the process
         struct stat st;
         stat(path, &st);
 
         // Process UID
-        struct passwd *pwd = getpwuid(st.st_uid);
-        char *UID = pwd->pw_name;
+        struct passwd *pwd = getpwuid(st.st_uid);   // Get the passwd struct for the UID (contains username)
+        char *UID = pwd->pw_name;                   // Fetch the username from the passwd struct
 
         // Process PID
-        int printPid = pid;
-        if (parentPid > 0)
+        int printPid = pid;                         // PID to print, defaults to current PID
+        if (parentPid > 0)                          // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
         {
             printPid = parentPid;
         }
 
-        // Process LWP
+        // Process LWP                              // LWP is always the same as the current PID
         int LWP = pid;
 
         // Process STIME
-        char *STIME = malloc(5);
-        if (parentPid > 0)
+        char *STIME = malloc(5);                    // STIME to print, defaults to current STIME
+        if (parentPid > 0)                          // If the parent PID is greater than 0, we are in a child process, and the printed STIME is the parent STIME
         {
             STIME = parentSTIME;
         }
-        else
+        else                                        // If the parent PID is 0, we are in the parent process, and the printed STIME is the STIME from the STAT
         {
             strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
         }
 
         // Process STAT
+        // TODO: missing last character
 
         // Process TIME
-        char *prettyTime = getProcTime(utime, stime);
+        char *prettyTime = getProcTime(utime, stime);   // Get the pretty TIME string
 
         // Process CMD
-        char *cmd = getCmd(basePath, pid);
+        char *cmd = getCmd(basePath, pid);              // Calculate the CMD string
 
         // Print the status row with padding
-        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-5s %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, STIME, "S", prettyTime, cmd);
+        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-5c %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, STIME, *stateChar, prettyTime, cmd);
 
         // Find child processes
         if (parentPid == 0)
