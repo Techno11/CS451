@@ -183,34 +183,6 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
-int countInDirectory(char *dir)
-{
-    // Init count
-    int count = 0;
-    // Directory pointer
-    DIR *d;
-    struct dirent *dirStruct;
-    d = opendir(dir);
-    // If directory exists
-    if (d)
-    {
-        // While there are still files in the directory
-        while ((dirStruct = readdir(d)) != NULL)
-        {
-            // If the file is a directory
-            if (dirStruct->d_type == DT_DIR)
-            {
-                // Increment count
-                count++;
-            }
-        }
-        // Close directory
-        closedir(d);
-    }
-    // Return count
-    return count - 2; // -2 for . and ..
-}
-
 void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 {
     // Build the path to the PID folder
