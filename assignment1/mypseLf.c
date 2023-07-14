@@ -88,6 +88,18 @@ int countIntDigits(long passedInt)
     return count;
 }
 
+void findAndReplaceChar(char toFind, char toReplaceWith, char* str)
+{
+    for (int ind = 0; str[ind] != '\0'; ind++)
+    {
+        if (str[ind] == toFind)
+        {
+            str[ind] = toReplaceWith;
+            break; //will only replace first instance
+        }
+    }
+}
+
 // Build a path to a file in the /proc directory
 // @param pid The process ID
 // @param path The path to the file
@@ -107,13 +119,13 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     unsigned long total = (*utime / sysconf(_SC_CLK_TCK)) + (*stime / sysconf(_SC_CLK_TCK));
 
     // Calculate num hours
-    unsigned long hours = total / 360000;
+    unsigned long hours = total / 3600;
 
     // Calculate num minutes
-    unsigned long minutes = (total - (hours * 360000)) / 6000;
+    unsigned long minutes = (total - (hours * 3600)) / 60;
 
     // Calculate num seconds
-    unsigned long seconds = (total - (hours * 360000) - (minutes * 6000)) / 100;
+    unsigned long seconds = (total - (hours * 3600) - (minutes * 60));
 
     char *prettyTime = malloc(10);
     sprintf(prettyTime, "%lu:%02lu:%02lu", hours, minutes, seconds);
@@ -166,7 +178,7 @@ char *getCmd(char *basePath, int pid)
         last = c;
     }
 
-    buffer[size] = 0;
+    buffer[size] = '\0';
 
     // Clean up
     free(cmdlineFile);
@@ -218,8 +230,12 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // Get the state of the process
         char *stateChar = malloc(32);
 
+        // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
+        // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
+        char *comm = malloc(18);
+
         // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s", a, a, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a);
+        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s", a, comm, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a);
 
         // Clean up
         free(a);
@@ -264,9 +280,16 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 
         // Process CMD
         char *cmd = getCmd(basePath, pid);              // Calculate the CMD string
+        // If CMD string is blank, then use the process' comm name:
+        if (cmd[0] == ' ')
+        {
+            cmd = comm;
+            findAndReplaceChar('(', '[', cmd);
+            findAndReplaceChar(')', ']', cmd);
+        }
 
         // Print the status row with padding
-        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-5c %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, STIME, *stateChar, prettyTime, cmd);
+        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, STIME, prettyTime, cmd);
 
         // Find child processes
         if (parentPid == 0)
@@ -303,7 +326,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 int main(void)
 {
     // Print the header with padding
-    printf("%-16s %-5s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "STAT", "TIME", "CMD");
+    printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
 
     // Iterate over all possible process IDs (PIDs)
     // TODO: Make this more efficient by reading files in the /proc directory
