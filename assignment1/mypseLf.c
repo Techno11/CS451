@@ -133,6 +133,23 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     return prettyTime;
 }
 
+unsigned long long *getStartTime(unsigned long long *startTime)
+{
+
+    unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
+    //Now in seconds:
+    *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
+
+    // TODO: use /proc/uptime and ADD to totalStartTime to = STIME in raw seconds
+    //  (/proc/uptime is in seconds; read or extract the FIRST value in uptime)
+    // see man7.org/linux/man-pages/man5/proc.5.html and CTRL+F 'uptime'
+    // Format STIME into what ps does from there after seconds are calculated with uptime
+
+    return totalStartTime; //WILL BE 0 MOST OF TIME SINCE SMALL CLOCK TICKS
+    // Minutes:
+
+}
+
 char *getCmd(char *basePath, int pid)
 {
     // Build path to cmdline file
@@ -234,8 +251,25 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
         char *comm = malloc(18);
 
+        // Get start time (Either YY in years (not started in same year), "MmmDD" if it was not
+        // started the same day, or "HH:MM" otherwise.) IF-ELSEIF-ELSE
+        // Will be scanned in as unsigned long-long clock ticks:
+        // (22) starttime %llu, the time the process started after system boot.
+        unsigned long long *startTime = malloc(sizeof(unsigned long long) + 1);
+
+
         // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s", a, comm, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a);
+        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
+
+        //Now in seconds:
+        //unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
+        //*totalStartTime = (*startTime / sysconf(_SC_CLK_TCK));
+        //sysconf(_SC_CLK_TCK)
+        unsigned long long *totalSTIME = getStartTime(startTime);
+
+        //printf("%llu", (*startTime));
+        //printf(" ");
+        //printf("%llu", *totalSTIME);
 
         // Clean up
         free(a);
@@ -272,9 +306,6 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
             strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
         }
 
-        // Process STAT
-        // TODO: missing last character
-
         // Process TIME
         char *prettyTime = getProcTime(utime, stime);   // Get the pretty TIME string
 
@@ -285,6 +316,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         {
             cmd = comm;
             findAndReplaceChar('(', '[', cmd);
+            // TODO: Change find and replace last ) to start from end of string (so doesn't replace wrong guy)
             findAndReplaceChar(')', ']', cmd);
         }
 
