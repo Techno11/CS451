@@ -13,9 +13,9 @@
 
 // Finds the number of characters on a line in a file:
 //(use this with fgets() to properly declare max char size param)
-int amtOfCharOnLine(char *filepath, int lineNum)
+size_t amtOfCharOnLine(char *filepath, int lineNum)
 {
-    int totalChars = 0;
+    size_t totalChars;
     int currLineNum = 0;
     char currentChar;
 
@@ -25,23 +25,26 @@ int amtOfCharOnLine(char *filepath, int lineNum)
     // First, locate correct line to count on
     while (currentChar != EOF)
     {
-        if (currentChar == '\n')
-        {
-            currLineNum++;
-        }
         if (currLineNum == lineNum)
         {
             break;
+        }
+        if (currentChar == '\n')
+        {
+            currLineNum++;
         }
         currentChar = getc(file);
     }
 
     // Then count each character on correct line until next line or EOF is encountered:
-    while ((currentChar != EOF) && (currentChar != '\n'))
+    /*while ((currentChar != EOF) && (currentChar != '\n'))
     {
         currentChar = getc(file);
         totalChars++;
-    }
+    }*/
+    char* buffer;
+    size_t bufferSize = 32;
+    totalChars = getline(&buffer, &bufferSize, file); //will return total characters on the line (include \n)
     fclose(file);
     return totalChars;
 }
@@ -100,14 +103,25 @@ void findAndReplaceChar(char toFind, char toReplaceWith, char* str)
     }
 }
 
-// Build a path to a file in the /proc directory
+// Build a path to a file in the /proc/pid directory
 // @param pid The process ID
 // @param path The path to the file
-char *buildPath(char *basePath, int pid, char *path)
+char *buildPidPath(char *basePath, int pid, char *path)
 {
     // Allocate more than enough space for the path
     char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
     sprintf(str, "%s/%d/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
+    return str;                                                  // return the fully allocated and fully formatted/written path
+}
+
+// Build a path to a file in the /proc directory
+// @param pid The process ID
+// @param path The path to the file
+char *buildProcPath(char *basePath, char *path)
+{
+    // Allocate more than enough space for the path
+    char *str = malloc(strlen(basePath) + strlen(path) + 1); // 1 for '/'
+    sprintf(str, "%s/%s", basePath, path);               // write the formatted string to buffer pointed by str
     return str;                                                  // return the fully allocated and fully formatted/written path
 }
 
@@ -133,19 +147,63 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     return prettyTime;
 }
 
-unsigned long long *getStartTime(unsigned long long *startTime)
+char* getPrettySTIME(unsigned long long totalSTIMESeconds)
+{
+    unsigned long hours = totalSTIMESeconds / 3600;
+    unsigned long minutes = (totalSTIMESeconds - (hours * 3600)) / 60;
+    unsigned long days = hours / 24;
+    unsigned long months = days / 30;
+    unsigned long years = months / 12;
+}
+
+unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
 {
 
     unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
     //Now in seconds:
     *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
 
+    // Get the path of the stat file
+    char *procStatPath = buildProcPath(procPath, "/stat");
+    // Open the stat file
+    FILE *statFile = fopen(procStatPath, "r"); // like $ cat /proc/stat
+    char* buffer;
+    size_t buffSize = 128;
+    buffer = (char *)malloc(buffSize * sizeof(char));
+
+    int totalLines = findFileLines(procStatPath);
+    int currentLine;
+    char* substringPtr;
+
+    for (currentLine = 0; currentLine < totalLines; currentLine++)
+    {
+        getline(&buffer, &buffSize, statFile);
+        substringPtr = strstr(buffer, "btime");
+
+        //if (strstr(buffer, "btime") != NULL)
+        if (substringPtr)
+        {
+            //char* realValuePtr = substringPtr + 6;
+            char* realValueStr = (char*)malloc(sizeof(char) * (strlen(buffer)+1));
+            strcpy(realValueStr, substringPtr+6);
+            char* endPtr;
+            unsigned long realValue = strtoul(realValueStr, &endPtr, 10);
+            unsigned long long result = *totalStartTime + realValue;
+            return result;
+            // --THIS IS USING NEW ALGORITHM FOR GETTING STIME--
+            //  1. Get start_time of individual process after system boot
+            //  2. Find the system boot time in seconds
+            //  3. Add start_time (seconds) to system boot time (btime)
+        }
+    }
+
+
     // TODO: use /proc/uptime and ADD to totalStartTime to = STIME in raw seconds
     //  (/proc/uptime is in seconds; read or extract the FIRST value in uptime)
     // see man7.org/linux/man-pages/man5/proc.5.html and CTRL+F 'uptime'
     // Format STIME into what ps does from there after seconds are calculated with uptime
 
-    return totalStartTime; //WILL BE 0 MOST OF TIME SINCE SMALL CLOCK TICKS
+    //return totalStartTime; //WILL BE 0 MOST OF TIME SINCE SMALL CLOCK TICKS
     // Minutes:
 
 }
@@ -153,7 +211,7 @@ unsigned long long *getStartTime(unsigned long long *startTime)
 char *getCmd(char *basePath, int pid)
 {
     // Build path to cmdline file
-    char *cmdlineFile = buildPath(basePath, pid, "cmdline");
+    char *cmdlineFile = buildPidPath(basePath, pid, "cmdline");
     // Open the cmdline file
     FILE *cmdlinePtr = fopen(cmdlineFile, "rb");
 
@@ -215,7 +273,7 @@ bool fileExists(char *filepath)
 void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 {
     // Build the path to the PID folder
-    char *path = buildPath(basePath, pid, "");
+    char *path = buildPidPath(basePath, pid, "");
 
     // Check to see if the file exists
     if (fileExists(path))
@@ -230,7 +288,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         char *a = malloc(128);
 
         // Get the path of the stat file
-        char *statPath = buildPath(basePath, pid, "/stat");
+        char *statPath = buildPidPath(basePath, pid, "/stat");
         // Open the stat file
         FILE *statFile = fopen(statPath, "r");
 
@@ -265,7 +323,8 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         //unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
         //*totalStartTime = (*startTime / sysconf(_SC_CLK_TCK));
         //sysconf(_SC_CLK_TCK)
-        unsigned long long *totalSTIME = getStartTime(startTime);
+        unsigned long long totalSTIME = getStartTime(basePath,startTime);
+
 
         //printf("%llu", (*startTime));
         //printf(" ");
@@ -327,7 +386,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         if (parentPid == 0)
         {
             // Build path to parent's child processes folder
-            char *childPath = buildPath(basePath, pid, "task");
+            char *childPath = buildPidPath(basePath, pid, "task");
             for (int i = 0; i < 32768; i++)
             {
                 // If the child process we found is not the parent process, then process it
