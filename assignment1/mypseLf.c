@@ -139,16 +139,8 @@ char *buildPidPath(char *basePath, char *pid, char *path)
 
     // TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
     char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
-
-    /*if (pid >= 640)
-    {
-        printf("%c", '\n');
-        printf("%s/%d/%s", basePath, pid, path);
-        printf("%c", '\n');
-    }*/
-
-    sprintf(str, "%s/%s/%s", basePath, pid, path); // write the formatted string to buffer pointed by str
-    return str;                                    // return the fully allocated and fully formatted/written path
+    sprintf(str, "%s/%s/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
+    return str;                                                  // return the fully allocated and fully formatted/written path
 }
 
 // Build a path to a file in the /proc directory
@@ -352,9 +344,32 @@ char *getCmd(char *basePath, char *pid)
     // Track current and last character
     unsigned char c = 0;
     unsigned char last = 0;
-
-    char *buffer = malloc(1);
+    
+    // Measure buffer size
     while (true)
+    {
+        // Read next character
+        c = fgetc(cmdlinePtr);
+
+        // Check for EOF
+        if (c == 255 && last == 255 && c != '\0')
+        {
+            break;
+        }
+
+        // Increase size and set last char
+        size++;
+        last = c;
+    }
+
+    // Reset file pointer
+    fseek(cmdlinePtr, 0, SEEK_SET);
+    c = 0;
+    last = 0;
+
+    // Allocate buffer
+    char *buffer = malloc(size + 1);
+    for (int i = 0; i < size; i++)
     {
         // Read next character
         c = fgetc(cmdlinePtr);
@@ -368,19 +383,16 @@ char *getCmd(char *basePath, char *pid)
         // Check for null terminator or nbsp
         if (c == '\0' || c == 255)
         {
-            // Extend buffer by 1, put space at end of buffer
-            buffer = realloc(buffer, size + 1);
-            buffer[size] = ' ';
+            // Put space at end of buffer
+            buffer[i] = ' ';
         }
         else
         {
-            // Extend buffer by 1, put char at end of buffer
-            buffer = realloc(buffer, size + 1);
-            buffer[size] = c;
+            // Put char at end of buffer
+            buffer[i] = c;
         }
-
-        // Increase size and set last char
-        size++;
+        
+        // Update last char
         last = c;
     }
 
@@ -447,9 +459,6 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         // Get number of threads (NLWP)
         unsigned long int *NLWP = malloc(64);
 
-        // Get the state of the process
-        char *stateChar = malloc(32);
-
         // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
         // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
         char *comm = malloc(18);
@@ -461,7 +470,7 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         unsigned long long *startTime = malloc(sizeof(unsigned long long) + 1);
 
         // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
+        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
 
         // Get start time
         unsigned long long totalSTIME = getStartTime("/proc", startTime);
@@ -500,6 +509,7 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
 
         // Process CMD
         char *cmd = getCmd(basePath, pid); // Calculate the CMD string
+        // char *cmd = "BLAH BLAH";
         // If CMD string is blank, then use the process' comm name:
         if (cmd[0] == ' ')
         {
@@ -518,34 +528,39 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
             // Build path to parent's child processes folder
             char *childPath = buildPidPath(basePath, pid, "task");
 
-            // Open the /proc directory
-            DIR *d;
-            struct dirent *dir;
-            d = opendir(childPath);
+            printf("%s\n", childPath);
 
-            // Iterate over all files in the /proc directory
-            if (d)
+            if (fileExists(childPath))
             {
-                while ((dir = readdir(d)) != NULL)
+                // Open the /proc directory
+                DIR *d;
+                struct dirent *dir;
+                d = opendir(childPath);
+
+                // Iterate over all files in the /proc directory
+                if (d)
                 {
-                    // If the directory string is numeric, then it is a PID
-                    if (isStringNumeric(dir->d_name))
+                    while ((dir = readdir(d)) != NULL)
                     {
-                        processPid(childPath, dir->d_name, pid, cmdExeTime);
+                        char *name = dir->d_name;
+                        // If the directory string is numeric, then it is a PID
+                        if (isStringNumeric(name) && name != pid)
+                        {
+                            processPid(childPath, name, pid, cmdExeTime);
+                        }
                     }
+                    closedir(d);
                 }
-                closedir(d);
             }
         }
 
         // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
         free(prettyTime);
-        // free(cmd);
+        free(cmd);
         // free(comm);
         free(utime);
         free(stime);
         free(NLWP);
-        // free(stateChar);
     }
 }
 
