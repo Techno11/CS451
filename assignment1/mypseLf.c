@@ -208,6 +208,42 @@ unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
 
 }
 
+char* getStartTimeSoren(char* basePath, unsigned long long *statStartTime)
+{
+    // Build path to uptime file
+    char *statFile = buildProcPath("/proc", "stat");
+    printf("%s\n", statFile);
+    // Open the cmdline file
+    FILE *statPtr = fopen("/proc/stat", "rb");
+    // Variable to read from file
+    char* a = malloc(20);
+    char* b = malloc(200);
+    unsigned long long *bootTime = malloc(sizeof(unsigned long long) + 1);
+    // Read first line of uptime file
+    fscanf(statPtr, "%sbtime %s\n", a, b, a);
+    // Close uptime file
+    fclose(statPtr);
+    free(a);
+
+    printf("%s\n", b);
+
+    // printf("%llu\n", *bootTime);
+
+    // Calculate seconds from stat uptime
+    unsigned long long *statUptime = malloc(sizeof(unsigned long long) + 1);
+    *statUptime = *statStartTime / sysconf(_SC_CLK_TCK);
+
+    // Calculate seconds from uptime file
+    unsigned long long *uptime = malloc(sizeof(unsigned long long) + 1);
+    *uptime = *bootTime + *statUptime;
+
+    // Convert startTime to a string
+    char *startTimeStr = malloc(100);
+    strftime(startTimeStr, 100, "%H:%M", localtime(&uptime));
+
+    return startTimeStr;
+}
+
 char *getCmd(char *basePath, int pid)
 {
     // Build path to cmdline file
@@ -302,9 +338,6 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // Get number of threads (NLWP)
         unsigned long int *NLWP = malloc(64);
 
-        // Get the state of the process
-        char *stateChar = malloc(32);
-
         // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
         // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
         char *comm = malloc(18);
@@ -317,18 +350,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 
 
         // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, stateChar, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
-
-        //Now in seconds:
-        //unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
-        //*totalStartTime = (*startTime / sysconf(_SC_CLK_TCK));
-        //sysconf(_SC_CLK_TCK)
-        unsigned long long totalSTIME = getStartTime(basePath,startTime);
-
-
-        //printf("%llu", (*startTime));
-        //printf(" ");
-        //printf("%llu", *totalSTIME);
+        fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
 
         // Clean up
         free(a);
@@ -355,14 +377,14 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         int LWP = pid;
 
         // Process STIME
-        char *STIME = malloc(5);                    // STIME to print, defaults to current STIME
+        char *STIME = malloc(20);                    // STIME to print, defaults to current STIME
         if (parentPid > 0)                          // If the parent PID is greater than 0, we are in a child process, and the printed STIME is the parent STIME
         {
             STIME = parentSTIME;
         }
         else                                        // If the parent PID is 0, we are in the parent process, and the printed STIME is the STIME from the STAT
         {
-            strftime(STIME, 100, "%H:%M", localtime(&st.st_atime));
+            STIME = getStartTimeSoren(basePath, startTime);
         }
 
         // Process TIME
