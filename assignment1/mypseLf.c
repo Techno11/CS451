@@ -13,7 +13,7 @@
 
 // Finds the number of characters on a line in a file:
 //(use this with fgets() to properly declare max char size param)
-size_t amtOfCharOnLine(char *filepath, int lineNum)
+/*size_t amtOfCharOnLine(char *filepath, int lineNum)
 {
     size_t totalChars;
     int currLineNum = 0;
@@ -42,12 +42,22 @@ size_t amtOfCharOnLine(char *filepath, int lineNum)
         currentChar = getc(file);
         totalChars++;
     }*/
-    char* buffer;
+    /*char* buffer;
     size_t bufferSize = 32;
     totalChars = getline(&buffer, &bufferSize, file); //will return total characters on the line (include \n)
     fclose(file);
     return totalChars;
-}
+}*/
+
+/*void printStrPtr(char* str)
+{
+    if (*str == '\0')
+    {
+        return; //end of string, BASE CASE
+    }
+    printf("%c", *str);
+    printStrPtr(str++);
+}*/
 
 // Finds the total lines in a file
 int findFileLines(char *filepath)
@@ -58,6 +68,8 @@ int findFileLines(char *filepath)
 
     // Begin with opening file and getting the first character
     FILE *file = fopen(filepath, "r");
+
+    //TODO: SEGFAULT SOURCE IS HERE
     currentChar = getc(file);
 
     // While we haven't reached the end of file, count the # of newlines
@@ -91,6 +103,20 @@ int countIntDigits(long passedInt)
     return count;
 }
 
+int countULongLongDigits(unsigned long long passedLong)
+{
+    // Filter out single digits:
+    passedLong = passedLong / 10;
+    int count = 1; // digit tracker (even 0 has 1 digit)
+
+    while (passedLong != 0) // while there's still digits left (no cutoff)
+    {
+        passedLong = passedLong / 10; // cut off next decimal place
+        count++;                    // we moved over, so that's a digit
+    }
+    return count;
+}
+
 void findAndReplaceChar(char toFind, char toReplaceWith, char* str)
 {
     for (int ind = 0; str[ind] != '\0'; ind++)
@@ -103,13 +129,25 @@ void findAndReplaceChar(char toFind, char toReplaceWith, char* str)
     }
 }
 
+
+
 // Build a path to a file in the /proc/pid directory
 // @param pid The process ID
 // @param path The path to the file
 char *buildPidPath(char *basePath, int pid, char *path)
 {
     // Allocate more than enough space for the path
+
+    //TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
     char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
+
+    if (pid >= 640)
+    {
+        printf("%c", '\n');
+        printf("%s/%d/%s", basePath, pid, path);
+        printf("%c", '\n');
+    }
+
     sprintf(str, "%s/%d/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
     return str;                                                  // return the fully allocated and fully formatted/written path
 }
@@ -123,6 +161,41 @@ char *buildProcPath(char *basePath, char *path)
     char *str = malloc(strlen(basePath) + strlen(path) + 1); // 1 for '/'
     sprintf(str, "%s/%s", basePath, path);               // write the formatted string to buffer pointed by str
     return str;                                                  // return the fully allocated and fully formatted/written path
+}
+
+char* convertNumToMonth(unsigned long monthNum)
+{
+    //char month[4];
+    char* month = (char*)malloc(sizeof(char) * 4);
+    if (monthNum == 1)
+    {
+        strcpy(month, "Jan");
+    }
+    else if (monthNum == 2)
+    {
+        strcpy(month, "Feb");
+    }
+    else if (monthNum == 3)
+    {
+        strcpy(month, "Mar");
+    }
+    else if (monthNum == 4)
+    {
+        strcpy(month, "Apr");
+    }
+    else if (monthNum == 5)
+    {
+        strcpy(month, "May");
+    }
+    else if (monthNum == 6)
+    {
+        strcpy(month, "Jun");
+    }
+    else if (monthNum == 7)
+    {
+        strcpy(month, "Jul");
+    }
+    return month;
 }
 
 // Get process TIME value
@@ -147,13 +220,65 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     return prettyTime;
 }
 
-char* getPrettySTIME(unsigned long long totalSTIMESeconds)
+char* getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTime)
 {
-    unsigned long hours = totalSTIMESeconds / 3600;
-    unsigned long minutes = (totalSTIMESeconds - (hours * 3600)) / 60;
-    unsigned long days = hours / 24;
-    unsigned long months = days / 30;
-    unsigned long years = months / 12;
+    //const time_t formatTotalSTIME = time((time_t *) &totalSTIMESeconds);
+    time_t currentTime = time(NULL);
+    time_t formatTotalSTIME = currentTime - currentTime; //set time struct to 0
+    formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
+
+
+    char* strSTIME = malloc(sizeof(char) * countULongLongDigits(totalSTIMESeconds));
+    sprintf(strSTIME, "%llu", totalSTIMESeconds);
+    char* prettySTIME = malloc(sizeof(char) * strlen(strSTIME));
+
+    //unsigned long stimeHours = totalSTIMESeconds / 3600;
+    //unsigned long stimeMinutes = (totalSTIMESeconds - (stimeHours * 3600)) / 60;
+    //unsigned long stimeDays = stimeHours / 24;
+    //unsigned long stimeMonths = stimeDays / 30;
+    //unsigned long stimeYears = stimeMonths / 12;
+
+
+    struct tm *cmdDetailTime = localtime(&cmdExeTime);
+    struct tm *stimeDetailTime = localtime(&formatTotalSTIME);
+    long stimeYears = stimeDetailTime->tm_year;
+    long stimeDays = stimeDetailTime->tm_mday;
+    long stimeHours = stimeDetailTime->tm_hour;
+    long stimeMinutes = stimeDetailTime->tm_min;
+
+    //Check if not started same year or same day
+    /*unsigned long uptimeHours = currentUptime / 3600;
+    unsigned long uptimeDays = uptimeHours / 24;
+    unsigned long uptimeMonths = uptimeDays / 30;
+    unsigned long uptimeYears = uptimeMonths / 12;*/
+    long lastCMDTimeYears = cmdDetailTime->tm_year;
+    long lastCMDTimeDays = cmdDetailTime->tm_mday; //day of the month
+
+    free(strSTIME);
+
+    //if (stimeYears != uptimeYears)
+    if (stimeYears != lastCMDTimeYears)
+    {
+        //Format STIME just as Year
+        sprintf(prettySTIME, "%ld", stimeYears);
+        return prettySTIME;
+    }
+    //else if (stimeDays != uptimeDays)
+    else if (stimeDays != lastCMDTimeDays)
+    {
+        //Format STIME as Mmm:DD (where Mmm is month and DD is day)
+        //struct tm *date = localtime(&formatTotalSTIME);
+        //strptime(aa, "", localtime(totalSTIMESeconds))
+        strftime(prettySTIME, 5, "%b%d", stimeDetailTime);
+        return prettySTIME;
+    }
+    else
+    {
+        //Format STIME as HH:MM
+        sprintf(prettySTIME, "%02lu:%02lu", stimeHours, stimeMinutes);
+        return prettySTIME;
+    }
+
 }
 
 unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
@@ -164,14 +289,20 @@ unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
     *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
 
     // Get the path of the stat file
-    char *procStatPath = buildProcPath(procPath, "/stat");
+    char *procStatPath = buildProcPath(procPath, "stat"); //used to use /stat
     // Open the stat file
     FILE *statFile = fopen(procStatPath, "r"); // like $ cat /proc/stat
     char* buffer;
     size_t buffSize = 128;
     buffer = (char *)malloc(buffSize * sizeof(char));
 
-    int totalLines = findFileLines(procStatPath);
+    // FIXED SEG FAULT BY CHECKING STAT PATH (WAS GOING TOO DEEP INTO A PATH)
+    //printf("%c", '\n');
+    //printStrPtr(procStatPath);
+    //printf("%s", procStatPath);
+    //printf("%c", '\n');
+
+    int totalLines = findFileLines(procStatPath); //THERE'S A FILE THAT DOESNT EXIST = SEGFAULT
     int currentLine;
     char* substringPtr;
 
@@ -184,11 +315,14 @@ unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
         if (substringPtr)
         {
             //char* realValuePtr = substringPtr + 6;
-            char* realValueStr = (char*)malloc(sizeof(char) * (strlen(buffer)+1));
+            char* realValueStr = (char*)malloc(sizeof(char) * (strlen(buffer))+1);
             strcpy(realValueStr, substringPtr+6);
             char* endPtr;
             unsigned long realValue = strtoul(realValueStr, &endPtr, 10);
             unsigned long long result = *totalStartTime + realValue;
+            fclose(statFile);
+            free(totalStartTime);
+            free(buffer);
             return result;
             // --THIS IS USING NEW ALGORITHM FOR GETTING STIME--
             //  1. Get start_time of individual process after system boot
@@ -196,6 +330,9 @@ unsigned long long getStartTime(char* procPath, unsigned long long *startTime)
             //  3. Add start_time (seconds) to system boot time (btime)
         }
     }
+    fclose(statFile);
+    free(buffer);
+    return 0;
 
 
     // TODO: use /proc/uptime and ADD to totalStartTime to = STIME in raw seconds
@@ -270,7 +407,7 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
-void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
+void processPid(char *basePath, int pid, int parentPid, char *parentSTIME,  const time_t cmdExeTime)
 {
     // Build the path to the PID folder
     char *path = buildPidPath(basePath, pid, "");
@@ -323,7 +460,15 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         //unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
         //*totalStartTime = (*startTime / sysconf(_SC_CLK_TCK));
         //sysconf(_SC_CLK_TCK)
-        unsigned long long totalSTIME = getStartTime(basePath,startTime);
+
+        //NEW STIME ALGORITHM USING BTIME AND STARTTIME:
+
+        //SEG FAULT HERE:
+        //unsigned long long totalSTIME = getStartTime(basePath,startTime); //adds startTime to btime
+        unsigned long long totalSTIME = getStartTime("/proc",startTime);
+
+        char* prettySTIME;
+        prettySTIME = getPrettySTIME(totalSTIME, cmdExeTime);
 
 
         //printf("%llu", (*startTime));
@@ -333,6 +478,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // Clean up
         free(a);
         free(statPath);
+        free(startTime);
         fclose(statFile);
         /** Done Reading STAT File **/
 
@@ -380,7 +526,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         }
 
         // Print the status row with padding
-        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, STIME, prettyTime, cmd);
+        printf("%-16s %-5d %-5d %-5d %-5lu %-5s %-10s %-5s\n", UID, printPid, *PPID, LWP, *NLWP, prettySTIME, prettyTime, cmd); //used to be STIME
 
         // Find child processes
         if (parentPid == 0)
@@ -393,7 +539,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
                 if (i != pid)
                 {
                     // Recursively Process a child PID
-                    processPid(childPath, i, pid, STIME);
+                    processPid(childPath, i, pid, STIME, cmdExeTime);
                 }
             }
         }
@@ -401,9 +547,11 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
         // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
         free(prettyTime);
         free(cmd);
+        free(comm);
         free(utime);
         free(stime);
         free(NLWP);
+        free(stateChar);
 
         // Only allow parent processes to free STIME, otherwise it will fail for parents with more than one child
         if (parentPid == 0)
@@ -416,6 +564,9 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME)
 // Main method
 int main(void)
 {
+    //Immediately store the current time when this "ps" command was executed:
+    const time_t psCMDTime = time(NULL);
+
     // Print the header with padding
     printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
 
@@ -423,10 +574,10 @@ int main(void)
     // TODO: Make this more efficient by reading files in the /proc directory
 
     // 32768
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 32768; i++)
     {
         // Process a parent PID
-        processPid("/proc", i, 0, "");
+        processPid("/proc", i, 0, "", psCMDTime);
     }
 
     // Exit
