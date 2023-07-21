@@ -1108,6 +1108,16 @@ int countULongLongDigits(unsigned long long passedLong)
     return count;
 }
 
+long convertStrToLong(char* str)
+{
+    char* strPtr;
+    long result;
+
+    result = strtol(str, &strPtr, 10);
+
+    return result;
+}
+
 void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
 {
     if (reverse)
@@ -1510,7 +1520,11 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
 
         // Process PID
         char *printPid = pid; // PID to print, defaults to current PID
-        if (parentPid > 0)    // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
+
+        //TODO: Need to convert parentPid to parentPidNum before calling this if statement:
+        long parentPidNum = convertStrToLong(parentPid);
+
+        if (parentPidNum > 0)    // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
         {
             printPid = parentPid;
         }
@@ -1567,8 +1581,9 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                     {
                         char *name = dir->d_name;
                         // If the directory string is numeric, then it is a PID
-                        char* digitPtr;
-                        long possiblePID = strtol(name, &digitPtr, 10);
+                        //char* digitPtr;
+                        //long possiblePID = strtol(name, &digitPtr, 10);
+                        long possiblePID = convertStrToLong(name);
                         if (isStringNumeric(name) && name != pid && ((possiblePID > 0) && (possiblePID < 4194305)))
                         {
                             processPid(childPath, name, pid, cmdExeTime);
@@ -1612,8 +1627,10 @@ int main(void)
         while ((dir = readdir(d)) != NULL)
         {
             // If the directory string is numeric, then it is a PID
-            char* digitPtr;
-            long possiblePID = strtol(dir->d_name, &digitPtr, 10);
+            //char* digitPtr;
+            //long possiblePID = strtol(dir->d_name, &digitPtr, 10);
+            char* dirName = dir->d_name;
+            long possiblePID = convertStrToLong(dirName);
             if (isStringNumeric(dir->d_name) && ((possiblePID > 0) && (possiblePID < 4194305)))
             {
                 processPid("/proc", dir->d_name, "0", psCMDTime);
