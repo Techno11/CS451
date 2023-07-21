@@ -499,7 +499,6 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         char *prettyTime = getProcTime(utime, stime); // Get the pretty TIME string
 
         // Process CMD
-        // char *cmd = "YOLO BITCHES";
         char *cmd = getCmd(basePath, pid); // Calculate the CMD string
         // If CMD string is blank, then use the process' comm name:
         if (cmd[0] == ' ')
