@@ -12,54 +12,6 @@
 #include <dirent.h> // opendir, readdir, closedir
 #include <ctype.h>  // isdigit
 
-// Finds the number of characters on a line in a file:
-//(use this with fgets() to properly declare max char size param)
-/*size_t amtOfCharOnLine(char *filepath, int lineNum)
-{
-    size_t totalChars;
-    int currLineNum = 0;
-    char currentChar;
-
-    FILE *file = fopen(filepath, "r");
-    currentChar = getc(file);
-
-    // First, locate correct line to count on
-    while (currentChar != EOF)
-    {
-        if (currLineNum == lineNum)
-        {
-            break;
-        }
-        if (currentChar == '\n')
-        {
-            currLineNum++;
-        }
-        currentChar = getc(file);
-    }
-
-    // Then count each character on correct line until next line or EOF is encountered:
-    /*while ((currentChar != EOF) && (currentChar != '\n'))
-    {
-        currentChar = getc(file);
-        totalChars++;
-    }*/
-/*char* buffer;
-size_t bufferSize = 32;
-totalChars = getline(&buffer, &bufferSize, file); //will return total characters on the line (include \n)
-fclose(file);
-return totalChars;
-}*/
-
-/*void printStrPtr(char* str)
-{
-    if (*str == '\0')
-    {
-        return; //end of string, BASE CASE
-    }
-    printf("%c", *str);
-    printStrPtr(str++);
-}*/
-
 // Finds the total lines in a file
 int findFileLines(char *filepath)
 {
@@ -118,14 +70,28 @@ int countULongLongDigits(unsigned long long passedLong)
     return count;
 }
 
-void findAndReplaceChar(char toFind, char toReplaceWith, char *str)
+void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
 {
-    for (int ind = 0; str[ind] != '\0'; ind++)
+    if (reverse)
     {
-        if (str[ind] == toFind)
+        for (int ind = strlen(str); ind > 0; ind--)
         {
-            str[ind] = toReplaceWith;
-            break; // will only replace first instance
+            if (str[ind] == toFind)
+            {
+                str[ind] = toReplaceWith;
+                break; // will only replace last instance
+            }
+        }
+    }
+    else
+    {
+        for (int ind = 0; str[ind] != '\0'; ind++)
+        {
+            if (str[ind] == toFind)
+            {
+                str[ind] = toReplaceWith;
+                break; // will only replace first instance
+            }
         }
     }
 }
@@ -138,9 +104,9 @@ char *buildPidPath(char *basePath, char *pid, char *path)
     // Allocate more than enough space for the path
 
     // TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
-    char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
-    sprintf(str, "%s/%s/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
-    return str;                                                  // return the fully allocated and fully formatted/written path
+    char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 6);  // 5 for max pid length, 2 for '/'
+    sprintf(str, "%s/%s/%s", basePath, pid, path);                          // write the formatted string to buffer pointed by str
+    return str;                                                             // return the fully allocated and fully formatted/written path
 }
 
 // Build a path to a file in the /proc directory
@@ -381,7 +347,7 @@ char *getCmd(char *basePath, char *pid)
         }
 
         // Check for null terminator or nbsp
-        if (c == '\0' || c == 255)
+        if (c == '\0' || c == 255 || c == '\n')
         {
             // Put space at end of buffer
             buffer[i] = ' ';
@@ -514,9 +480,9 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         if (cmd[0] == ' ')
         {
             cmd = comm;
-            findAndReplaceChar('(', '[', cmd);
-            // TODO: Change find and replace last ) to start from end of string (so doesn't replace wrong guy) | TRAVERSE THE STRING BACKWARDS
-            findAndReplaceChar(')', ']', cmd);
+            findAndReplaceChar('(', '[', cmd, 0);
+            // Go backwards and replace last ) with ]
+            findAndReplaceChar(')', ']', cmd, 1);
         }
 
         // Print the status row with padding
@@ -527,8 +493,6 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         {
             // Build path to parent's child processes folder
             char *childPath = buildPidPath(basePath, pid, "task");
-
-            printf("%s\n", childPath);
 
             if (fileExists(childPath))
             {
