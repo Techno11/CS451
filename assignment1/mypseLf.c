@@ -141,12 +141,12 @@ char *buildPidPath(char *basePath, int pid, char *path)
     //TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
     char *str = malloc(strlen(basePath) + strlen(path) + 1 + 5); // 5 for max pid length, 1 for '/'
 
-    if (pid >= 640)
+    /*if (pid >= 640)
     {
         printf("%c", '\n');
         printf("%s/%d/%s", basePath, pid, path);
         printf("%c", '\n');
-    }
+    }*/
 
     sprintf(str, "%s/%d/%s", basePath, pid, path);               // write the formatted string to buffer pointed by str
     return str;                                                  // return the fully allocated and fully formatted/written path
@@ -478,7 +478,7 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME,  cons
         // Clean up
         free(a);
         free(statPath);
-        free(startTime);
+        //free(startTime);
         fclose(statFile);
         /** Done Reading STAT File **/
 
@@ -547,11 +547,11 @@ void processPid(char *basePath, int pid, int parentPid, char *parentSTIME,  cons
         // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
         free(prettyTime);
         free(cmd);
-        free(comm);
+        //free(comm);
         free(utime);
         free(stime);
         free(NLWP);
-        free(stateChar);
+        //free(stateChar);
 
         // Only allow parent processes to free STIME, otherwise it will fail for parents with more than one child
         if (parentPid == 0)
