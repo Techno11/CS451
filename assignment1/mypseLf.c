@@ -1157,6 +1157,15 @@ char *buildPidPath(char *basePath, char *pid, char *path)
     return str;                                                             // return the fully allocated and fully formatted/written path
 }
 
+char *buildPidMaxPath()
+{
+    //Always in /proc/sys/kernel/pid_max
+    //          123456789123456789123456 = 24 characters total + 1 for '\0'
+    char* str = malloc( sizeof(*str) * (1 +strlen("/proc") + strlen("/sys") + strlen("/kernel") + strlen("/pid_max")));
+    sprintf(str, "%s/%s/%s/%s", "/proc", "sys", "kernel", "pid_max");
+    return str;
+}
+
 // Build a path to a file in the /proc directory
 // @param pid The process ID
 // @param path The path to the file
@@ -1409,7 +1418,7 @@ int isStringNumeric(char *str)
     return 1;
 }
 
-void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime)
+void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, const size_t maxPid)
 {
     // Build the path to the PID folder
     char *path = buildPidPath(basePath, pid, "");
@@ -1559,9 +1568,9 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                         //long possiblePID = strtol(name, &digitPtr, 10);
                         long possiblePIDName = convertStrToLong(name);
                         long pidNum = convertStrToLong(pid);
-                        if (isStringNumeric(name) && (possiblePIDName != pidNum) && ((possiblePIDName > 0) && (possiblePIDName < 4194305)))
+                        if (isStringNumeric(name) && (possiblePIDName != pidNum) && ((possiblePIDName > 0) && (possiblePIDName <= maxPid)))
                         {
-                            processPid(childPath, name, pid, cmdExeTime);
+                            processPid(childPath, name, pid, cmdExeTime, maxPid);
                         }
                     }
                     closedir(d);
@@ -1583,7 +1592,19 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
 int main(void)
 {
     // Immediately store the current time when this "ps" command was executed:
-    const time_t psCMDTime = time(NULL);
+    const time_t psCMDTime = time(NULL); //DONT CHANGE!!!
+
+    // Get the max PID for this system in proc kernel directory (use for validating PIDs):
+    char* pidMaxPath = buildPidMaxPath();
+    FILE* pidMaxFile = fopen(pidMaxPath, "r");
+    char* pidMaxBuffer;
+    size_t pidMaxBufferLen = 4194304; //this is 2^22, or the PID_MAX_LIMIT for x64 systems
+    pidMaxBuffer = malloc(pidMaxBufferLen * sizeof(*pidMaxBuffer));
+    getline(&pidMaxBuffer, &pidMaxBufferLen, pidMaxFile); //will re-size if necessary
+    const size_t pidMax = convertStrToLong(pidMaxBuffer); //DONT CHANGE!!!
+    fclose(pidMaxFile);
+    free(pidMaxBuffer);
+
 
     // Print the header with padding
     printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
@@ -1606,9 +1627,9 @@ int main(void)
             //long possiblePID = strtol(dir->d_name, &digitPtr, 10);
             char* dirName = dir->d_name;
             long possiblePID = convertStrToLong(dirName);
-            if (isStringNumeric(dir->d_name) && ((possiblePID > 0) && (possiblePID < 4194305)))
+            if (isStringNumeric(dir->d_name) && ((possiblePID > 0) && (possiblePID <= pidMax)))
             {
-                processPid("/proc", dir->d_name, "0", psCMDTime);
+                processPid("/proc", dir->d_name, "0", psCMDTime, pidMax);
             }
         }
         closedir(d);
