@@ -455,7 +455,7 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
 
         // Process PID
         char *printPid = pid; // PID to print, defaults to current PID
-        if (parentPid > 0)    // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
+        if (parentPid != "0")    // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
         {
             printPid = parentPid;
         }
@@ -562,7 +562,7 @@ int main(void)
         while ((dir = readdir(d)) != NULL)
         {
             // If the directory string is numeric, then it is a PID
-            if (isStringNumeric(dir->d_name))
+            if (isStringNumeric(dir->d_name) && dir->d_name != "0")
             {
                 processPid("/proc", dir->d_name, "0", psCMDTime);
             }
