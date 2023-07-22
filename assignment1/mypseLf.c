@@ -197,7 +197,7 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
 
     struct tm *cmdDetailTime = localtime(&cmdExeTime);
     struct tm *stimeDetailTime = localtime(&formatTotalSTIME);
-    long stimeYears = stimeDetailTime->tm_year;
+    long stimeYears = stimeDetailTime->tm_year + 1900; // add 1900 to get actual year
     long stimeDays = stimeDetailTime->tm_mday;
     long stimeHours = stimeDetailTime->tm_hour;
     long stimeMinutes = stimeDetailTime->tm_min;
@@ -239,7 +239,7 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
 unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
 {
 
-    unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
+    unsigned long long *totalStartTime;
     // Now in seconds:
     *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
 
@@ -276,7 +276,6 @@ unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
             unsigned long realValue = strtoul(realValueStr, &endPtr, 10);
             unsigned long long result = *totalStartTime + realValue;
             fclose(statFile);
-            free(totalStartTime);
             free(buffer);
             return result;
             // --THIS IS USING NEW ALGORITHM FOR GETTING STIME--
@@ -405,7 +404,7 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
         char *a = malloc(128);
 
         // Get the path of the stat file
-        char *statPath = buildPidPath(basePath, pid, "/stat");
+        char *statPath = buildPidPath(basePath, pid, "stat");
         // Open the stat file
         FILE *statFile = fopen(statPath, "r");
 
