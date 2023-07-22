@@ -1848,7 +1848,7 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     unsigned long uptimeDays = uptimeHours / 24;
     unsigned long uptimeMonths = uptimeDays / 30;
     unsigned long uptimeYears = uptimeMonths / 12;*/
-    long lastCMDTimeYears = cmdDetailTime->tm_year;
+    long lastCMDTimeYears = cmdDetailTime->tm_year + 1900;
     long lastCMDTimeDays = cmdDetailTime->tm_mday; // day of the month
 
     free(strSTIME);
