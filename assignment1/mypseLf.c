@@ -44,11 +44,11 @@
         currentChar = getc(file);
         totalChars++;
     }*/
-    /*char* buffer;
-    size_t bufferSize = 32;
-    totalChars = getline(&buffer, &bufferSize, file); //will return total characters on the line (include \n)
-    fclose(file);
-    return totalChars;
+/*char* buffer;
+size_t bufferSize = 32;
+totalChars = getline(&buffer, &bufferSize, file); //will return total characters on the line (include \n)
+fclose(file);
+return totalChars;
 }*/
 
 /*
@@ -1745,9 +1745,9 @@ char *buildPidPath(char *basePath, char *pid, char *path)
     // Allocate more than enough space for the path
 
     // TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
-    char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 6);  // 5 for max pid length, 2 for '/'
-    sprintf(str, "%s/%s/%s", basePath, pid, path);                          // write the formatted string to buffer pointed by str
-    return str;                                                             // return the fully allocated and fully formatted/written path
+    char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 6); // 5 for max pid length, 2 for '/'
+    sprintf(str, "%s/%s/%s", basePath, pid, path);                         // write the formatted string to buffer pointed by str
+    return str;                                                            // return the fully allocated and fully formatted/written path
 }
 
 // Build a path to a file in the /proc directory
@@ -1823,7 +1823,8 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
 {
     // const time_t formatTotalSTIME = time((time_t *) &totalSTIMESeconds);
     time_t currentTime = time(NULL);
-    time_t formatTotalSTIME = currentTime - currentTime; // set time struct to 0
+    time_t formatTotalSTIME;
+    formatTotalSTIME = currentTime - currentTime; // set time struct to 0
     formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
 
     char *strSTIME = malloc(sizeof(char) * countULongLongDigits(totalSTIMESeconds));
@@ -1838,7 +1839,8 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
 
     struct tm *cmdDetailTime = localtime(&cmdExeTime);
     struct tm *stimeDetailTime = localtime(&formatTotalSTIME);
-    long stimeYears = stimeDetailTime->tm_year + 1900; // add 1900 to get actual year
+
+    int stimeYears = stimeDetailTime->tm_year + 1900; // add 1900 to get actual year
     long stimeDays = stimeDetailTime->tm_mday;
     long stimeHours = stimeDetailTime->tm_hour;
     long stimeMinutes = stimeDetailTime->tm_min;
@@ -1857,10 +1859,10 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     if (stimeYears != lastCMDTimeYears)
     {
         // Format STIME just as Year
-        sprintf(prettySTIME, "%ld", stimeYears);
+        sprintf(prettySTIME, "%d", stimeYears);
         return prettySTIME;
     }
-        // else if (stimeDays != uptimeDays)
+    // else if (stimeDays != uptimeDays)
     else if (stimeDays != lastCMDTimeDays)
     {
         // Format STIME as Mmm:DD (where Mmm is month and DD is day)
@@ -1877,28 +1879,16 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     }
 }
 
-unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
+unsigned long getBootTime()
 {
-
-    unsigned long long *totalStartTime;
-    // Now in seconds:
-    *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
-
-    // Get the path of the stat file
-    char *procStatPath = buildProcPath(procPath, "stat"); // used to use /stat
     // Open the stat file
-    FILE *statFile = fopen(procStatPath, "r"); // like $ cat /proc/stat
+    FILE *statFile = fopen("/proc/stat", "r"); // like $ cat /proc/stat
     char *buffer;
     size_t buffSize = 128;
     buffer = (char *)malloc(buffSize * sizeof(char));
 
-    // FIXED SEG FAULT BY CHECKING STAT PATH (WAS GOING TOO DEEP INTO A PATH)
-    // printf("%c", '\n');
-    // printStrPtr(procStatPath);
-    // printf("%s", procStatPath);
-    // printf("%c", '\n');
-
-    int totalLines = findFileLines(procStatPath); // THERE'S A FILE THAT DOESNT EXIST = SEGFAULT
+    // Count # of lines in file
+    int totalLines = findFileLines("/proc/stat"); // THERE'S A FILE THAT DOESNT EXIST = SEGFAULT
     int currentLine;
     char *substringPtr;
 
@@ -1907,35 +1897,23 @@ unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
         getline(&buffer, &buffSize, statFile);
         substringPtr = strstr(buffer, "btime");
 
-        // if (strstr(buffer, "btime") != NULL)
         if (substringPtr)
         {
             // char* realValuePtr = substringPtr + 6;
             char *realValueStr = (char *)malloc(sizeof(char) * (strlen(buffer)) + 1);
             strcpy(realValueStr, substringPtr + 6);
             char *endPtr;
-            unsigned long realValue = strtoul(realValueStr, &endPtr, 10);
-            unsigned long long result = *totalStartTime + realValue;
+            unsigned long bootTime = strtoul(realValueStr, &endPtr, 10);
             fclose(statFile);
             free(buffer);
-            return result;
-            // --THIS IS USING NEW ALGORITHM FOR GETTING STIME--
-            //  1. Get start_time of individual process after system boot
-            //  2. Find the system boot time in seconds
-            //  3. Add start_time (seconds) to system boot time (btime)
+            return bootTime;
         }
     }
+
+    // Failed to find btime
     fclose(statFile);
     free(buffer);
     return 0;
-
-    // TODO: use /proc/uptime and ADD to totalStartTime to = STIME in raw seconds
-    //  (/proc/uptime is in seconds; read or extract the FIRST value in uptime)
-    // see man7.org/linux/man-pages/man5/proc.5.html and CTRL+F 'uptime'
-    // Format STIME into what ps does from there after seconds are calculated with uptime
-
-    // return totalStartTime; //WILL BE 0 MOST OF TIME SINCE SMALL CLOCK TICKS
-    //  Minutes:
 }
 
 char *getCmd(char *basePath, char *pid)
@@ -2020,9 +1998,9 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
-long getIndexOf(char* sourceStr, char* destStr)
+long getIndexOf(char *sourceStr, char *destStr)
 {
-    //Pointer subtraction:
+    // Pointer subtraction:
     long indexPosition = destStr - sourceStr;
     return indexPosition;
 }
@@ -2042,7 +2020,7 @@ int isStringNumeric(char *str)
 }
 
 // Print a PID line for the program
-void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const time_t cmdExeTime)
+void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, unsigned long bootTime)
 {
     /** READ STAT FILE **/
     // stat file breakdown:
@@ -2079,8 +2057,11 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
     // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
     fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
 
-    // Get start time
-    unsigned long long totalSTIME = getStartTime("/proc", startTime);
+    printf("startTime: %llu\n", *startTime);
+
+    // Calculate start time
+    unsigned long long totalStartTime = *startTime / sysconf(_SC_CLK_TCK); // seconds
+    unsigned long long totalSTIME = totalStartTime + bootTime;
 
     // And make it pretty ;)
     char *prettySTIME;
@@ -2089,7 +2070,7 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
     // Clean up
     free(a);
     free(statPath);
-    // free(startTime);
+    free(startTime);
     fclose(statFile);
     /** Done Reading STAT File **/
 
@@ -2103,7 +2084,7 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
 
     // Process PID
     char *printPid = pid; // PID to print, defaults to current PID
-    if (parentPid != "0")    // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
+    if (parentPid != "0") // If the parent PID is greater than 0, we are in a child process, and the printed PID is the parent PID
     {
         printPid = parentPid;
     }
@@ -2127,8 +2108,8 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
     }
     else
     {
-        //Truncate any end arguments at the end using pattern ' -'
-        char* substrPtr;
+        // Truncate any end arguments at the end using pattern ' -'
+        char *substrPtr;
         substrPtr = strstr(cmd, " -");
         if (substrPtr)
         {
@@ -2149,7 +2130,7 @@ void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const 
     free(NLWP);
 }
 
-void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime)
+void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, unsigned long bootTime)
 {
     // Build the path to the PID folder
     char *path = buildPidPath(basePath, pid, "");
@@ -2158,7 +2139,7 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
     if (fileExists(path))
     {
         // IT'S A VALID PID:
-        printPidLine(path, basePath, pid, parentPid, cmdExeTime);
+        printPidLine(path, basePath, pid, parentPid, cmdExeTime, bootTime);
 
         // Find child processes
         if (parentPid == "0")
@@ -2183,8 +2164,8 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                         // If the directory string is numeric, then it is a PID
                         if (isStringNumeric(name) && strcmp(name, pid) != 0)
                         {
-                            char* cPath = buildPidPath(childPath, name, "");
-                            printPidLine(cPath, childPath, name, pid, cmdExeTime);
+                            char *cPath = buildPidPath(childPath, name, "");
+                            printPidLine(cPath, childPath, name, pid, cmdExeTime, bootTime);
                             free(cPath);
                         }
                     }
@@ -2201,8 +2182,17 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
 // Main method
 int main(void)
 {
+
+    // getPrettySTIME(78856361931648234, 1689994820);
+    // return 1;
+
     // Immediately store the current time when this "ps" command was executed:
     const time_t psCMDTime = time(NULL);
+
+    // Get system boot time
+    unsigned long bootTime = getBootTime();
+
+    printf("bootTime: %lu\n", bootTime);
 
     // Print the header with padding
     printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
@@ -2223,7 +2213,7 @@ int main(void)
             // If the directory string is numeric, then it is a PID
             if (isStringNumeric(dir->d_name) && dir->d_name != "0")
             {
-                processPid("/proc", dir->d_name, "0", psCMDTime);
+                processPid("/proc", dir->d_name, "0", psCMDTime, bootTime);
             }
         }
         closedir(d);
