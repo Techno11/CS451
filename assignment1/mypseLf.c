@@ -1152,7 +1152,7 @@ char *buildPidPath(char *basePath, char *pid, char *path)
     // Allocate more than enough space for the path
 
     // TODO: POSSIBLE SIGABRT (ABORT CORE DUMPED) HERE (Option 1) with malloc:
-    char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 6);  // 5 for max pid length, 2 for '/'
+    char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 7);  // 5 for max pid length, 2 for '/'
     sprintf(str, "%s/%s/%s", basePath, pid, path);                          // write the formatted string to buffer pointed by str
     return str;                                                             // return the fully allocated and fully formatted/written path
 }
@@ -1163,45 +1163,12 @@ char *buildPidPath(char *basePath, char *pid, char *path)
 char *buildProcPath(char *basePath, char *path)
 {
     // Allocate more than enough space for the path
-    char *str = malloc(strlen(basePath) + strlen(path) + 1); // 1 for '/'
+    char *str = malloc(strlen(basePath) + strlen(path) + 3); // 1 for '/'
     sprintf(str, "%s/%s", basePath, path);                   // write the formatted string to buffer pointed by str
     return str;                                              // return the fully allocated and fully formatted/written path
 }
 
-char *convertNumToMonth(unsigned long monthNum)
-{
-    // char month[4];
-    char *month = (char *)malloc(sizeof(char) * 4);
-    if (monthNum == 1)
-    {
-        strcpy(month, "Jan");
-    }
-    else if (monthNum == 2)
-    {
-        strcpy(month, "Feb");
-    }
-    else if (monthNum == 3)
-    {
-        strcpy(month, "Mar");
-    }
-    else if (monthNum == 4)
-    {
-        strcpy(month, "Apr");
-    }
-    else if (monthNum == 5)
-    {
-        strcpy(month, "May");
-    }
-    else if (monthNum == 6)
-    {
-        strcpy(month, "Jun");
-    }
-    else if (monthNum == 7)
-    {
-        strcpy(month, "Jul");
-    }
-    return month;
-}
+
 
 // Get process TIME value
 // @param pid The process ID
@@ -1239,15 +1206,11 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     time_t formatTotalSTIME = currentTime - currentTime; // set time struct to 0
     formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
 
-    char *strSTIME = malloc(sizeof(char) * countULongLongDigits(totalSTIMESeconds));
+    //char *strSTIME = malloc(sizeof(char) * countULongLongDigits(totalSTIMESeconds));
+    char *strSTIME = malloc(sizeof(*strSTIME) * (countULongLongDigits(totalSTIMESeconds)));
     sprintf(strSTIME, "%llu", totalSTIMESeconds);
-    char *prettySTIME = malloc(sizeof(char) * strlen(strSTIME));
-
-    // unsigned long stimeHours = totalSTIMESeconds / 3600;
-    // unsigned long stimeMinutes = (totalSTIMESeconds - (stimeHours * 3600)) / 60;
-    // unsigned long stimeDays = stimeHours / 24;
-    // unsigned long stimeMonths = stimeDays / 30;
-    // unsigned long stimeYears = stimeMonths / 12;
+    //char *prettySTIME = malloc(sizeof(char) * strlen(strSTIME));
+    char *prettySTIME = malloc(sizeof(*prettySTIME) * strlen(strSTIME));
 
     struct tm *cmdDetailTime = localtime(&cmdExeTime);
     struct tm *stimeDetailTime = localtime(&formatTotalSTIME);
@@ -1256,11 +1219,6 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     long stimeHours = stimeDetailTime->tm_hour;
     long stimeMinutes = stimeDetailTime->tm_min;
 
-    // Check if not started same year or same day
-    /*unsigned long uptimeHours = currentUptime / 3600;
-    unsigned long uptimeDays = uptimeHours / 24;
-    unsigned long uptimeMonths = uptimeDays / 30;
-    unsigned long uptimeYears = uptimeMonths / 12;*/
     long lastCMDTimeYears = cmdDetailTime->tm_year;
     long lastCMDTimeDays = cmdDetailTime->tm_mday; // day of the month
 
@@ -1292,8 +1250,8 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
 
 unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
 {
-
-    unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
+    //unsigned long long *totalStartTime = malloc(sizeof(unsigned long long) + 1);
+    unsigned long long *totalStartTime = malloc((sizeof(*totalStartTime) * countULongLongDigits(*startTime)) + 1);
     // Now in seconds:
     *totalStartTime = (*startTime / sysconf(_SC_CLK_TCK)); // seconds
     //free(startTime);
@@ -1304,7 +1262,8 @@ unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
     FILE *statFile = fopen(procStatPath, "r"); // like $ cat /proc/stat
     char *buffer;
     size_t buffSize = 128;
-    buffer = (char *)malloc(buffSize * sizeof(char));
+    //buffer = malloc(buffSize * sizeof(char)); //used to be char* cast here
+    buffer = malloc(buffSize * sizeof(*buffer)); //used to be char* cast here
 
     // FIXED SEG FAULT BY CHECKING STAT PATH (WAS GOING TOO DEEP INTO A PATH)
     // printf("%c", '\n');
@@ -1325,7 +1284,8 @@ unsigned long long getStartTime(char *procPath, unsigned long long *startTime)
         if (substringPtr)
         {
             // char* realValuePtr = substringPtr + 6;
-            char *realValueStr = (char *)malloc(sizeof(char) * (strlen(buffer)) + 1);
+            //char *realValueStr = malloc(sizeof(char) * (strlen(buffer)) + 1);
+            char *realValueStr = malloc(sizeof(*realValueStr) * (strlen(buffer)) + 1);
             strcpy(realValueStr, substringPtr + 6);
             char *endPtr;
             unsigned long realValue = strtoul(realValueStr, &endPtr, 10);
@@ -1469,7 +1429,7 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         char *a = malloc(128);
 
         // Get the path of the stat file
-        char *statPath = buildPidPath(basePath, pid, "/stat");
+        char *statPath = buildPidPath(basePath, pid, "stat");
         // Open the stat file
         FILE *statFile = fopen(statPath, "r");
 
@@ -1491,7 +1451,21 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
         // started the same day, or "HH:MM" otherwise.) IF-ELSEIF-ELSE
         // Will be scanned in as unsigned long-long clock ticks:
         // (22) starttime %llu, the time the process started after system boot.
-        unsigned long long *startTime = (unsigned long long *)malloc(sizeof(unsigned long long) + 1);
+        char* lenBuffer;
+        size_t lenBufferSize = 128;
+        //lenBuffer = malloc(lenBufferSize * sizeof(char));
+        lenBuffer = malloc(lenBufferSize * sizeof(*lenBuffer));
+        FILE* dupStatFile = fopen(statPath, "r");
+        size_t statLength = getline(&lenBuffer, &lenBufferSize, dupStatFile);
+        fclose(dupStatFile);
+
+        //To be safe, we'll allocate:
+        //  the size in bytes of startTime's type
+        //* (length of statfile in chars
+        //+ length of stat file line buffer in bytes
+        //+ 2048 [2^11] safety net for ulong)
+        unsigned long long *startTime = malloc((sizeof(*startTime) * (statLength + lenBufferSize + 2048)));
+        free(lenBuffer);
 
         // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
         fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
@@ -1583,8 +1557,9 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                         // If the directory string is numeric, then it is a PID
                         //char* digitPtr;
                         //long possiblePID = strtol(name, &digitPtr, 10);
-                        long possiblePID = convertStrToLong(name);
-                        if (isStringNumeric(name) && name != pid && ((possiblePID > 0) && (possiblePID < 4194305)))
+                        long possiblePIDName = convertStrToLong(name);
+                        long pidNum = convertStrToLong(pid);
+                        if (isStringNumeric(name) && (possiblePIDName != pidNum) && ((possiblePIDName > 0) && (possiblePIDName < 4194305)))
                         {
                             processPid(childPath, name, pid, cmdExeTime);
                         }
