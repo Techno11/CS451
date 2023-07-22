@@ -156,7 +156,8 @@ char *convertNumToMonth(unsigned long monthNum)
 }
 
 // Get process TIME value
-// @param pid The process ID
+// @param utime Utime from the process stat file
+// @param stime stime from the process stat file
 char *getProcTime(unsigned long int *utime, unsigned long int *stime)
 {
     // Get the total time
@@ -393,6 +394,7 @@ int isStringNumeric(char *str)
     return 1;
 }
 
+// Print a PID line for the program
 void printPidLine(char* path, char *basePath, char *pid, char *parentPid, const time_t cmdExeTime)
 {
             /** READ STAT FILE **/
