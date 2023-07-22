@@ -522,7 +522,7 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                         // Get the name of the directory
                         char *name = dir->d_name;
                         // If the directory string is numeric, then it is a PID
-                        if (isStringNumeric(name) && name != pid)
+                        if (isStringNumeric(name) && strcmp(name, pid) != 0)
                         {
                             char* cPath = buildPidPath(childPath, name, "");
                             printPidLine(cPath, childPath, name, pid, cmdExeTime);
