@@ -2057,8 +2057,6 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
     fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
 
-    printf("startTime: %llu\n", *startTime);
-
     // Calculate start time
     unsigned long long totalStartTime = *startTime / sysconf(_SC_CLK_TCK); // seconds
     unsigned long long totalSTIME = totalStartTime + bootTime;
@@ -2191,8 +2189,6 @@ int main(void)
 
     // Get system boot time
     unsigned long bootTime = getBootTime();
-
-    printf("bootTime: %lu\n", bootTime);
 
     // Print the header with padding
     printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
