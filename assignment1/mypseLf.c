@@ -216,6 +216,7 @@ unsigned long getBootTime()
             unsigned long bootTime = strtoul(realValueStr, &endPtr, 10);
             fclose(statFile);
             free(buffer);
+            free(realValueStr);
             return bootTime;
         }
     }
@@ -409,14 +410,25 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
 
     // Process CMD
     char *cmd = getCmd(basePath, pid); // Calculate the CMD string
-    // char *cmd = "BLAH BLAH";
+    int freeComm = true;
+
     // If CMD string is blank, then use the process' comm name:
     if (cmd[0] == ' ')
     {
+        // Free CMD, as it was malloc'd
+        free(cmd);
+
+        // We don't need to clear comm, as it will be freed under "free(cmd)" later
+        freeComm = false;
+
+        // Set CMD to comm
         cmd = comm;
-        findAndReplaceChar('(', '[', cmd, 0);
+        
+        // Go forward and replace first ( with [
+        findAndReplaceChar('(', '[', cmd, false);
+
         // Go backwards and replace last ) with ]
-        findAndReplaceChar(')', ']', cmd, 1);
+        findAndReplaceChar(')', ']', cmd, true);
     }
     else
     {
@@ -435,11 +447,18 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
 
     // Free up memory (anything that was malloc'd above should be freed here before the next loop iteration)
     free(prettyTime);
+    free(prettySTIME);
     free(cmd);
-    //free(comm);
     free(utime);
     free(stime);
     free(NLWP);
+    free(PPID);
+
+    // Comm only needs to be cleared if it was not used as the CMD
+    if(freeComm == true)
+    {
+        free(comm);
+    }
 }
 
 void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, unsigned long bootTime)
@@ -488,6 +507,9 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
                     closedir(d);
                 }
             }
+
+            // Free child path
+            free(childPath);
         }
     }
 
@@ -498,10 +520,6 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
 // Main method
 int main(void)
 {
-
-    // getPrettySTIME(78856361931648234, 1689994820);
-    // return 1;
-
     // Immediately store the current time when this "ps" command was executed:
     const time_t psCMDTime = time(NULL);
 
