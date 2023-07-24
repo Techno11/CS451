@@ -135,10 +135,10 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     formatTotalSTIME = currentTime - currentTime; // set time struct to 0
     formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
 
-    char *strSTIME = malloc(sizeof(char) * countULongLongDigits(totalSTIMESeconds));
+    char *strSTIME = malloc((sizeof(char) * countULongLongDigits(totalSTIMESeconds))+ 1);
     sprintf(strSTIME, "%llu", totalSTIMESeconds);
     //TODO: 1,780 bytes and 4,030 bytes lost here (DEF. LEAK):
-    char *prettySTIME = malloc(sizeof(char) * strlen(strSTIME));
+    char *prettySTIME = malloc((sizeof(char) * strlen(strSTIME)) + 1);
 
     // unsigned long stimeHours = totalSTIMESeconds / 3600;
     // unsigned long stimeMinutes = (totalSTIMESeconds - (stimeHours * 3600)) / 60;
@@ -338,7 +338,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     // https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=ptrace(2).-,/proc/pid/stat,-Status%20information%20about
 
     // Create dummy variables that we don't care about
-    char *a = malloc(128);
+    //char *a = malloc(128);
 
     // Get the path of the stat file
     char *statPath = buildPidPath(basePath, pid, "stat");
@@ -346,27 +346,41 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     FILE *statFile = fopen(statPath, "r");
 
     // Get the utime and stime from the stat file to use to calculate TIME value
-    unsigned long int *utime = malloc(64);
-    unsigned long int *stime = malloc(64);
+    unsigned long int *utime = malloc(sizeof(unsigned long int) + 64);
+    unsigned long int *stime = malloc(sizeof(unsigned long int) + 64);
 
     // Get parent process ID (PPID)
-    int *PPID = malloc(32);  //TODO: 5,696 and 12,896 bytes lost here (DEF. LEAK)
+    int *PPID = malloc(sizeof(int));  //TODO: 5,696 and 12,896 bytes lost here (DEF. LEAK)
 
     // Get number of threads (NLWP)
-    unsigned long int *NLWP = malloc(64);
+    unsigned long int *NLWP = malloc(sizeof(unsigned long int));
 
     // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
     // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
-    char *comm = malloc(18); //TODO: 1,980 bytes and 7,254 bytes lost here (DEF. LEAK)
+    char *commPath = buildPidPath(basePath, pid, "comm");
+    // Open the comm file
+    FILE *commFile = fopen(commPath, "r");
+    // Get the size of the comm file
+    fscanf(commFile, "%*s");
+    long sz = ftell(commFile);
+    fclose(commFile);
+    free(commPath);
+
+    // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
+    // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
+    char *comm = malloc((sizeof(char) * sz) + 3); //TODO: 1,980 bytes and 7,254 bytes lost here (DEF. LEAK)
 
     // Get start time (Either YY in years (not started in same year), "MmmDD" if it was not
     // started the same day, or "HH:MM" otherwise.) IF-ELSEIF-ELSE
     // Will be scanned in as unsigned long-long clock ticks:
     // (22) starttime %llu, the time the process started after system boot.
-    unsigned long long *startTime = malloc(sizeof(*startTime));
+    unsigned long long *startTime = malloc(sizeof(*startTime) + 1);
 
     // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-    fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
+    //fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
+    fscanf(statFile, "%*s %s %*c %d %*s %*s %*s %*s %*s %*s %*s %*s %*s %lu %lu %*s %*s %*s %*s %lu %*s %llu %*s", comm, PPID, utime, stime, NLWP, startTime);
+
+
 
     // Calculate start time
     unsigned long long totalStartTime = *startTime / sysconf(_SC_CLK_TCK); // seconds
@@ -377,7 +391,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     prettySTIME = getPrettySTIME(totalSTIME, cmdExeTime);
 
     // Clean up
-    free(a);
+    //free(a);
     free(statPath);
     free(startTime);
     fclose(statFile);
@@ -423,7 +437,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
 
         // Set CMD to comm
         cmd = comm;
-        
+
         // Go forward and replace first ( with [
         findAndReplaceChar('(', '[', cmd, false);
 
