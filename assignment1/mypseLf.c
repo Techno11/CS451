@@ -13,6 +13,7 @@
 #include <ctype.h>  // isdigit
 
 // Finds the total lines in a file
+// @param filepath The path to the file
 int findFileLines(char *filepath)
 {
     // Initialize values for total file line count and character tracker
@@ -40,6 +41,8 @@ int findFileLines(char *filepath)
     //(e.g. 0 1 2 = ...\n...\n...EOF = total lines are 3
 }
 
+// Count the number of digits in an unsigned long long
+// @param passedLong The unsigned long long to count digits of
 int countULongLongDigits(unsigned long long passedLong)
 {
     // Filter out single digits:
@@ -54,6 +57,12 @@ int countULongLongDigits(unsigned long long passedLong)
     return count;
 }
 
+
+// Find and replace a char in a string
+// @param toFind The char to find
+// @param toReplaceWith The char to replace with
+// @param str The string to search
+// @param reverse Whether to search in reverse
 void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
 {
     if (reverse)
@@ -86,8 +95,6 @@ void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
 char *buildPidPath(char *basePath, char *pid, char *path)
 {
     // Allocate more than enough space for the path
-
-    //TODO: 3,236 bytes lost here (DEF. LEAK)
     char *str = malloc(strlen(basePath) + strlen(path) + strlen(pid) + 6); // 5 for max pid length, 2 for '/'
     sprintf(str, "%s/%s/%s", basePath, pid, path);                         // write the formatted string to buffer pointed by str
     return str;                                                            // return the fully allocated and fully formatted/written path
@@ -127,56 +134,47 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     return prettyTime;
 }
 
+// Get process STIME value
+// @param totalSTIMESeconds Total STIME seconds
+// @param cmdExeTime Time when the ps command was executed
 char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTime)
 {
-    // const time_t formatTotalSTIME = time((time_t *) &totalSTIMESeconds);
+    // Setup time struct
     time_t currentTime = time(NULL);
     time_t formatTotalSTIME;
     formatTotalSTIME = currentTime - currentTime; // set time struct to 0
     formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
 
+    // Get total STIME seconds as a string
     char *strSTIME = malloc((sizeof(char) * countULongLongDigits(totalSTIMESeconds))+ 1);
     sprintf(strSTIME, "%llu", totalSTIMESeconds);
-    //TODO: 1,780 bytes and 4,030 bytes lost here (DEF. LEAK):
     char *prettySTIME = malloc((sizeof(char) * strlen(strSTIME)) + 1);
 
-    // unsigned long stimeHours = totalSTIMESeconds / 3600;
-    // unsigned long stimeMinutes = (totalSTIMESeconds - (stimeHours * 3600)) / 60;
-    // unsigned long stimeDays = stimeHours / 24;
-    // unsigned long stimeMonths = stimeDays / 30;
-    // unsigned long stimeYears = stimeMonths / 12;
-
+    // Get current time as a string
     struct tm *cmdDetailTime = localtime(&cmdExeTime);
     struct tm *stimeDetailTime = localtime(&formatTotalSTIME);
 
+    // Get current time details
     int stimeYears = stimeDetailTime->tm_year + 1900; // add 1900 to get actual year
     long stimeDays = stimeDetailTime->tm_mday;
     long stimeHours = stimeDetailTime->tm_hour;
     long stimeMinutes = stimeDetailTime->tm_min;
 
     // Check if not started same year or same day
-    /*unsigned long uptimeHours = currentUptime / 3600;
-    unsigned long uptimeDays = uptimeHours / 24;
-    unsigned long uptimeMonths = uptimeDays / 30;
-    unsigned long uptimeYears = uptimeMonths / 12;*/
     long lastCMDTimeYears = cmdDetailTime->tm_year + 1900;
     long lastCMDTimeDays = cmdDetailTime->tm_mday; // day of the month
 
     free(strSTIME);
 
-    // if (stimeYears != uptimeYears)
     if (stimeYears != lastCMDTimeYears)
     {
         // Format STIME just as Year
         sprintf(prettySTIME, "%d", stimeYears);
         return prettySTIME;
     }
-        // else if (stimeDays != uptimeDays)
     else if (stimeDays != lastCMDTimeDays)
     {
         // Format STIME as Mmm:DD (where Mmm is month and DD is day)
-        // struct tm *date = localtime(&formatTotalSTIME);
-        // strptime(aa, "", localtime(totalSTIMESeconds))
         strftime(prettySTIME, 5, "%b%d", stimeDetailTime);
         return prettySTIME;
     }
@@ -188,6 +186,7 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     }
 }
 
+// Get system boot time
 unsigned long getBootTime()
 {
     // Open the stat file
@@ -227,6 +226,9 @@ unsigned long getBootTime()
     return 0;
 }
 
+// Get the CMD value for a process
+// @param basePath The base path to the /proc directory
+// @param pid The process ID
 char *getCmd(char *basePath, char *pid)
 {
     // Build path to cmdline file
@@ -309,6 +311,9 @@ bool fileExists(char *filepath)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
+// Uses pointer arithmetic to get the new position of a string
+// @param sourceStr The source string
+// @param destStr The destination string
 long getIndexOf(char *sourceStr, char *destStr)
 {
     // Pointer subtraction:
@@ -336,9 +341,6 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     /** READ STAT FILE **/
     // stat file breakdown:
     // https://man7.org/linux/man-pages/man5/proc.5.html#:~:text=ptrace(2).-,/proc/pid/stat,-Status%20information%20about
-
-    // Create dummy variables that we don't care about
-    //char *a = malloc(128);
 
     // Get the path of the stat file
     char *statPath = buildPidPath(basePath, pid, "stat");
@@ -376,22 +378,18 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     // (22) starttime %llu, the time the process started after system boot.
     unsigned long long *startTime = malloc(sizeof(*startTime) + 1);
 
-    // Parse the stat file as documented, using "a" for the values we don't care about, and capturing the values we do care about in the variables we created above
-    //fscanf(statFile, "%s %s %c %d %s %s %s %s %s %s %s %s %s %lu %lu %s %s %s %s %lu %s %llu %s", a, comm, a, PPID, a, a, a, a, a, a, a, a, a, utime, stime, a, a, a, a, NLWP, a, startTime, a);
+    // Parse the stat file as documented, capturing the values we do care about in the variables we created above, and ignoring the rest
     fscanf(statFile, "%*s %s %*c %d %*s %*s %*s %*s %*s %*s %*s %*s %*s %lu %lu %*s %*s %*s %*s %lu %*s %llu %*s", comm, PPID, utime, stime, NLWP, startTime);
-
-
 
     // Calculate start time
     unsigned long long totalStartTime = *startTime / sysconf(_SC_CLK_TCK); // seconds
     unsigned long long totalSTIME = totalStartTime + bootTime;
 
-    // And make it pretty ;)
+    // And make it pretty
     char *prettySTIME;
     prettySTIME = getPrettySTIME(totalSTIME, cmdExeTime);
 
     // Clean up
-    //free(a);
     free(statPath);
     free(startTime);
     fclose(statFile);
