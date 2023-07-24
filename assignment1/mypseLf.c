@@ -1,6 +1,12 @@
-//
-// Created by bsting on 7/12/23.
-//
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 1
+        Date of Submission: 7/24/2022
+        Name of this file: mypseLf.c
+        Short Description of contents:
+            This program is a clone of the ps command in Linux. It prints out a list of all processes running on the system, including their UID, PID, PPID, LWP, NLWP, STIME, TIME, and CMD.
+
+*/
 #include <sys/stat.h> // stat (import struct def. of stat)
 #include <stdbool.h>  // bool type
 #include <stdio.h>    // printf
@@ -12,8 +18,18 @@
 #include <dirent.h> // opendir, readdir, closedir
 #include <ctype.h>  // isdigit
 
-// Finds the total lines in a file
-// @param filepath The path to the file
+/*
+    Function Name: findFileLines
+
+    Input to Method: 
+        filepath - The path to the file
+
+    Output (Return value): 
+        The total number of lines in the file
+
+    Breif description of the task:
+        Finds the total lines in a file
+*/
 int findFileLines(char *filepath)
 {
     // Initialize values for total file line count and character tracker
@@ -41,8 +57,18 @@ int findFileLines(char *filepath)
     //(e.g. 0 1 2 = ...\n...\n...EOF = total lines are 3
 }
 
-// Count the number of digits in an unsigned long long
-// @param passedLong The unsigned long long to count digits of
+/*
+    Function Name: countULongLongDigits
+
+    Input to Method: 
+        passedLong - The unsigned long long to count digits of
+
+    Output(Return value): 
+        The total number of digits in the unsigned long long
+
+    Breif description of the task:
+        Count the number of digits in an unsigned long long
+*/
 int countULongLongDigits(unsigned long long passedLong)
 {
     // Filter out single digits:
@@ -57,12 +83,21 @@ int countULongLongDigits(unsigned long long passedLong)
     return count;
 }
 
+/*
+    Function Name: findAndReplaceChar
 
-// Find and replace a char in a string
-// @param toFind The char to find
-// @param toReplaceWith The char to replace with
-// @param str The string to search
-// @param reverse Whether to search in reverse
+    Input to Method: 
+        toFind - The char to find
+        toReplaceWith - The char to replace with
+        str - The string to search
+        reverse - Whether to search in reverse
+
+    Output(Return value): 
+        void
+
+    Breif description of the task:
+        Find and replace a specific char in a string
+*/
 void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
 {
     if (reverse)
@@ -89,9 +124,19 @@ void findAndReplaceChar(char toFind, char toReplaceWith, char *str, int reverse)
     }
 }
 
-// Build a path to a file in the /proc/pid directory
-// @param pid The process ID
-// @param path The path to the file
+/*
+    Function Name: buildPidPath
+
+    Input to Method: 
+        pid - The process ID
+        path - The path to the file
+
+    Output(Return value): 
+        A path to a file in the /proc/<pid> directory
+
+    Breif description of the task:
+        Build a path to a file in the /proc/pid directory
+*/
 char *buildPidPath(char *basePath, char *pid, char *path)
 {
     // Allocate more than enough space for the path
@@ -100,9 +145,19 @@ char *buildPidPath(char *basePath, char *pid, char *path)
     return str;                                                            // return the fully allocated and fully formatted/written path
 }
 
-// Build a path to a file in the /proc directory
-// @param pid The process ID
-// @param path The path to the file
+/*
+    Function Name: buildProcPath
+
+    Input to Method: 
+        pid - The process ID
+        path - The path to the file
+
+    Output(Return value): 
+        A path to a file in the /<base_dir>/<pid> directory
+
+    Breif description of the task:
+        Build a path to a file in the /<base_dir>/<pid> directory
+*/
 char *buildProcPath(char *basePath, char *path)
 {
     // Allocate more than enough space for the path
@@ -111,9 +166,19 @@ char *buildProcPath(char *basePath, char *path)
     return str;                                              // return the fully allocated and fully formatted/written path
 }
 
-// Get process TIME value
-// @param utime Utime from the process stat file
-// @param stime stime from the process stat file
+/*
+    Function Name: getProcTime
+
+    Input to Method: 
+        utime - Utime from the process stat file
+        stime - stime from the process stat file
+
+    Output(Return value): 
+        TIME value for printing in the ps command
+
+    Breif description of the task:
+        Get a process TIME value
+*/
 char *getProcTime(unsigned long int *utime, unsigned long int *stime)
 {
     // Get the total time
@@ -128,15 +193,26 @@ char *getProcTime(unsigned long int *utime, unsigned long int *stime)
     // Calculate num seconds
     unsigned long seconds = (total - (hours * 3600) - (minutes * 60));
 
+    // Max size of that the time can take up
     char *prettyTime = malloc(10);
     sprintf(prettyTime, "%lu:%02lu:%02lu", hours, minutes, seconds);
 
     return prettyTime;
 }
 
-// Get process STIME value
-// @param totalSTIMESeconds Total STIME seconds
-// @param cmdExeTime Time when the ps command was executed
+/*
+    Function Name: getPrettySTIME
+
+    Input to Method: 
+        totalSTIMESeconds - Total STIME seconds
+        cmdExeTime - Time when the ps command was executed
+
+    Output(Return value): 
+        STIME value for printing in the ps command
+
+    Breif description of the task:
+        Beautify a process STIME value
+*/
 char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTime)
 {
     // Setup time struct
@@ -146,7 +222,7 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     formatTotalSTIME = formatTotalSTIME + totalSTIMESeconds;
 
     // Get total STIME seconds as a string
-    char *strSTIME = malloc((sizeof(char) * countULongLongDigits(totalSTIMESeconds))+ 1);
+    char *strSTIME = malloc((sizeof(char) * countULongLongDigits(totalSTIMESeconds)) + 1);
     sprintf(strSTIME, "%llu", totalSTIMESeconds);
     char *prettySTIME = malloc((sizeof(char) * strlen(strSTIME)) + 1);
 
@@ -186,7 +262,18 @@ char *getPrettySTIME(unsigned long long totalSTIMESeconds, const time_t cmdExeTi
     }
 }
 
-// Get system boot time
+/*
+    Function Name: getBootTime
+
+    Input to Method: 
+        n/a
+
+    Output(Return value): 
+        Boot time of system
+
+    Breif description of the task:
+        Get the boot time of the system from the /proc/stat file
+*/
 unsigned long getBootTime()
 {
     // Open the stat file
@@ -200,19 +287,26 @@ unsigned long getBootTime()
     int currentLine;
     char *substringPtr;
 
+    // Iterate over all lines in the file
     for (currentLine = 0; currentLine < totalLines; currentLine++)
     {
+        // Read line
         getline(&buffer, &buffSize, statFile);
+        // Search for "btime" in line
         substringPtr = strstr(buffer, "btime");
 
+        // If we found btime, then get the boot time
         if (substringPtr)
         {
-            // char* realValuePtr = substringPtr + 6;
-            //TODO: 18 bytes are lost here (DEF. LEAK):
+            // Allocate space for boot time as a string
             char *realValueStr = (char *)malloc(sizeof(char) * (strlen(buffer)) + 1);
+            // Copy the boot time string
             strcpy(realValueStr, substringPtr + 6);
+            // Convert the boot time string to an unsigned long
             char *endPtr;
             unsigned long bootTime = strtoul(realValueStr, &endPtr, 10);
+
+            // Clean up
             fclose(statFile);
             free(buffer);
             free(realValueStr);
@@ -226,9 +320,19 @@ unsigned long getBootTime()
     return 0;
 }
 
-// Get the CMD value for a process
-// @param basePath The base path to the /proc directory
-// @param pid The process ID
+/*
+    Function Name: getCmd
+
+    Input to Method: 
+        basePath - The base path to the /proc directory
+        pid - The process ID
+
+    Output(Return value): 
+        CMD value for a process
+
+    Breif description of the task:
+        Get a CMD value for a process
+*/
 char *getCmd(char *basePath, char *pid)
 {
     // Build path to cmdline file
@@ -266,7 +370,7 @@ char *getCmd(char *basePath, char *pid)
     last = 0;
 
     // Allocate buffer
-    char *buffer = malloc(size + 1); //TODO: 136 bytes are lost here (DEF. LEAK)
+    char *buffer = malloc(size + 1);
     for (int i = 0; i < size; i++)
     {
         // Read next character
@@ -303,17 +407,37 @@ char *getCmd(char *basePath, char *pid)
     return buffer;
 }
 
-// Check to see if a file exists
-// @param filename The name of the file to check
+/*
+    Function Name: fileExists
+
+    Input to Method: 
+        filename - The name of the file to check
+
+    Output(Return value): 
+        true/false if a file exists
+
+    Breif description of the task:
+        Check to see if a file exists
+*/
 bool fileExists(char *filepath)
 {
     struct stat buffer;                    // reference to stat's buffer (will fill next)
     return (stat(filepath, &buffer) == 0); // returns 0 on stat success, else -1 + err
 }
 
-// Uses pointer arithmetic to get the new position of a string
-// @param sourceStr The source string
-// @param destStr The destination string
+/*
+    Function Name: getIndexOf
+
+    Input to Method: 
+        sourceStr - The source string
+        destStr - The destination string
+
+    Output(Return value): 
+        offset between the 2 strings
+
+    Breif description of the task:
+        Get the distantce between 2 strings
+*/
 long getIndexOf(char *sourceStr, char *destStr)
 {
     // Pointer subtraction:
@@ -321,8 +445,18 @@ long getIndexOf(char *sourceStr, char *destStr)
     return indexPosition;
 }
 
-// Check if a string is numeric
-// @param str The string to check
+/*
+    Function Name: isStringNumeric
+
+    Input to Method: 
+        str - The string to check
+
+    Output(Return value): 
+        true/false whether a string is numeric or not (if the string doesn't contain any non-numeric characters)
+
+    Breif description of the task:
+        Check if a string is numeric
+*/
 int isStringNumeric(char *str)
 {
     for (int i = 0; i < strlen(str); i++)
@@ -335,7 +469,23 @@ int isStringNumeric(char *str)
     return 1;
 }
 
-// Print a PID line for the program
+/*
+    Function Name: printPidLine
+
+    Input to Method: 
+        path - path to main directory
+        basePath - path to /proc/<pid> directory
+        pid - The process ID
+        parentPid - The parent process ID (if applicable)
+        cmdExeTime - Time when the ps command was executed
+        bootTime - Boot time of the system
+
+    Output(Return value): 
+        void
+
+    Breif description of the task:
+        Print PID line for a process
+*/
 void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, unsigned long bootTime)
 {
     /** READ STAT FILE **/
@@ -352,7 +502,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     unsigned long int *stime = malloc(sizeof(unsigned long int) + 64);
 
     // Get parent process ID (PPID)
-    int *PPID = malloc(sizeof(int));  //TODO: 5,696 and 12,896 bytes lost here (DEF. LEAK)
+    int *PPID = malloc(sizeof(int));
 
     // Get number of threads (NLWP)
     unsigned long int *NLWP = malloc(sizeof(unsigned long int));
@@ -370,7 +520,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
 
     // Process comm name should be allocated (numOfChars * 1) + 1 [1 byte per char]
     // According to man, it is truncated to 16 chars, including null byte (so 18 for ())
-    char *comm = malloc((sizeof(char) * sz) + 3); //TODO: 1,980 bytes and 7,254 bytes lost here (DEF. LEAK)
+    char *comm = malloc((sizeof(char) * sz) + 3);
 
     // Get start time (Either YY in years (not started in same year), "MmmDD" if it was not
     // started the same day, or "HH:MM" otherwise.) IF-ELSEIF-ELSE
@@ -405,7 +555,7 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
 
     // Process PID
     char *printPid = pid; // PID to print, defaults to current PID
-    char* passedPPIDPtr;
+    char *passedPPIDPtr;
     long passedPPIDNum;
     passedPPIDNum = strtol(parentPid, &passedPPIDPtr, 10);
 
@@ -467,15 +617,32 @@ void printPidLine(char *path, char *basePath, char *pid, char *parentPid, const 
     free(PPID);
 
     // Comm only needs to be cleared if it was not used as the CMD
-    if(freeComm == true)
+    if (freeComm == true)
     {
         free(comm);
     }
 }
 
+
+/*
+    Function Name: processPid
+
+    Input to Method:
+        basePath - path to /proc/<pid> directory
+        pid - The process ID
+        parentPid - The parent process ID (if applicable)
+        cmdExeTime - Time when the ps command was executed
+        bootTime - Boot time of the system
+
+    Output(Return value): 
+        void
+
+    Breif description of the task:
+        Process a PID
+*/
 void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeTime, unsigned long bootTime)
 {
-    char* ppidToNumPtr;
+    char *ppidToNumPtr;
     long ppidNum;
 
     // Build the path to the PID folder
@@ -529,7 +696,18 @@ void processPid(char *basePath, char *pid, char *parentPid, const time_t cmdExeT
     free(path);
 }
 
-// Main method
+/*
+    Function Name: main
+
+    Input to Method: 
+        n/a
+
+    Output(Return value): 
+        Exit code of the program
+
+    Breif description of the task:
+        Run the main program
+*/
 int main(void)
 {
     // Immediately store the current time when this "ps" command was executed:
@@ -538,7 +716,7 @@ int main(void)
     // Get system boot time
     unsigned long bootTime = getBootTime();
     long dirToNum;
-    char* strtolPtr;
+    char *strtolPtr;
 
     // Print the header with padding
     printf("%-16s %-5s %-5s %-5s %-5s %-5s %-10s %-5s\n", "UID", "PID", "PPID", "LWP", "NLWP", "STIME", "TIME", "CMD");
@@ -561,7 +739,6 @@ int main(void)
             {
                 processPid("/proc", dir->d_name, "0", psCMDTime, bootTime);
             }
-
         }
         closedir(d);
     }
