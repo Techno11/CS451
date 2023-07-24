@@ -1,0 +1,253 @@
+UID              PID   PPID  LWP   NLWP  STIME TIME       CMD  
+root             1     0     1     1     00:23 0:00:04    /sbin/init  
+root             2     1     2     2     00:23 0:00:00    /init  
+root             2     1     7     2     00:23 0:00:00    /init  
+root             5     2     5     2     00:23 0:00:00    plan9
+root             5     2     6     2     00:23 0:00:00    plan9
+root             40    1     40    1     00:23 0:00:02    /lib/systemd/systemd-journald  
+root             64    1     64    1     00:23 0:00:08    /lib/systemd/systemd-udevd  
+root             69    1     69    1     00:23 0:00:00    snapfuse /var/lib/snapd/snaps/bare_5.snap /snap/bare/5
+root             74    1     74    1     00:23 0:00:00    snapfuse /var/lib/snapd/snaps/core22_607.snap /snap/core22/607
+root             81    1     81    1     00:23 0:00:00    snapfuse /var/lib/snapd/snaps/gtk-common-themes_1535.snap /snap/gtk-common-themes/1535
+root             82    1     82    1     00:23 0:00:02    snapfuse /var/lib/snapd/snaps/snapd_18933.snap /snap/snapd/18933
+root             85    1     85    1     00:23 0:00:00    snapfuse /var/lib/snapd/snaps/ubuntu-desktop-installer_967.snap /snap/ubuntu-desktop-installer/967
+systemd-resolve  92    1     92    1     00:23 0:00:00    /lib/systemd/systemd-resolved  
+root             136   1     136   1     00:23 0:00:00    /usr/sbin/cron
+messagebus       138   1     138   1     00:23 0:00:00    @dbus-daemon
+root             144   1     144   1     00:23 0:00:00    /usr/bin/python3 /usr/bin/networkd-dispatcher
+syslog           147   1     147   4     00:23 0:00:00    /usr/sbin/rsyslogd
+syslog           147   1     156   4     00:23 0:00:00    /usr/sbin/rsyslogd
+syslog           147   1     157   4     00:23 0:00:00    /usr/sbin/rsyslogd
+syslog           147   1653123248 158   94048552005488 02:02 522491955:27:41 /usr/sbin/rsyslogd
+root             155   1     155   1     00:23 0:00:00    /lib/systemd/systemd-logind  
+root             217   1     217   1     00:23 0:00:00    /sbin/agetty
+root             219   1     219   1     00:23 0:00:00    /sbin/agetty
+root             221   1     221   2     00:23 0:00:00    /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown
+root             221   1     222   2     00:23 0:00:00    /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown
+root             350   2     350   1     00:23 0:00:00    /bin/login
+sozaiser         377   1     377   1     00:23 0:00:00    /lib/systemd/systemd
+sozaiser         384   377   384   1     00:23 0:00:00    (sd-pam)  
+sozaiser         419   350   419   1     00:23 0:00:00    -bash  
+root             481   2     481   1     00:23 0:00:00    /bin/login
+root             508   481   508   1     00:23 0:00:00    -bash  
+root             769   2     769   1     00:24 0:00:00    /init  
+root             770   769   770   1     00:24 0:00:00    /init  
+root             771   770   771   14    00:24 0:00:01    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   772   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   773   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   774   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   775   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   776   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   777   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   778   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   779   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   780   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   781   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   782   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   784   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             771   770   786   14    00:24 0:00:00    /mnt/wsl/docker-desktop/docker-desktop-user-distro proxy
+root             820   769   820   1     00:24 0:00:00    /init  
+sozaiser         821   820   821   13    00:24 0:00:04    docker serve
+sozaiser         821   820   822   13    00:24 0:00:00    docker serve
+sozaiser         821   820   823   13    00:24 0:00:00    docker serve
+sozaiser         821   820   824   13    00:24 0:00:00    docker serve
+sozaiser         821   820   825   13    00:24 0:00:00    docker serve
+sozaiser         821   820   826   13    00:24 0:00:00    docker serve
+sozaiser         821   820   827   13    00:24 0:00:00    docker serve
+sozaiser         821   820   828   13    00:24 0:00:00    docker serve
+sozaiser         821   820   829   13    00:24 0:00:00    docker serve
+sozaiser         821   820   830   13    00:24 0:00:00    docker serve
+sozaiser         821   820   831   13    00:24 0:00:00    docker serve
+sozaiser         821   820   832   13    00:24 0:00:00    docker serve
+sozaiser         821   820   833   13    00:24 0:00:00    docker serve
+root             1383  1     1383  3     00:24 0:00:00    /usr/libexec/packagekitd  
+root             1383  1     1384  3     00:24 0:00:00    /usr/libexec/packagekitd  
+root             1383  1     1385  3     00:24 0:00:00    /usr/libexec/packagekitd  
+root             1387  1     1387  3     00:24 0:00:00    /usr/libexec/polkitd
+root             1387  1     1388  3     00:24 0:00:00    /usr/libexec/polkitd
+root             1387  1     1390  3     00:24 0:00:00    /usr/libexec/polkitd
+root             5147  2     5147  1     00:28 0:00:00    /init  
+root             5148  5147  5148  1     00:28 0:00:00    /init  
+sozaiser         5149  5148  5149  1     00:28 0:00:00    sh   
+sozaiser         5150  5149  5150  1     00:28 0:00:00    sh /mnt/c/Users/soren.zaiser/.vscode/extensions/ms-vscode-remote.remote-wsl-0.80.2/scripts/wslServer.sh 74f6148eb9ea00507ec113ec51c489d6ffb4b771 stable code-server .vscode-server
+sozaiser         5155  5150  5155  1     00:28 0:00:00    sh /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/bin/code-server
+sozaiser         5159  5155  5159  11    00:28 0:03:17    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5160  11    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5161  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5162  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5163  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5164  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5165  11    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5166  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5167  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5168  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5159  5155  5169  11    00:28 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/server-main.js
+sozaiser         5170  5159  5170  13    00:28 0:02:41    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5171  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5172  13    00:28 0:00:01    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5173  13    00:28 0:00:01    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5174  13    00:28 0:00:01    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5175  13    00:28 0:00:01    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5176  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5177  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5178  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5179  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5180  13    00:28 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  5695  13    00:33 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5170  5159  153644 13    13:36 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         5694  5170  5694  1     00:33 0:00:02    /bin/bash
+root             75150 1     75150 1     07:08 0:00:03    snapfuse /var/lib/snapd/snaps/snapd_19457.snap /snap/snapd/19457
+root             75402 1     75402 1     07:08 0:00:00    snapfuse /var/lib/snapd/snaps/core22_817.snap /snap/core22/817
+root             75598 1     75598 1     07:08 0:00:00    snapfuse /var/lib/snapd/snaps/ubuntu-desktop-installer_1165.snap /snap/ubuntu-desktop-installer/1165
+root             77449 1     77449 26    07:15 0:10:36    /usr/lib/snapd/snapd  
+root             77449 1     77460 26    07:15 0:01:12    /usr/lib/snapd/snapd  
+root             77449 1     77461 26    07:15 0:00:00    /usr/lib/snapd/snapd  
+root             77449 1     77462 26    07:15 0:00:28    /usr/lib/snapd/snapd  
+root             77449 1     77463 26    07:15 0:00:28    /usr/lib/snapd/snapd  
+root             77449 1     77464 26    07:15 0:00:00    /usr/lib/snapd/snapd  
+root             77449 1     77465 26    07:15 0:00:20    /usr/lib/snapd/snapd  
+root             77449 1     77466 26    07:15 0:00:25    /usr/lib/snapd/snapd  
+root             77449 1     77468 26    07:15 0:00:30    /usr/lib/snapd/snapd  
+root             77449 1     77469 26    07:15 0:00:33    /usr/lib/snapd/snapd  
+root             77449 1     77471 26    07:15 0:00:27    /usr/lib/snapd/snapd  
+root             77449 1     77472 26    07:15 0:00:33    /usr/lib/snapd/snapd  
+root             77449 1     77489 26    07:15 0:00:35    /usr/lib/snapd/snapd  
+root             77449 1     77498 26    07:15 0:00:21    /usr/lib/snapd/snapd  
+root             77449 1     77500 26    07:15 0:00:26    /usr/lib/snapd/snapd  
+root             77449 1     77502 26    07:15 0:00:14    /usr/lib/snapd/snapd  
+root             77449 1     77503 26    07:15 0:00:35    /usr/lib/snapd/snapd  
+root             77449 1     77504 26    07:15 0:00:36    /usr/lib/snapd/snapd  
+root             77449 1     77505 26    07:15 0:00:21    /usr/lib/snapd/snapd  
+root             77449 1     87364 26    07:22 0:00:32    /usr/lib/snapd/snapd  
+root             77449 1     87431 26    07:22 0:00:22    /usr/lib/snapd/snapd  
+root             77449 1     87432 26    07:22 0:00:14    /usr/lib/snapd/snapd  
+root             77449 1     87453 26    07:22 0:00:34    /usr/lib/snapd/snapd  
+root             77449 1     87466 26    07:22 0:00:31    /usr/lib/snapd/snapd  
+root             77449 1     135971 26    11:13 0:00:00    /usr/lib/snapd/snapd  
+root             77449 1     135974 26    11:14 0:00:00    /usr/lib/snapd/snapd  
+root             86914 1     86914 1     07:20 0:00:01    snapfuse /var/lib/snapd/snaps/ubuntu-desktop-installer_1170.snap /snap/ubuntu-desktop-installer/1170
+root             86988 1     86988 1     07:20 0:00:00    /bin/bash /snap/ubuntu-desktop-installer/1170/bin/subiquity-server  
+root             87016 86988 87016 6     07:20 0:00:31    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87016 86988 87033 6     07:20 0:00:00    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87016 86988 88918 6     07:30 0:00:00    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87016 86988 88920 6     07:30 0:00:00    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87016 86988 88921 6     07:30 0:00:00    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87016 86988 88922 6     07:30 0:00:00    /snap/ubuntu-desktop-installer/1170/usr/bin/python3.10
+root             87032 87016 87032 1     07:20 0:00:44    python3 /snap/ubuntu-desktop-installer/1170/usr/bin/cloud-init status
+sozaiser         94641 5694  94641 13    07:52 0:00:00    gdb a.out  
+sozaiser         94641 1653081952 94643 94048552005498 02:09 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124064 94644 94048551962464 02:10 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124986 94645 94048552004576 02:02 522491955:27:41 gdb a.out  
+sozaiser         94641 1653081952 94646 94048552005498 02:09 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124064 94647 94048551962464 02:10 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124986 94648 94048552004576 02:02 522491955:27:41 gdb a.out  
+sozaiser         94641 1653081952 94649 94048552005498 02:09 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124064 94650 94048551962464 02:10 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124986 94651 94048552004576 02:02 522491955:27:41 gdb a.out  
+sozaiser         94641 1653081952 94652 94048552005498 02:09 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124064 94653 94048551962464 02:10 522491955:27:41 gdb a.out  
+sozaiser         94641 1653124986 94654 94048552004576 02:02 522491955:27:41 gdb a.out  
+sozaiser         94661 94641 94661 1     07:52 0:00:00    /mnt/c/Users/soren.zaiser/Essium LLC/Documents/GitHub/CS451-new/assignment1/a.out  
+root             135851 1     135851 1     11:12 0:00:00    /init  
+sozaiser         135852 135851 135852 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135853 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135854 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135855 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135856 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135857 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         135852 135851 135858 7     11:12 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         136989 5159  136989 13    11:32 0:13:25    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136990 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136991 13    11:32 0:01:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136992 13    11:32 0:01:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136993 13    11:32 0:01:06    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136994 13    11:32 0:01:07    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136995 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136996 13    11:32 0:00:14    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136997 13    11:32 0:00:14    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136998 13    11:32 0:00:14    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  136999 13    11:32 0:00:14    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  137000 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         136989 5159  137201 13    11:32 0:00:11    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137001 13    11:32 0:00:03    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137002 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137003 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137004 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137005 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137006 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137007 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137011 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137012 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137013 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137014 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137141 13    11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137001 5159  137142 13    11:32 0:00:02    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/out/bootstrap-fork
+sozaiser         137080 136989 137080 22    11:32 0:00:54    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137081 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137082 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137083 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137084 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137085 22    11:32 0:00:04    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137086 22    11:32 0:00:02    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137087 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137088 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137089 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137090 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137091 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137092 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137093 22    11:32 0:00:03    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137094 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137095 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137096 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137257 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137258 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137259 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 137260 22    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137080 136989 163935 22    14:25 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools  
+sozaiser         137132 136989 137132 7     11:32 0:00:01    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137133 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137134 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137135 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137136 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137137 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137132 136989 137139 7     11:32 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/extensions/json-language-features/server/dist/node/jsonServerMain
+sozaiser         137238 5148  137238 20    11:32 0:00:40    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137239 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137240 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137241 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137242 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137243 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137244 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137245 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137246 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137247 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137248 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137249 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137250 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137251 20    11:32 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137252 20    11:32 0:00:01    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137253 20    11:32 0:00:04    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137254 20    11:32 0:00:04    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137255 20    11:32 0:00:05    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  137256 20    11:32 0:00:05    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+sozaiser         137238 5148  164332 20    14:27 0:00:00    /home/sozaiser/.vscode-server/extensions/ms-vscode.cpptools-1.16.3-linux-x64/bin/cpptools-srv 137080 {2508D08B-5CB7-4B2E-97E1-77F223E3B356}  
+root             144363 2     144363 1     12:44 0:00:00    /init  
+root             144364 144363 144364 1     12:44 0:00:01    /init  
+sozaiser         144365 144364 144365 7     12:44 0:00:05    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144366 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144367 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144368 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144369 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144370 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144365 144364 144371 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+root             144372 2     144372 1     12:44 0:00:00    /init  
+root             144373 144372 144373 1     12:44 0:00:04    /init  
+sozaiser         144374 144373 144374 7     12:44 0:00:17    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144375 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144376 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144377 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144378 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144379 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         144374 144373 144380 7     12:44 0:00:00    /home/sozaiser/.vscode-server/bin/74f6148eb9ea00507ec113ec51c489d6ffb4b771/node
+sozaiser         153643 5170  153643 1     13:36 0:00:00    /bin/bash
+sozaiser         165453 5694  165453 1     14:34 0:00:00    ./a.out  
