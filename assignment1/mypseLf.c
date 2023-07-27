@@ -1,7 +1,7 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 1
-        Date of Submission: 7/24/2022
+        Date of Submission: 7/24/2023
         Name of this file: mypseLf.c
         Short Description of contents:
             This program is a clone of the ps command in Linux. It prints out a list of all processes running on the system, including their UID, PID, PPID, LWP, NLWP, STIME, TIME, and CMD.
