@@ -13,8 +13,8 @@ typedef struct Queue
 {
     size_t arraySize;
     size_t currCount;
-    int rearIndex;
-    int frontIndex;
+    size_t rearIndex;
+    size_t frontIndex;
     pid_t* array; // Dynamic array to accept various sizes
 
 } Queue;
@@ -33,15 +33,15 @@ bool isEmpty(Queue* thisQueue);
 bool isFull(Queue* thisQueue);
 
 size_t getQueueSize(Queue* thisQueue);
-int getRear(Queue* thisQueue);
-int getFront(Queue* thisQueue);
+size_t getRear(Queue* thisQueue);
+size_t getFront(Queue* thisQueue);
 size_t getCount(Queue* thisQueue);
-pid_t getElementAt(Queue* thisQueue, int index);
+pid_t getElementAt(Queue* thisQueue, size_t index);
 
 void setQueueSize(Queue* thisQueue, size_t newSize);
-void setFront(Queue* thisQueue, int newFrontIndex);
-void setRear(Queue* thisQueue, int newRearIndex);
+void setFront(Queue* thisQueue, size_t newFrontIndex);
+void setRear(Queue* thisQueue, size_t newRearIndex);
 void setCount(Queue* thisQueue, size_t newCount);
-void setElementAt(Queue* thisQueue, pid_t newElement, int index);
+void setElementAt(Queue* thisQueue, pid_t newElement, size_t index);
 
 #endif //QUEUE_H

@@ -49,15 +49,15 @@ size_t getQueueSize(Queue* thisQueue)
     return thisSize;
 }
 
-int getRear(Queue* thisQueue)
+size_t getRear(Queue* thisQueue)
 {
-    int thisRear = thisQueue->rearIndex;
+    size_t thisRear = thisQueue->rearIndex;
     return thisRear;
 }
 
-int getFront(Queue* thisQueue)
+size_t getFront(Queue* thisQueue)
 {
-    int thisFront = thisQueue->frontIndex;
+    size_t thisFront = thisQueue->frontIndex;
     return thisFront;
 }
 
@@ -67,7 +67,7 @@ size_t getCount(Queue* thisQueue)
     return thisCount;
 }
 
-pid_t getElementAt(Queue* thisQueue, int index)
+pid_t getElementAt(Queue* thisQueue, size_t index)
 {
     if (index < getQueueSize(thisQueue))
     {
@@ -86,12 +86,12 @@ void setQueueSize(Queue* thisQueue, size_t newSize)
     thisQueue->arraySize = newSize;
 }
 
-void setFront(Queue* thisQueue, int newFrontIndex)
+void setFront(Queue* thisQueue, size_t newFrontIndex)
 {
     thisQueue->frontIndex = newFrontIndex;
 }
 
-void setRear(Queue* thisQueue, int newRearIndex)
+void setRear(Queue* thisQueue, size_t newRearIndex)
 {
     thisQueue->rearIndex = newRearIndex;
 }
@@ -101,7 +101,7 @@ void setCount(Queue* thisQueue, size_t newCount)
     thisQueue->currCount = newCount;
 }
 
-void setElementAt(Queue* thisQueue, pid_t newElement, int index)
+void setElementAt(Queue* thisQueue, pid_t newElement, size_t index)
 {
     if (index < getQueueSize(thisQueue)) // Can set elem. indices from 0 to size-1
     {
@@ -115,7 +115,7 @@ void newQueue(Queue* new_queue, size_t queueSize)
     //new_queue = allocThisQueue(new_queue, queueSize);
     setQueueSize(new_queue, queueSize);
     setFront(new_queue, 0);
-    setRear(new_queue, -1);
+    setRear(new_queue, getQueueSize(new_queue) - 1);
     setCount(new_queue, 0);
 }
 
@@ -129,8 +129,8 @@ void enqueue_Push(Queue* queue, pid_t newProc)
     }
     else
     {
-        int newRear = getRear(queue);
-        newRear = (newRear + 1); //;
+        size_t newRear = getRear(queue);
+        newRear = (newRear + 1) % getQueueSize(queue);
         setRear(queue, newRear);
         setElementAt(queue, newProc, newRear);
         size_t newCount = getCount(queue);
@@ -153,8 +153,8 @@ pid_t dequeue_Pop(Queue* queue)
         // OPTIONAL STEP: I'm just cleaning this PID up, to a default value of 0...
         setElementAt(queue, 0, getFront(queue)); // 0 = NULL PID
 
-        int newFront = getFront(queue);
-        newFront = (newFront + 1); //% getQueueSize(queue);
+        size_t newFront = getFront(queue);
+        newFront = (newFront + 1) % getQueueSize(queue);
         setFront(queue, newFront);
         size_t newCount = getCount(queue);
         newCount = newCount - 1; // Update number of items in this queue
