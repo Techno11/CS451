@@ -7,81 +7,12 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
+#include "queue.c"
 
-/*
-    Function Name: isPrime
+// CONSTANTS:
+#define M_SIZE 100
 
-    Input to Method: 
-        num - The number to be prime checked
-
-    Output (Return value): 
-        Whether or not the number is prime
-
-    Breif description of the task:
-        Checks if the number is prime or not
-*/
-bool isPrime(long unsigned int num)
-{
-    if (num <= 1)
-        return false;
-
-    for (long unsigned int i = 2; i * i <= num; i++)
-    {
-        if (num % i == 0)
-            return false;
-    }
-
-    return true;
-}
-
-/*
-    Function Name: findNextPrime
-
-    Input to Method: 
-        startNum - The number to start checking from
-
-    Output (Return value): 
-        The next prime number
-
-    Breif description of the task:
-        Finds the next prime number after the given number
-*/
-long unsigned int findNextPrime(long unsigned int startNum)
-{
-    long unsigned int currentNum = startNum + 1;
-
-    while (true)
-    {
-        if (isPrime(currentNum))
-            return currentNum;
-
-        currentNum++;
-    }
-}
-
-/*
-    Function Name: generateRandom10DigitNumber
-
-    Input to Method: 
-        N/A
-
-    Output (Return value): 
-        Random 10 digit number
-
-    Breif description of the task:
-        Generates a random 10 digit number
-*/
-long unsigned int generateRandom10DigitNumber()
-{
-    long unsigned int minNumber = 1000000000; // 10^9
-    long unsigned int maxNumber = 9999999999; // 10^10 - 1
-
-    // Seed the random number generator with the current time
-    srand((unsigned int)time(NULL));
-
-    // Generate a random number between min_number and max_number
-    return (rand() % (maxNumber - minNumber + 1)) + minNumber;
-}
+//Queues should have pid_t elements since each child process is uniquely identified by its PID
 
 void timer_handler(int sigNum)
 {
@@ -124,8 +55,8 @@ void beginRuntimeOfChild()
     // Timers decrement from it_value to zero, generate a signal, and reset it to it_interval.
 
     /* The timer goes off 1.0 second after installation of the timer. */
-    timer.it_value.tv_sec = 1;
-    timer.it_value.tv_usec =0;
+    timer.it_value.tv_sec = 1; // _sec = seconds.
+    timer.it_value.tv_usec =0; // _usec = microseconds.
     /* ... and every 1.0 second after that. */
     timer.it_interval.tv_sec = 1;
     timer.it_interval.tv_usec =0;
@@ -138,11 +69,15 @@ void beginRuntimeOfChild()
 // Main method
 int main(void)
 {
-    long unsigned int starting_number = generateRandom10DigitNumber();
-    long unsigned int next_prime = findNextPrime(starting_number);
+    printf("Test");
 
-    printf("Starting number: %lu\n", starting_number);
-    printf("Next prime number: %lu\n", next_prime);
+    Queue q2;
+    newQueue(&q2, M_SIZE);
+    enqueue_Push(&q2, 1234); /*TODO: BUG - pid_t* array is NOT making an array, instead, a negative number.*/
+    enqueue_Push(&q2, 5678);
+    pid_t poppedItem = dequeue_Pop(&q2);
+    printf("I am a queue of size %zu, and I popped %d", getQueueSize(&q2), poppedItem);
     // Exit
+    freeThisQueue(&q2);
     return 0;
 }
