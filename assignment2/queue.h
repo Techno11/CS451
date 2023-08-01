@@ -19,13 +19,16 @@ typedef struct Queue
 
 } Queue;
 
-void allocThisQueue(Queue* queue, size_t arraySize);
+pid_t* allocThisQueue(Queue* queue, size_t arraySize);
+Queue* initStruct(Queue* queue, size_t arraySize);
+//Queue* allocThisQueue(Queue* queue, size_t arraySize);
 void freeThisQueue(Queue* queue);
 
 void newQueue(Queue* new_queue, size_t queueSize);
 
 void enqueue_Push(Queue* queue, pid_t newProc);
 pid_t dequeue_Pop(Queue* queue);
+pid_t peek(Queue* queue);
 bool isEmpty(Queue* thisQueue);
 bool isFull(Queue* thisQueue);
 

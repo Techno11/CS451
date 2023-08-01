@@ -4,20 +4,31 @@
 #include <stdlib.h>
 #include "queue.h"
 
-void allocThisQueue(Queue* queue, size_t arraySize)
+pid_t* allocThisQueue(Queue* queue, size_t arraySize)
+//Queue* allocThisQueue(Queue* queue, size_t arraySize)
 {
-    queue = malloc(sizeof(*queue));
-    queue->array = (pid_t*)malloc(sizeof(pid_t) * queue->arraySize);
-    for (int i = 0; i < arraySize; i++)
+    //queue = malloc(sizeof(*queue) + arraySize * sizeof *queue->array);
+    queue->array = (pid_t*)malloc(sizeof(pid_t) * arraySize);
+    //pid_t newArray[arraySize];
+    //queue->array = newArray;
+    for (pid_t i = 0; i < arraySize; i++)
     {
-        queue->array[i] = 0;
+        queue->array[i] = i;
     }
+    return queue->array;
+    //return queue;
+}
+
+Queue* initStruct(Queue* queue, size_t arraySize)
+{
+    queue = malloc(sizeof(*queue) + (arraySize * sizeof *queue->array));
+    return queue;
 }
 
 void freeThisQueue(Queue* queue)
 {
     free(queue->array);
-    free(queue);
+    //free(queue);
 }
 
 bool isEmpty(Queue* thisQueue)
@@ -100,9 +111,10 @@ void setElementAt(Queue* thisQueue, pid_t newElement, int index)
 
 void newQueue(Queue* new_queue, size_t queueSize)
 {
-    allocThisQueue(new_queue, queueSize);
+    new_queue->array = allocThisQueue(new_queue, queueSize);
+    //new_queue = allocThisQueue(new_queue, queueSize);
     setQueueSize(new_queue, queueSize);
-    setFront(new_queue, -1);
+    setFront(new_queue, 0);
     setRear(new_queue, -1);
     setCount(new_queue, 0);
 }
@@ -148,5 +160,19 @@ pid_t dequeue_Pop(Queue* queue)
         newCount = newCount - 1; // Update number of items in this queue
         setCount(queue, newCount);
         return poppedItem;
+    }
+}
+
+pid_t peek(Queue* queue)
+{
+    if (isEmpty(queue))
+    {
+        printf("Queue: empty! \n");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        // Peek and get the front item of the queue:
+        return getElementAt(queue, getFront(queue));
     }
 }

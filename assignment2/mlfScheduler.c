@@ -69,15 +69,20 @@ void beginRuntimeOfChild()
 // Main method
 int main(void)
 {
-    printf("Test");
+    //printf("Test");
 
-    Queue q2;
-    newQueue(&q2, M_SIZE);
-    enqueue_Push(&q2, 1234); /*TODO: BUG - pid_t* array is NOT making an array, instead, a negative number.*/
-    enqueue_Push(&q2, 5678);
-    pid_t poppedItem = dequeue_Pop(&q2);
-    printf("I am a queue of size %zu, and I popped %d", getQueueSize(&q2), poppedItem);
+    //struct Queue* q2 = malloc(sizeof(*q2) + (M_SIZE * sizeof *q2->array));
+    struct Queue* q2 = initStruct(q2, M_SIZE);
+    newQueue(q2, M_SIZE);
+    enqueue_Push(q2, 1234);
+    enqueue_Push(q2, 5678);
+    pid_t poppedItem = dequeue_Pop(q2); // FIFO pop
+    pid_t newFront = peek(q2);
+    size_t q2Size = getQueueSize(q2);
+    printf("I am a queue of size %zu, and I popped %d \n", q2Size, poppedItem);
+    printf("I have a new head of %d", newFront);
     // Exit
-    freeThisQueue(&q2);
+    freeThisQueue(q2);
+    free(q2);
     return 0;
 }
