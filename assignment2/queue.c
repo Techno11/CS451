@@ -3,18 +3,19 @@
 //
 #include <stdlib.h>
 #include "queue.h"
+//#include "datum.c"
 
-pid_t* allocThisQueue(Queue* queue, size_t arraySize)
+Datum* allocThisQueue(Queue* queue, size_t arraySize)
 //Queue* allocThisQueue(Queue* queue, size_t arraySize)
 {
     //queue = malloc(sizeof(*queue) + arraySize * sizeof *queue->array);
-    queue->array = (pid_t*)malloc(sizeof(pid_t) * arraySize);
+    queue->array = (Datum*)malloc(sizeof(Datum) * arraySize);
     //pid_t newArray[arraySize];
     //queue->array = newArray;
-    for (pid_t i = 0; i < arraySize; i++)
+    /*for (pid_t i = 0; i < arraySize; i++)
     {
         queue->array[i] = i;
-    }
+    }*/
     return queue->array;
     //return queue;
 }
@@ -67,11 +68,11 @@ size_t getCount(Queue* thisQueue)
     return thisCount;
 }
 
-pid_t getElementAt(Queue* thisQueue, size_t index)
+Datum getElementAt(Queue* thisQueue, size_t index)
 {
     if (index < getQueueSize(thisQueue))
     {
-        pid_t reqElement = thisQueue->array[index];
+        Datum reqElement = thisQueue->array[index];
         return reqElement;
     }
     else
@@ -101,7 +102,7 @@ void setCount(Queue* thisQueue, size_t newCount)
     thisQueue->currCount = newCount;
 }
 
-void setElementAt(Queue* thisQueue, pid_t newElement, size_t index)
+void setElementAt(Queue* thisQueue, Datum newElement, size_t index)
 {
     if (index < getQueueSize(thisQueue)) // Can set elem. indices from 0 to size-1
     {
@@ -119,7 +120,7 @@ void newQueue(Queue* new_queue, size_t queueSize)
     setCount(new_queue, 0);
 }
 
-void enqueue_Push(Queue* queue, pid_t newProc)
+void enqueue_Push(Queue* queue, Datum newProc)
 {
     //if (getRear(queue) == (getQueueSize(queue) - 1))
     if(isFull(queue))
@@ -139,7 +140,7 @@ void enqueue_Push(Queue* queue, pid_t newProc)
     }
 }
 
-pid_t dequeue_Pop(Queue* queue)
+Datum dequeue_Pop(Queue* queue)
 {
     if (isEmpty(queue))
     {
@@ -148,10 +149,11 @@ pid_t dequeue_Pop(Queue* queue)
     }
     else
     {
-        pid_t poppedItem = getElementAt(queue, getFront(queue));
+        Datum poppedItem = getElementAt(queue, getFront(queue));
 
         // OPTIONAL STEP: I'm just cleaning this PID up, to a default value of 0...
-        setElementAt(queue, 0, getFront(queue)); // 0 = NULL PID
+        //TODO: make new Datum default element instead of 0
+        //setElementAt(queue, 0, getFront(queue)); // 0 = NULL PID
 
         size_t newFront = getFront(queue);
         newFront = (newFront + 1) % getQueueSize(queue);
@@ -163,7 +165,7 @@ pid_t dequeue_Pop(Queue* queue)
     }
 }
 
-pid_t peek(Queue* queue)
+Datum peek(Queue* queue)
 {
     if (isEmpty(queue))
     {
