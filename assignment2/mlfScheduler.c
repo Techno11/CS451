@@ -93,7 +93,7 @@ int main(int argc,char* argv[])
         //void enqueue_Push(Queue* queue, Datum newProc)
         pid_t* filePID = malloc(sizeof(pid_t) * len);
         unsigned long* fileBurstTime = malloc(sizeof(unsigned long) * len);
-        sscanf(line, "%d%zu", filePID, fileBurstTime);
+        sscanf(line, "%d%zu\n", filePID, fileBurstTime);
         struct Datum* newDatum = initDatumStruct(newDatum, *filePID, *fileBurstTime);
         newDatum->inputPID = *filePID;
         newDatum->inputBurst = *fileBurstTime;
