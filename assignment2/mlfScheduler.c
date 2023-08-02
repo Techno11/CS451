@@ -67,22 +67,56 @@ void beginRuntimeOfChild()
 }
 
 // Main method
-int main(void)
+int main(int argc,char* argv[])
 {
     //printf("Test");
+
+    int burstTime = atoi(argv[2]);
+    // Create a queue
+    struct Queue* q1 = initQueueStruct(q1, M_SIZE);
+    newQueue(q1, M_SIZE);
+
+    // Open file from first argument
+    FILE *fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    fp = fopen(argv[1], "r");
+
+    // Iterate over each line of file and add to queue
+    while ((read = getline(&line, &len, fp)) != -1)
+    {
+        // printf("Retrieved line of length %zu:\n", read);
+        //void enqueue_Push(Queue* queue, Datum newProc)
+        pid_t* filePID = malloc(sizeof(pid_t) * len);
+        unsigned long* fileBurstTime = malloc(sizeof(unsigned long) * len);
+        sscanf(line, "%d%zu", filePID, fileBurstTime);
+        struct Datum* newDatum = initDatumStruct(newDatum, *filePID, *fileBurstTime);
+        newDatum->inputPID = *filePID;
+        newDatum->inputBurst = *fileBurstTime;
+        enqueue_Push(q1, *newDatum);
+        printf("%s", line);
+    }
 
     //struct Queue* q2 = malloc(sizeof(*q2) + (M_SIZE * sizeof *q2->array));
     struct Queue* q2 = initQueueStruct(q2, M_SIZE);
     newQueue(q2, M_SIZE);
-    enqueue_Push(q2, 1234);
-    enqueue_Push(q2, 5678);
-    pid_t poppedItem = dequeue_Pop(q2); // FIFO pop
-    pid_t newFront = peek(q2);
+    //enqueue_Push(q2, 1234);
+    //enqueue_Push(q2, 5678);
+    //pid_t poppedItem = dequeue_Pop(q2); // FIFO pop
+    //pid_t newFront = peek(q2);
     size_t q2Size = getQueueSize(q2);
-    printf("I am a queue of size %zu, and I popped %d \n", q2Size, poppedItem);
-    printf("I have a new head of %d", newFront);
+    //printf("I am a queue of size %zu, and I popped %d \n", q2Size, poppedItem);
+    //printf("I have a new head of %d", newFront);
+    Datum line1 = dequeue_Pop(q1);
+    pid_t line1PID = line1.inputPID;
+    unsigned long line1Burst = line1.inputBurst;
+    printf("The thing I popped has a file PID of %u, with a burst of %zu", line1PID, line1Burst);
+
     // Exit
     freeThisQueue(q2);
     free(q2);
+    freeThisQueue(q1);
+    free(q1);
     return 0;
 }
