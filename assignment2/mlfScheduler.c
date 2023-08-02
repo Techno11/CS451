@@ -8,11 +8,12 @@
 #include <unistd.h>
 #include <string.h>
 #include "queue.c"
+#include "prime.c"
 
 // CONSTANTS:
 #define M_SIZE 100
 
-//Queues should have pid_t elements since each child process is uniquely identified by its PID
+// Queues should have pid_t elements since each child process is uniquely identified by its PID
 
 void timer_handler(int sigNum)
 {
@@ -44,7 +45,7 @@ void beginRuntimeOfChild()
     struct itimerval timer;
 
     /* Install timer_handler as the signal handler for SIGALRM. */
-    //signal(SIGALRM, timer_handler);  // NOTE: signal() is poorly defined, use sigaction
+    // signal(SIGALRM, timer_handler);  // NOTE: signal() is poorly defined, use sigaction
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = &timer_handler;
@@ -55,30 +56,32 @@ void beginRuntimeOfChild()
     // Timers decrement from it_value to zero, generate a signal, and reset it to it_interval.
 
     /* The timer goes off 1.0 second after installation of the timer. */
-    timer.it_value.tv_sec = 1; // _sec = seconds.
-    timer.it_value.tv_usec =0; // _usec = microseconds.
+    timer.it_value.tv_sec = 1;  // _sec = seconds.
+    timer.it_value.tv_usec = 0; // _usec = microseconds.
     /* ... and every 1.0 second after that. */
     timer.it_interval.tv_sec = 1;
-    timer.it_interval.tv_usec =0;
+    timer.it_interval.tv_usec = 0;
 
     /* Start a real timer. It counts down whenever this process is executing. */
-    setitimer (ITIMER_REAL, &timer, NULL);
-    while (1) { }
+    setitimer(ITIMER_REAL, &timer, NULL);
+    while (1)
+    {
+    }
 }
 
 // Main method
-int main(int argc,char* argv[])
+int main(int argc, char *argv[])
 {
-    //printf("Test");
+    // printf("Test");
 
     int burstTime = atoi(argv[2]);
     // Create a queue
-    struct Queue* q1 = initQueueStruct(q1, M_SIZE);
+    struct Queue *q1 = initQueueStruct(q1, M_SIZE);
     newQueue(q1, M_SIZE);
 
     // Open file from first argument
     FILE *fp;
-    char * line = NULL;
+    char *line = NULL;
     size_t len = 0;
     ssize_t read;
     fp = fopen(argv[1], "r");
@@ -90,36 +93,63 @@ int main(int argc,char* argv[])
     while ((read = getline(&line, &len, fp)) != -1)
     {
         // printf("Retrieved line of length %zu:\n", read);
-        //void enqueue_Push(Queue* queue, Datum newProc)
-        pid_t* filePID = malloc(sizeof(pid_t) * len);
-        unsigned long* fileBurstTime = malloc(sizeof(unsigned long) * len);
+        // void enqueue_Push(Queue* queue, Datum newProc)
+        pid_t *filePID = malloc(sizeof(pid_t) * len);
+        unsigned long *fileBurstTime = malloc(sizeof(unsigned long) * len);
         sscanf(line, "%d%zu\n", filePID, fileBurstTime);
-        struct Datum* newDatum = initDatumStruct(newDatum, *filePID, *fileBurstTime);
+        struct Datum *newDatum = initDatumStruct(newDatum, *filePID, *fileBurstTime);
         newDatum->inputPID = *filePID;
         newDatum->inputBurst = *fileBurstTime;
         enqueue_Push(q1, *newDatum);
         printf("PID: %d, Burst: %zu\n", *filePID, *fileBurstTime);
     }
 
-    //struct Queue* q2 = malloc(sizeof(*q2) + (M_SIZE * sizeof *q2->array));
-    struct Queue* q2 = initQueueStruct(q2, M_SIZE);
-    newQueue(q2, M_SIZE);
-    //enqueue_Push(q2, 1234);
-    //enqueue_Push(q2, 5678);
-    //pid_t poppedItem = dequeue_Pop(q2); // FIFO pop
-    //pid_t newFront = peek(q2);
-    size_t q2Size = getQueueSize(q2);
-    //printf("I am a queue of size %zu, and I popped %d \n", q2Size, poppedItem);
-    //printf("I have a new head of %d", newFront);
-    Datum line1 = dequeue_Pop(q1);
-    pid_t line1PID = line1.inputPID;
-    unsigned long line1Burst = line1.inputBurst;
-    printf("The thing I popped has a file PID of %u, with a burst of %zu\n", line1PID, line1Burst);
+    // struct Queue* q2 = initQueueStruct(q2, M_SIZE);
+    // newQueue(q2, M_SIZE);
+    // size_t q2Size = getQueueSize(q2);
+    // Datum line1 = dequeue_Pop(q1);
+    // pid_t line1PID = line1.inputPID;
+    // unsigned long line1Burst = line1.inputBurst;
+    // printf("The thing I popped has a file PID of %u, with a burst of %zu\n", line1PID, line1Burst);
 
-    // Exit
-    freeThisQueue(q2);
-    free(q2);
-    freeThisQueue(q1);
-    free(q1);
+    // // Exit
+    // freeThisQueue(q2);
+    // free(q2);
+    // freeThisQueue(q1);
+    // free(q1);
+
+    while (!isEmpty(q1))
+    {
+        // Pop from queue to get first element to run
+        Datum line1 = dequeue_Pop(q1);
+
+        printf("Is Empty: %d\n", isEmpty(q1));
+
+        // Create a child process
+        pid_t childPid = fork();
+
+        if (childPid != 0)
+        {
+            // Do nothing
+            printf("Parent of child %d\n", childPid);
+                        
+            // Update the PID of the child process
+            line1.childPID = childPid;
+
+
+        }
+        else
+        {
+            printf("I AM CHILD AND I AM %d \n", childPid);
+
+            // Start processing Prime Numbers
+            long unsigned int prime = processPrime();
+
+            printf("YO i found a prime %lu\n", prime);
+
+            return 0;
+        }
+    }
+
     return 0;
 }

@@ -71,21 +71,26 @@ long unsigned int generateRandom10DigitNumber()
     long unsigned int minNumber = 1000000000; // 10^9
     long unsigned int maxNumber = 9999999999; // 10^10 - 1
 
-    // Seed the random number generator with the current time
-    srand((unsigned int)time(NULL));
-
     // Generate a random number between min_number and max_number
     return (rand() % (maxNumber - minNumber + 1)) + minNumber;
 }
 
-// Main method
-int main(void)
-{
-    long unsigned int starting_number = generateRandom10DigitNumber();
-    long unsigned int next_prime = findNextPrime(starting_number);
+/*
+    Function Name: process
 
-    printf("Starting number: %lu\n", starting_number);
-    printf("Next prime number: %lu\n", next_prime);
-    // Exit
-    return 0;
+    Input to Method:
+        N/A
+
+    Output (Return value):
+        The next prime number starting from a random number
+
+    Brief description of the task:
+        Generates a random 10 digit number and finds the next prime number
+*/
+long unsigned int processPrime()
+{
+    long unsigned int currentNum = generateRandom10DigitNumber();
+    long unsigned int nextPrime = findNextPrime(currentNum);
+
+    return nextPrime;
 }
