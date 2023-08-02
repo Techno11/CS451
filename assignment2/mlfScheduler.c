@@ -83,6 +83,9 @@ int main(int argc,char* argv[])
     ssize_t read;
     fp = fopen(argv[1], "r");
 
+    // Skip first line (header line)
+    getline(&line, &len, fp);
+
     // Iterate over each line of file and add to queue
     while ((read = getline(&line, &len, fp)) != -1)
     {
@@ -95,7 +98,7 @@ int main(int argc,char* argv[])
         newDatum->inputPID = *filePID;
         newDatum->inputBurst = *fileBurstTime;
         enqueue_Push(q1, *newDatum);
-        printf("%s", line);
+        printf("PID: %d, Burst: %zu\n", *filePID, *fileBurstTime);
     }
 
     //struct Queue* q2 = malloc(sizeof(*q2) + (M_SIZE * sizeof *q2->array));
@@ -111,7 +114,7 @@ int main(int argc,char* argv[])
     Datum line1 = dequeue_Pop(q1);
     pid_t line1PID = line1.inputPID;
     unsigned long line1Burst = line1.inputBurst;
-    printf("The thing I popped has a file PID of %u, with a burst of %zu", line1PID, line1Burst);
+    printf("The thing I popped has a file PID of %u, with a burst of %zu\n", line1PID, line1Burst);
 
     // Exit
     freeThisQueue(q2);
