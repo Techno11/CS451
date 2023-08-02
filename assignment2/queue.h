@@ -20,7 +20,7 @@ typedef struct Queue
 } Queue;
 
 pid_t* allocThisQueue(Queue* queue, size_t arraySize);
-Queue* initStruct(Queue* queue, size_t arraySize);
+Queue* initQueueStruct(Queue* queue, size_t arraySize);
 //Queue* allocThisQueue(Queue* queue, size_t arraySize);
 void freeThisQueue(Queue* queue);
 

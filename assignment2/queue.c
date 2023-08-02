@@ -19,7 +19,7 @@ pid_t* allocThisQueue(Queue* queue, size_t arraySize)
     //return queue;
 }
 
-Queue* initStruct(Queue* queue, size_t arraySize)
+Queue* initQueueStruct(Queue* queue, size_t arraySize)
 {
     queue = malloc(sizeof(*queue) + (arraySize * sizeof *queue->array));
     return queue;

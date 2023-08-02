@@ -72,7 +72,7 @@ int main(void)
     //printf("Test");
 
     //struct Queue* q2 = malloc(sizeof(*q2) + (M_SIZE * sizeof *q2->array));
-    struct Queue* q2 = initStruct(q2, M_SIZE);
+    struct Queue* q2 = initQueueStruct(q2, M_SIZE);
     newQueue(q2, M_SIZE);
     enqueue_Push(q2, 1234);
     enqueue_Push(q2, 5678);
