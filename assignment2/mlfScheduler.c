@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include "queue.c"
 #include "prime.c"
 
@@ -21,7 +22,6 @@ bool timerExpired = false;
 void timer_handler(int sigNum)
 {
     /* Handle SIGALRM here. */
-    printf("Current guy I stopped on: %u\n", currentChild);
     timerExpired = true;
 }
 
@@ -61,8 +61,8 @@ void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
     // Timers decrement from it_value to zero, generate a signal, and reset it to it_interval.
 
     /* The timer goes off 1.0 second after installation of the timer. */
-    timer.it_value.tv_sec = timeSlice;  // _sec = seconds.
-    timer.it_value.tv_usec = 0; // _usec = microseconds.
+    timer.it_value.tv_sec = timeSlice; // _sec = seconds.
+    timer.it_value.tv_usec = 0;        // _usec = microseconds.
     /* ... and every 1.0 second after that. */
     timer.it_interval.tv_sec = timeSlice;
     timer.it_interval.tv_usec = 0;
@@ -78,8 +78,6 @@ void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
 // Main method
 int main(int argc, char *argv[])
 {
-    // printf("Test");
-
     time_t timeSlice = atoi(argv[2]);
     // Create a queue
     struct Queue *q1 = initQueueStruct(q1, M_SIZE);
@@ -110,57 +108,51 @@ int main(int argc, char *argv[])
         printf("PID: %d, Burst: %zu\n", *filePID, *fileBurstTime);
     }
 
-    // struct Queue* q2 = initQueueStruct(q2, M_SIZE);
-    // newQueue(q2, M_SIZE);
-    // size_t q2Size = getQueueSize(q2);
-    // Datum line1 = dequeue_Pop(q1);
-    // pid_t line1PID = line1.inputPID;
-    // unsigned long line1Burst = line1.inputBurst;
-    // printf("The thing I popped has a file PID of %u, with a burst of %zu\n", line1PID, line1Burst);
+    struct Queue *q2 = initQueueStruct(q2, M_SIZE);
+    newQueue(q2, M_SIZE);
 
-    // // Exit
-    // freeThisQueue(q2);
-    // free(q2);
-    // freeThisQueue(q1);
-    // free(q1);
-
+    // Iterate over Q1 and fork each process
     while (!isEmpty(q1))
     {
         // Pop from queue to get first element to run
         Datum line1 = dequeue_Pop(q1);
-
-        printf("Is Empty: %d\n", isEmpty(q1));
 
         // Create a child process
         pid_t childPid = fork();
 
         if (childPid != 0)
         {
-            //beginRuntimeOfChild(timeSlice);
-            //wait(NULL);
-            // Do nothing
-            printf("Parent of child %d\n", childPid);
-
             // Update the PID of the child process
             line1.childPID = childPid;
-            currentChild = childPid;
-            beginRuntimeOfChild(timeSlice, childPid);
-            wait(NULL);
-            //beginRuntimeOfChild(timeSlice, childPid);
 
+            // Update global
+            currentChild = childPid;
+
+            // Start timer
+            beginRuntimeOfChild(timeSlice, childPid);
+
+            /* If we get here, timer has exited */
+            printf("Suspending %d\n", childPid);
+
+            // Suspend child process (SIGSTP)
+            sendSignalToChildProc(childPid, SIGTSTP);
+
+            // Push process to Q2
+            enqueue_Push(q2, line1);
         }
         else
         {
-            printf("I AM CHILD AND I AM %d \n", childPid);
-
             // Start processing Prime Numbers
-            long unsigned int prime = processPrime();
-
-            printf("YO i found a prime %lu\n", prime);
+            processPrime();
 
             return 0;
         }
     }
 
+    // Cleanup
+    // freeThisQueue(q2);
+    // free(q2);
+    // freeThisQueue(q1);
+    // free(q1);
     return 0;
 }
