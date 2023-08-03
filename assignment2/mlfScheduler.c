@@ -16,7 +16,8 @@
 #define M_SIZE 100
 pid_t currentChild;
 bool timerExpired = false;
-
+int fd[2]; // pipe for child processes to use
+long unsigned int *lastPrime;
 
 void timer_handler(int sigNum)
 {
@@ -71,6 +72,8 @@ void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
     timerExpired = false;
     while (!timerExpired)
     {
+        // Read from pipe while timering
+        read(fd[0], lastPrime, sizeof(lastPrime));
     }
 }
 
@@ -86,16 +89,14 @@ int main(int argc, char *argv[])
     FILE *fp;
     char *line = NULL;
     size_t len = 0;
-    ssize_t read;
     fp = fopen(argv[1], "r");
 
     // Skip first line (header line)
     getline(&line, &len, fp);
 
     // Iterate over each line of file and add to queue
-    while ((read = getline(&line, &len, fp)) != -1)
+    while ((getline(&line, &len, fp)) != -1)
     {
-        // printf("Retrieved line of length %zu:\n", read);
         // void enqueue_Push(Queue* queue, Datum newProc)
         pid_t *filePID = malloc(sizeof(pid_t) * len);
         unsigned long *fileBurstTime = malloc(sizeof(unsigned long) * len);
@@ -109,6 +110,12 @@ int main(int argc, char *argv[])
 
     struct Queue *q2 = initQueueStruct(q2, M_SIZE);
     newQueue(q2, M_SIZE);
+
+    // Open a pipe for all child processes to use
+    pipe(fd);
+
+    // Initilize lastPrime
+    lastPrime = malloc(sizeof(lastPrime));
 
     // Iterate over Q1 and fork each process
     while (!isEmpty(q1))
@@ -131,7 +138,7 @@ int main(int argc, char *argv[])
             beginRuntimeOfChild(timeSlice, childPid);
 
             /* If we get here, timer has exited */
-            printf("Child %d with last prime of %lu is being suspended\n", childPid, *line1.lastPrime);
+            printf("Child %d with last prime of %lu is being suspended\n", childPid, *lastPrime);
 
             // Suspend child process (SIGSTP)
             sendSignalToChildProc(childPid, SIGSTOP);
@@ -141,14 +148,20 @@ int main(int argc, char *argv[])
         }
         else
         {
+            // Close read end of pipe, not required
+            close(fd[0]);
+
             // Start processing Prime Numbers
-            generateRandom10DigitNumber(line1.lastPrime);
+            long unsigned int num = generateRandom10DigitNumber();
 
-            printf("Child %d is checking %lu for primality\n", getpid(), *line1.lastPrime);
+            // Print random number
+            printf("Child %d is checking %lu for primality.\n", getpid(), num);
 
+            // Infinately search for primes
             while (true)
             {
-                findNextPrime(line1.lastPrime);
+                num = findNextPrime(num);
+                int n = write(fd[1], &num, sizeof(num));
             }
 
             return 0;
@@ -160,5 +173,6 @@ int main(int argc, char *argv[])
     // free(q2);
     // freeThisQueue(q1);
     // free(q1);
+    // free(lastPrime);
     return 0;
 }

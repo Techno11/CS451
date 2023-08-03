@@ -15,14 +15,14 @@
     Breif description of the task:
         Checks if the number is prime or not
 */
-bool isPrime(long unsigned int* num)
+bool isPrime(long unsigned int num)
 {
-    if (*num <= 1)
+    if (num <= 1)
         return false;
 
-    for (long unsigned int i = 2; i * i <= *num; i++)
+    for (long unsigned int i = 2; i * i <= num; i++)
     {
-        if (*num % i == 0)
+        if (num % i == 0)
             return false;
     }
 
@@ -33,25 +33,24 @@ bool isPrime(long unsigned int* num)
     Function Name: findNextPrime
 
     Input to Method:
-        startNum - Pointer to the number to start checking from
+        startNum - The number to start checking from
 
     Output (Return value):
-        N/A
+        The next prime number
 
     Brief description of the task:
         Finds the next prime number after the given number
 */
-void findNextPrime(long unsigned int* startNum)
+long unsigned int findNextPrime(long unsigned int startNum)
 {
-    // Increase the number by 1
-    *startNum++;
+    long unsigned int currentNum = startNum + 1;
 
     while (true)
     {
-        if (isPrime(startNum))
-            return;
+        if (isPrime(currentNum))
+            return currentNum;
 
-        *startNum++;
+        currentNum++;
     }
 }
 
@@ -59,15 +58,15 @@ void findNextPrime(long unsigned int* startNum)
     Function Name: generateRandom10DigitNumber
 
     Input to Method:
-        Pointer to memory location to store the random number
+        N/A
 
     Output (Return value):
-        N/A
+        Random 10 digit number
 
     Brief description of the task:
         Generates a random 10 digit number
 */
-long unsigned int generateRandom10DigitNumber(long unsigned int* ptr)
+long unsigned int generateRandom10DigitNumber()
 {
     // Set the seed
     srand(time(NULL));
@@ -76,5 +75,5 @@ long unsigned int generateRandom10DigitNumber(long unsigned int* ptr)
     long unsigned int maxNumber = 9999999999; // 10^10 - 1
 
     // Generate a random number between min_number and max_number
-    ptr = (rand() % (maxNumber - minNumber + 1)) + minNumber;
+    return (rand() % (maxNumber - minNumber + 1)) + minNumber;
 }

@@ -3,8 +3,8 @@
 #define PRIME_H
 
 
-bool isPrime(long unsigned int* num);
-void findNextPrime(long unsigned int* startNum);
-void generateRandom10DigitNumber(long unsigned int* ptr);
+bool isPrime(long unsigned int num);
+long unsigned int findNextPrime(long unsigned int startNum);
+long unsigned int generateRandom10DigitNumber();
 
 #endif
