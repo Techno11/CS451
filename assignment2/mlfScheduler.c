@@ -7,17 +7,22 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
 #include "queue.c"
 #include "prime.c"
 
 // CONSTANTS:
 #define M_SIZE 100
+pid_t currentChild;
+bool timerExpired = false;
 
 // Queues should have pid_t elements since each child process is uniquely identified by its PID
 
 void timer_handler(int sigNum)
 {
     /* Handle SIGALRM here. */
+    printf("Current guy I stopped on: %u\n", currentChild);
+    timerExpired = true;
 }
 
 /*
@@ -40,7 +45,7 @@ int sendSignalToChildProc(pid_t childPID, int signalNum)
     return killStatus;
 }
 
-void beginRuntimeOfChild()
+void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
 {
     struct itimerval timer;
 
@@ -56,15 +61,16 @@ void beginRuntimeOfChild()
     // Timers decrement from it_value to zero, generate a signal, and reset it to it_interval.
 
     /* The timer goes off 1.0 second after installation of the timer. */
-    timer.it_value.tv_sec = 1;  // _sec = seconds.
+    timer.it_value.tv_sec = timeSlice;  // _sec = seconds.
     timer.it_value.tv_usec = 0; // _usec = microseconds.
     /* ... and every 1.0 second after that. */
-    timer.it_interval.tv_sec = 1;
+    timer.it_interval.tv_sec = timeSlice;
     timer.it_interval.tv_usec = 0;
 
     /* Start a real timer. It counts down whenever this process is executing. */
     setitimer(ITIMER_REAL, &timer, NULL);
-    while (1)
+    timerExpired = false;
+    while (!timerExpired)
     {
     }
 }
@@ -74,7 +80,7 @@ int main(int argc, char *argv[])
 {
     // printf("Test");
 
-    int burstTime = atoi(argv[2]);
+    time_t timeSlice = atoi(argv[2]);
     // Create a queue
     struct Queue *q1 = initQueueStruct(q1, M_SIZE);
     newQueue(q1, M_SIZE);
@@ -130,12 +136,17 @@ int main(int argc, char *argv[])
 
         if (childPid != 0)
         {
+            //beginRuntimeOfChild(timeSlice);
+            //wait(NULL);
             // Do nothing
             printf("Parent of child %d\n", childPid);
-                        
+
             // Update the PID of the child process
             line1.childPID = childPid;
-
+            currentChild = childPid;
+            beginRuntimeOfChild(timeSlice, childPid);
+            wait(NULL);
+            //beginRuntimeOfChild(timeSlice, childPid);
 
         }
         else
