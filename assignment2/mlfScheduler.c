@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 
             while (true)
             {
-                findNextPrime(&line1.lastPrime);
+                findNextPrime(line1.lastPrime);
             }
 
             return 0;
