@@ -15,14 +15,14 @@
     Breif description of the task:
         Checks if the number is prime or not
 */
-bool isPrime(long unsigned int num)
+bool isPrime(long unsigned int* num)
 {
-    if (num <= 1)
+    if (*num <= 1)
         return false;
 
-    for (long unsigned int i = 2; i * i <= num; i++)
+    for (long unsigned int i = 2; i * i <= *num; i++)
     {
-        if (num % i == 0)
+        if (*num % i == 0)
             return false;
     }
 
@@ -33,24 +33,25 @@ bool isPrime(long unsigned int num)
     Function Name: findNextPrime
 
     Input to Method:
-        startNum - The number to start checking from
+        startNum - Pointer to the number to start checking from
 
     Output (Return value):
-        The next prime number
+        N/A
 
     Brief description of the task:
         Finds the next prime number after the given number
 */
-long unsigned int findNextPrime(long unsigned int startNum)
+void findNextPrime(long unsigned int* startNum)
 {
-    long unsigned int currentNum = startNum + 1;
+    // Increase the number by 1
+    *startNum++;
 
     while (true)
     {
-        if (isPrime(currentNum))
-            return currentNum;
+        if (isPrime(startNum))
+            return;
 
-        currentNum++;
+        *startNum++;
     }
 }
 
@@ -58,15 +59,15 @@ long unsigned int findNextPrime(long unsigned int startNum)
     Function Name: generateRandom10DigitNumber
 
     Input to Method:
-        N/A
+        Pointer to memory location to store the random number
 
     Output (Return value):
-        Random 10 digit number
+        N/A
 
     Brief description of the task:
         Generates a random 10 digit number
 */
-long unsigned int generateRandom10DigitNumber()
+long unsigned int generateRandom10DigitNumber(long unsigned int* ptr)
 {
     // Set the seed
     srand(time(NULL));
@@ -75,26 +76,5 @@ long unsigned int generateRandom10DigitNumber()
     long unsigned int maxNumber = 9999999999; // 10^10 - 1
 
     // Generate a random number between min_number and max_number
-    return (rand() % (maxNumber - minNumber + 1)) + minNumber;
-}
-
-/*
-    Function Name: process
-
-    Input to Method:
-        N/A
-
-    Output (Return value):
-        The next prime number starting from a random number
-
-    Brief description of the task:
-        Generates a random 10 digit number and finds the next prime number
-*/
-void processPrime()
-{
-    long unsigned int currentNum = generateRandom10DigitNumber();
-
-    while(true) {
-        currentNum = findNextPrime(currentNum);
-    }
+    ptr = (rand() % (maxNumber - minNumber + 1)) + minNumber;
 }

@@ -17,7 +17,6 @@
 pid_t currentChild;
 bool timerExpired = false;
 
-// Queues should have pid_t elements since each child process is uniquely identified by its PID
 
 void timer_handler(int sigNum)
 {
@@ -132,10 +131,10 @@ int main(int argc, char *argv[])
             beginRuntimeOfChild(timeSlice, childPid);
 
             /* If we get here, timer has exited */
-            printf("Suspending %d\n", childPid);
+            printf("Child %d with last prime of %lu is being suspended\n", childPid, *line1.lastPrime);
 
             // Suspend child process (SIGSTP)
-            sendSignalToChildProc(childPid, SIGTSTP);
+            sendSignalToChildProc(childPid, SIGSTOP);
 
             // Push process to Q2
             enqueue_Push(q2, line1);
@@ -143,7 +142,14 @@ int main(int argc, char *argv[])
         else
         {
             // Start processing Prime Numbers
-            processPrime();
+            generateRandom10DigitNumber(line1.lastPrime);
+
+            printf("Child %d is checking %lu for primality\n", getpid(), *line1.lastPrime);
+
+            while (true)
+            {
+                findNextPrime(&line1.lastPrime);
+            }
 
             return 0;
         }

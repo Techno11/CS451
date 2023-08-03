@@ -10,6 +10,7 @@ typedef struct Datum
     pid_t inputPID;
     unsigned long inputBurst;
     pid_t childPID;
+    unsigned long int* lastPrime;
 } Datum;
 
 

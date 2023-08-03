@@ -4,8 +4,8 @@
 
 Datum* initDatumStruct(Datum* datum, pid_t pid, unsigned long burst)
 {
-    //datum->inputPID = pid;
     //datum->inputBurst = burst;
     datum = malloc(sizeof(*datum));
+    datum->lastPrime = malloc(sizeof(unsigned long int));
     return datum;
 }
