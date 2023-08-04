@@ -1,5 +1,5 @@
 dont process this its the header line!
-0    18
+0    10
 4       4
 6     12
 10   2

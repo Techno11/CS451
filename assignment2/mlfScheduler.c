@@ -18,6 +18,7 @@ pid_t currentChild;
 bool timerExpired = false;
 int fd[2]; // pipe for child processes to use
 long unsigned int *lastPrime;
+time_t schedulerTime = 0;
 
 void timer_handler(int sigNum)
 {
@@ -117,6 +118,9 @@ int main(int argc, char *argv[])
     // Initilize lastPrime
     lastPrime = malloc(sizeof(lastPrime));
 
+    // Initial print
+    bool first = true;
+
     // Iterate over Q1 and fork each process
     while (!isEmpty(q1))
     {
@@ -134,17 +138,56 @@ int main(int argc, char *argv[])
             // Update global
             currentChild = childPid;
 
+            // Calculate the time slice
+            long unsigned int slice = timeSlice;
+
+            // If the burst time is less than the time slice, set the slice to the burst time
+            if (line1.inputBurst <= timeSlice)
+            {
+                slice = line1.inputBurst;
+            }
+
+            // Print the first time
+            if (first)
+            {
+                printf("Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
+            }
+            else
+            {
+                printf("scheduling Process %d (Pid %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
+            }
+
+            schedulerTime += slice;
+
             // Start timer
-            beginRuntimeOfChild(timeSlice, childPid);
+            beginRuntimeOfChild(slice, childPid);
+
+            printf("Scheduler: Time Now: %lu seconds\n", schedulerTime);
 
             /* If we get here, timer has exited */
-            printf("Child %d with last prime of %lu is being suspended\n", childPid, *lastPrime);
 
-            // Suspend child process (SIGSTP)
-            sendSignalToChildProc(childPid, SIGSTOP);
+            // Determine if we want to kill, or if we want to suspend process. If burst time is less than time slice, kill.
+            if (line1.inputBurst <= timeSlice)
+            {
+                // Print message and flush output
+                printf("Terminating Process %d and scheduling ", line1.inputPID);
+                fflush(stdout);
 
-            // Push process to Q2
-            enqueue_Push(q2, line1);
+                // Kill the process
+                sendSignalToChildProc(childPid, SIGKILL);
+            }
+            else
+            {
+                // Print message and flush output
+                printf("Suspending Process %d and moving it to FCFS queue and ", line1.inputPID);
+                fflush(stdout);
+
+                // Suspend child process (SIGSTP)
+                sendSignalToChildProc(childPid, SIGSTOP);
+
+                // Push process to Q2
+                enqueue_Push(q2, line1);
+            }
         }
         else
         {
@@ -155,7 +198,7 @@ int main(int argc, char *argv[])
             long unsigned int num = generateRandom10DigitNumber();
 
             // Print random number
-            printf("Child %d is checking %lu for primality.\n", getpid(), num);
+            printf("Process %d: my PID is %d: I just got started. I am starting with the number %lu to find the next prime number.\n", line1.inputPID, getpid(), num);
 
             // Infinately search for primes
             while (true)
@@ -166,7 +209,10 @@ int main(int argc, char *argv[])
 
             return 0;
         }
+        first = false;
     }
+
+    printf("NO MORE PROCESSES IN Q1, MOVING TO QUEUE 2\n");
 
     // Cleanup
     // freeThisQueue(q2);
