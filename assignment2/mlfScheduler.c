@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
             if (line1.inputBurst <= timeSlice)
             {
                 // Print message and flush output
-                printf("Terminating Process %d and scheduling ", line1.inputPID);
+                printf("Terminating Process %d and ", line1.inputPID);
                 fflush(stdout);
 
                 // Kill the process
