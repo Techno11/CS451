@@ -9,15 +9,11 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include <time.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/wait.h>
-#include <errno.h>
 #include "queue.c"
 #include "prime.c"
 
@@ -246,18 +242,18 @@ int main(int argc, char *argv[])
             // Print the first time
             if (first)
             {
-                printf("Scheduler: Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
+                printf("\nScheduler: Time Now: %lu seconds. ", schedulerTime);
+                printf("Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
             }
             else
             {
                 // Second part of Suspending/Terminating message (must exit to see next Pid)
-                printf("Scheduler: %s scheduling Process %d (Pid %d) for the time slice of %lu seconds.\n", nextHeader, line1.inputPID, childPid, slice);
+                printf("\nScheduler: Time Now: %lu seconds. ", schedulerTime);
+                printf("%s scheduling Process %d (Pid %d) for the time slice of %lu seconds.\n", nextHeader, line1.inputPID, childPid, slice);
             }
 
             // Start timer
             beginRuntimeOfChild(slice);
-
-            printf("\nScheduler: Time Now: %lu seconds\n", schedulerTime);
 
             /* If we get here, timer has exited! */
 
