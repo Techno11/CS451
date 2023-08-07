@@ -129,7 +129,6 @@ int main(int argc, char *argv[])
         newDatum->inputPID = *filePID;
         newDatum->inputBurst = *fileBurstTime;
         enqueue_Push(q1, *newDatum);
-        printf("PID: %d, Burst: %zu\n", *filePID, *fileBurstTime);
     }
 
     struct Queue *q2 = initQueueStruct(q2, M_SIZE);
@@ -177,7 +176,7 @@ int main(int argc, char *argv[])
             // Print the first time
             if (first)
             {
-                printf("Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
+                printf("Scheduler: Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
             }
             else
             {
