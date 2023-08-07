@@ -10,11 +10,21 @@
 #include "datum.h"
 #include <stdlib.h>
 
+/*
+    Function Name: initDatumStruct
 
+    Input to Method:
+        int sigNum - Signal number which triggered this handler
+
+    Output (Return value):
+        N/A
+
+    Brief description of the task:
+        Initilize the datum struct
+*/
 Datum* initDatumStruct(Datum* datum, pid_t pid, unsigned long burst)
 {
     //datum->inputBurst = burst;
     datum = malloc(sizeof(*datum));
-    datum->lastPrime = malloc(sizeof(unsigned long int));
     return datum;
 }
