@@ -70,7 +70,7 @@ void SIGTSTPHandler(int sig)
 void SIGTERMHandler(int sig)
 {
     // Print final message
-    printf("\nProcess %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, myPid, *lastPrime);
+    printf("Process %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, myPid, *lastPrime);
     fflush(stdout);
 
     // Free last prime if it hasn't been freed already
