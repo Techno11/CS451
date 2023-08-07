@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
         // If this is the first, we have to print a *slightly* different message
         if (first)
         {
-            printf("\nResuming process %d\n\n", line1.inputPID);
+            printf("\nResuming process %d\n", line1.inputPID);
         }
 
         // Send signal to child process to resume:
