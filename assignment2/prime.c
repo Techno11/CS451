@@ -80,6 +80,9 @@ long unsigned int generateRandom10DigitNumber()
     // Set the seed
     srand(time(NULL));
 
+    // Seed the random number generator with a random number
+    srand(rand());
+
     long unsigned int minNumber = 1000000000; // 10^9
     long unsigned int maxNumber = 9999999999; // 10^10 - 1
 
