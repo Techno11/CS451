@@ -1,3 +1,12 @@
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 2
+        Date of Submission: 7/24/2023
+        Name of this file: prime.c
+        Short Description of contents:
+            This file contains the functions for finding the next prime number and generating a random 10 digit number. These are used by the child processes
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>

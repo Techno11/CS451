@@ -1,6 +1,12 @@
-//
-// Created by bsting on 7/31/23.
-//
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 2
+        Date of Submission: 7/24/2023
+        Name of this file: queue.c
+        Short Description of contents:
+            This file contains the functions for the queue data structure
+*/
+
 #include <stdlib.h>
 #include "queue.h"
 //#include "datum.c"

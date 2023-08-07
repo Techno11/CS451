@@ -1,6 +1,11 @@
-//
-// Created by bsting on 7/31/23.
-//
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 2
+        Date of Submission: 7/24/2023
+        Name of this file: queue.h
+        Short Description of contents:
+            This file contains the prototypes for the queue data structure
+*/
 
 #ifndef QUEUE_H
 #define QUEUE_H

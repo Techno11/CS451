@@ -1,3 +1,12 @@
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 2
+        Date of Submission: 7/24/2023
+        Name of this file: mlfScheduler.c
+        Short Description of contents:
+            This program runs a scheduler of child processes that process prime numbers. Processes first executed for a standard amount of time, then paused, then resumed for the remainder of their burst time
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
@@ -23,6 +32,18 @@ long unsigned int *lastPrime;
 time_t schedulerTime = 0;
 time_t lastTimeSlice = 0;
 
+/*
+    Function Name: SIGSTPHandler
+
+    Input to Method:
+        int sigNum - Signal number which triggered this handler
+
+    Output (Return value):
+        N/A
+
+    Brief description of the task:
+        Handle the SIGSTP signal, which is sent when the process is about to be suspended.
+*/
 void SIGTSTPHandler(int sig)
 {
     // Print about to be suspended
@@ -32,14 +53,46 @@ void SIGTSTPHandler(int sig)
     signal(SIGTSTP, SIG_DFL);
 }
 
+/*
+    Function Name: SIGTERMHandler
+
+    Input to Method:
+        int sigNum - Signal number which triggered this handler
+
+    Output (Return value):
+        N/A
+
+    Brief description of the task:
+        Handle the SIGTERM signal, which is sent when the process is about to be terminated.
+*/
 void SIGTERMHandler(int sig)
 {
     // Print final message
     printf("\nProcess %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, getpid(), *lastPrime);
+
+    // Free last prime if it hasn't been freed already
+    if(lastPrime != NULL)
+    {
+        free(lastPrime);
+        lastPrime = NULL;
+    }
+
     // Exit
     exit(0);
 }
 
+/*
+    Function Name: SIGALRMHandler
+
+    Input to Method:
+        int sigNum - Signal number which triggered this handler
+
+    Output (Return value):
+        N/A
+
+    Brief description of the task:
+        Handle the SIGALRM signal, which is sent when the timer expires.
+*/
 void SIGALRMHandler(int sigNum)
 {
     /* Handle SIGALRM here. */
@@ -67,7 +120,19 @@ int sendSignalToChildProc(pid_t childPID, int signalNum)
     return killStatus;
 }
 
-void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
+/*
+    Function Name: beginRuntimeOfChild
+
+    Input to Method:
+        time_t timeSlice - The amount of time (in seconds) for the timer to run at
+
+    Output (Return value):
+        N/A
+
+    Brief description of the task:
+        Register a SIGALRM handler, and then start a timer for the amount of time specified by the timeSlice parameter.
+*/
+void beginRuntimeOfChild(time_t timeSlice)
 {
     struct itimerval timer;
     lastTimeSlice = timeSlice;
@@ -102,9 +167,10 @@ void beginRuntimeOfChild(time_t timeSlice, pid_t childPid)
 // Main method
 int main(int argc, char *argv[])
 {
-
+    // Fetch the time slice from the arguments
     time_t timeSlice = atoi(argv[2]);
-    // Create a queue
+
+    // Create our Q1
     struct Queue *q1 = initQueueStruct(q1, M_SIZE);
     newQueue(q1, M_SIZE);
 
@@ -120,27 +186,31 @@ int main(int argc, char *argv[])
     // Iterate over each line of file and add to queue
     while ((getline(&line, &len, fp)) != -1)
     {
-        // void enqueue_Push(Queue* queue, Datum newProc)
+        // Malloc space for PID and Burst Time
         pid_t *filePID = malloc(sizeof(pid_t) * len);
-        // unsigned long *fileBurstTime = malloc(sizeof(unsigned long) * len);
         time_t *fileBurstTime = malloc(sizeof(time_t) * len);
+
+        // Scan the line for the PID and Burst Time
         sscanf(line, "%d%zu\n", filePID, fileBurstTime);
+
+        // Create a new datum structure and initilize it's values
         struct Datum *newDatum = initDatumStruct(newDatum, *filePID, *fileBurstTime);
         newDatum->inputPID = *filePID;
         newDatum->inputBurst = *fileBurstTime;
+
+        // Push the new datum to the queue
         enqueue_Push(q1, *newDatum);
     }
 
+    // Initialize Q2
     struct Queue *q2 = initQueueStruct(q2, M_SIZE);
     newQueue(q2, M_SIZE);
 
-    // Initial print
+    // Track if this is the first run
     bool first = true;
 
     // Last Process # and what we did with it
     char* nextHeader = malloc(sizeof(char) * 128);
-    pid_t lastPid = 0;
-    bool terminateLast = false;
 
     // Iterate over Q1 and fork each process
     while (!isEmpty(q1))
@@ -185,11 +255,11 @@ int main(int argc, char *argv[])
             }
 
             // Start timer
-            beginRuntimeOfChild(slice, childPid);
+            beginRuntimeOfChild(slice);
 
             printf("\nScheduler: Time Now: %lu seconds\n", schedulerTime);
 
-            /* If we get here, timer has exited */
+            /* If we get here, timer has exited! */
 
             // Determine if we want to kill, or if we want to suspend process. If burst time is less than time slice, kill.
             if (line1.inputBurst <= timeSlice)
@@ -234,38 +304,47 @@ int main(int argc, char *argv[])
                 *lastPrime = findNextPrime(*lastPrime);
             }
 
-            free(lastPrime);
+            // Free last prime if it hasn't been freed already
+            if(lastPrime != NULL)
+            {
+                free(lastPrime);
+                lastPrime = NULL;
+            }
 
+            // Exit child process so we don't accidentally start looping again
             return 0;
         }
+
+        // No longer the first time through
         first = false;
     }
 
+    // Free last header, as we're done with it
     free(nextHeader);
 
+    // Print message that we're switching to Q2
     printf("NO MORE PROCESSES IN Q1, MOVING TO QUEUE 2\n");
 
+    // Reset first tracker
     first = true;
 
     // Iterate over Queue 2 and resume each process:
     while (!isEmpty(q2))
     {
+        // Fetch first Q2 element to process
         Datum line1 = dequeue_Pop(q2);
 
+        // If this is the first, we have to print a *slightly* different message
         if (first)
         {
             printf("Resuming process %d\n\n", line1.inputPID);
-            // first = false;
         }
-        /*else
-        {
-            printf("and resuming process %d.\n", line1.inputPID);
-        }*/
 
+        // Send signal to child process to resume:
         sendSignalToChildProc(line1.childPID, SIGCONT); // Assume it resumes the infinite while prime loop
 
         // Call upon parent signal handler to time this continued process; the timer:
-        beginRuntimeOfChild((line1.inputBurst - timeSlice), line1.childPID);
+        beginRuntimeOfChild((line1.inputBurst - timeSlice));
 
         // Now, process' burst has been completed, proceed to terminate:
 
@@ -274,27 +353,17 @@ int main(int argc, char *argv[])
         {
             printf("Scheduler: Time now is %lu seconds. Terminating process %d \n", schedulerTime, line1.inputPID);
         }
-        else
+        else // If the queue isn't empty, we need to peek at the next process to run so we know what to print
         {
             Datum nextLine = peek(q2);
             printf("Scheduler: Time now is %lu seconds. Terminating Process %d and resuming Process %d \n", schedulerTime, line1.inputPID, nextLine.inputPID);
         }
 
+        // Terminate the child (process)
         sendSignalToChildProc(line1.childPID, SIGTERM);
-        // printf("Scheduler: Time now is %lu seconds. Terminating Process %d ", schedulerTime, line1.inputPID);
-        // fflush(stdout);
 
+        // No longer the first time through
         first = false;
-
-        // Last prime from continue should be in global var *lastPrime now
-        // printf("Scheduler: Time now is %lu seconds. Terminating Process %d ", schedulerTime, line1.inputPID);
-        // fflush(stdout);
-
-        /*while (!timerExpired)
-        {
-            num = findNextPrime(*line1.lastPrime);
-            int n = write(fd[1], &num, sizeof(num));
-        }*/
     }
 
     printf("\nScheduler: No more processes to run. Bye");
@@ -304,6 +373,5 @@ int main(int argc, char *argv[])
     // free(q2);
     // freeThisQueue(q1);
     // free(q1);
-    // free(lastPrime);
     return 0;
 }

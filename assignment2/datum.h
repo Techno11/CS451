@@ -1,3 +1,12 @@
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 2
+        Date of Submission: 7/24/2023
+        Name of this file: datum.h
+        Short Description of contents:
+            This file contains the prototypes for the datum data structure
+*/
+
 #ifndef DATUM_H
 #define DATUM_H
 
@@ -11,7 +20,6 @@ typedef struct Datum
     //unsigned long inputBurst;
     time_t inputBurst;
     pid_t childPID;
-    unsigned long int* lastPrime;
 } Datum;
 
 
