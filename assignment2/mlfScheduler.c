@@ -237,7 +237,6 @@ int main(int argc, char *argv[])
             currentChild = childPid;
 
             // Calculate the time slice
-            // long unsigned int slice = timeSlice;
             time_t slice = timeSlice;
 
             // If the burst time is less than the time slice, set the slice to the burst time
