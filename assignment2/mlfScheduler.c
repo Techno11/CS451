@@ -31,6 +31,7 @@ bool timerExpired = false;
 long unsigned int *lastPrime;
 time_t schedulerTime = 0;
 time_t lastTimeSlice = 0;
+pid_t myPid = -1;
 
 /*
     Function Name: SIGSTPHandler
@@ -47,7 +48,7 @@ time_t lastTimeSlice = 0;
 void SIGTSTPHandler(int sig)
 {
     // Print about to be suspended
-    printf("Process %d: my PID is %d: I am about to be suspended...Highest prime number I found is %lu.\n", currentProcess, getpid(), *lastPrime);
+    printf("Process %d: my PID is %d: I am about to be suspended...Highest prime number I found is %lu.\n", currentProcess, myPid, *lastPrime);
 
     // Return proper signal
     signal(SIGTSTP, SIG_DFL);
@@ -68,7 +69,7 @@ void SIGTSTPHandler(int sig)
 void SIGTERMHandler(int sig)
 {
     // Print final message
-    printf("\nProcess %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, getpid(), *lastPrime);
+    printf("\nProcess %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, myPid, *lastPrime);
 
     // Free last prime if it hasn't been freed already
     if(lastPrime != NULL)
@@ -285,6 +286,9 @@ int main(int argc, char *argv[])
         // We are in the child PID:
         else
         {
+            // Set this process' PID
+            myPid = getpid();
+
             // Register SIGTSTP handler
             signal(SIGTSTP, SIGTSTPHandler);
 
@@ -296,7 +300,7 @@ int main(int argc, char *argv[])
             *lastPrime = generateRandom10DigitNumber();
 
             // Print random number
-            printf("\nProcess %d: my PID is %d: I just got started. I am starting with the number %lu to find the next prime number.\n", line1.inputPID, getpid(), *lastPrime);
+            printf("\nProcess %d: my PID is %d: I just got started. I am starting with the number %lu to find the next prime number.\n", line1.inputPID, myPid, *lastPrime);
 
             // Infinately search for primes
             while (true)
