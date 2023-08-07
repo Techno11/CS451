@@ -49,6 +49,7 @@ void SIGTSTPHandler(int sig)
 {
     // Print about to be suspended
     printf("Process %d: my PID is %d: I am about to be suspended...Highest prime number I found is %lu.\n", currentProcess, myPid, *lastPrime);
+    fflush(stdout);
 
     // Return proper signal
     signal(SIGTSTP, SIG_DFL);
@@ -70,9 +71,10 @@ void SIGTERMHandler(int sig)
 {
     // Print final message
     printf("\nProcess %d: my PID is %d: I am leaving the system. The largest prime I found was %lu \n", currentProcess, myPid, *lastPrime);
+    fflush(stdout);
 
     // Free last prime if it hasn't been freed already
-    if(lastPrime != NULL)
+    if (lastPrime != NULL)
     {
         free(lastPrime);
         lastPrime = NULL;
@@ -211,7 +213,7 @@ int main(int argc, char *argv[])
     bool first = true;
 
     // Last Process # and what we did with it
-    char* nextHeader = malloc(sizeof(char) * 128);
+    char *nextHeader = malloc(sizeof(char) * 128);
 
     // Iterate over Q1 and fork each process
     while (!isEmpty(q1))
@@ -248,17 +250,20 @@ int main(int argc, char *argv[])
             if (first)
             {
                 printf("Scheduler: Scheduling to Process %d (PID %d) for the time slice of %lu seconds.\n", line1.inputPID, childPid, slice);
+                fflush(stdout);
             }
             else
             {
                 // Second part of Suspending/Terminating message (must exit to see next Pid)
                 printf("Scheduler: %s scheduling Process %d (Pid %d) for the time slice of %lu seconds.\n", nextHeader, line1.inputPID, childPid, slice);
+                fflush(stdout);
             }
 
             // Start timer
             beginRuntimeOfChild(slice);
 
             printf("\nScheduler: Time Now: %lu seconds\n", schedulerTime);
+            fflush(stdout);
 
             /* If we get here, timer has exited! */
 
@@ -301,6 +306,7 @@ int main(int argc, char *argv[])
 
             // Print random number
             printf("\nProcess %d: my PID is %d: I just got started. I am starting with the number %lu to find the next prime number.\n", line1.inputPID, myPid, *lastPrime);
+            fflush(stdout);
 
             // Infinately search for primes
             while (true)
@@ -309,7 +315,7 @@ int main(int argc, char *argv[])
             }
 
             // Free last prime if it hasn't been freed already
-            if(lastPrime != NULL)
+            if (lastPrime != NULL)
             {
                 free(lastPrime);
                 lastPrime = NULL;
@@ -328,6 +334,7 @@ int main(int argc, char *argv[])
 
     // Print message that we're switching to Q2
     printf("NO MORE PROCESSES IN Q1, MOVING TO QUEUE 2\n");
+    fflush(stdout);
 
     // Reset first tracker
     first = true;
@@ -342,6 +349,7 @@ int main(int argc, char *argv[])
         if (first)
         {
             printf("Resuming process %d\n\n", line1.inputPID);
+            fflush(stdout);
         }
 
         // Send signal to child process to resume:
@@ -356,11 +364,13 @@ int main(int argc, char *argv[])
         if (isEmpty(q2))
         {
             printf("Scheduler: Time now is %lu seconds. Terminating process %d \n", schedulerTime, line1.inputPID);
+            fflush(stdout);
         }
         else // If the queue isn't empty, we need to peek at the next process to run so we know what to print
         {
             Datum nextLine = peek(q2);
             printf("Scheduler: Time now is %lu seconds. Terminating Process %d and resuming Process %d \n", schedulerTime, line1.inputPID, nextLine.inputPID);
+            fflush(stdout);
         }
 
         // Terminate the child (process)
