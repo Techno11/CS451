@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
         first = false;
     }
 
-    printf("\nScheduler: No more processes to run. Bye");
+    printf("\nScheduler: No more processes to run. Bye\n");
 
     // Cleanup
     // freeThisQueue(q2);
