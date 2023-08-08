@@ -1,7 +1,7 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 2
-        Date of Submission: 7/24/2023
+        Date of Submission: 8/9/2023
         Name of this file: queue.c
         Short Description of contents:
             This file contains the functions for the queue data structure
@@ -9,71 +9,184 @@
 
 #include <stdlib.h>
 #include "queue.h"
-//#include "datum.c"
 
+/*
+    Function Name: allocThisQueue
+
+    Input to Method:
+        queue - The queue structure that has the array to dynamically allocate memory to
+        arraySize - The length of the queue's array
+
+    Output (Return value):
+        The new reference to the allocated queue array, of type Datum
+
+    Brief description of the task:
+        Allocates memory to the queue's array
+*/
 Datum* allocThisQueue(Queue* queue, size_t arraySize)
-//Queue* allocThisQueue(Queue* queue, size_t arraySize)
 {
-    //queue = malloc(sizeof(*queue) + arraySize * sizeof *queue->array);
     queue->array = (Datum*)malloc(sizeof(Datum) * arraySize);
-    //pid_t newArray[arraySize];
-    //queue->array = newArray;
-    /*for (pid_t i = 0; i < arraySize; i++)
-    {
-        queue->array[i] = i;
-    }*/
+
     return queue->array;
-    //return queue;
 }
 
+/*
+    Function Name: initQueueStruct
+
+    Input to Method:
+        queue - The queue structure to dynamically allocate memory to
+        arraySize - The length of the queue's array
+
+    Output (Return value):
+        The new reference to the allocated queue
+
+    Brief description of the task:
+        Allocates memory to the queue's structure
+*/
 Queue* initQueueStruct(Queue* queue, size_t arraySize)
 {
     queue = malloc(sizeof(*queue) + (arraySize * sizeof *queue->array));
     return queue;
 }
 
+/*
+    Function Name: freeThisQueue
+
+    Input to Method:
+        queue - The queue structure with the encapsulated array to free dynamic memory from
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Frees the memory allocated to this queue's array
+*/
 void freeThisQueue(Queue* queue)
 {
     free(queue->array);
-    //free(queue);
 }
 
+/*
+    Function Name: isEmpty
+
+    Input to Method:
+        thisQueue - The queue structure to be checked if it's empty or not
+
+    Output (Return value):
+        True/false as to if this queue is empty or not
+
+    Brief description of the task:
+        Checks if the passed queue is empty or not
+*/
 bool isEmpty(Queue* thisQueue)
 {
     bool emptyOrNot = (getCount(thisQueue) == 0);
     return emptyOrNot;
 }
 
+/*
+    Function Name: isFull
+
+    Input to Method:
+        thisQueue - The queue structure to be checked if it's full or not
+
+    Output (Return value):
+        True/false as to if this queue is full or not
+
+    Brief description of the task:
+        Checks if the passed queue is full (at max item capacity) or not
+*/
 bool isFull(Queue* thisQueue)
 {
     bool fullOrNot = (getCount(thisQueue) == getQueueSize(thisQueue));
     return fullOrNot;
 }
 
+/*
+    Function Name: getQueueSize
+
+    Input to Method:
+        thisQueue - The queue structure whose array size is to be fetched
+
+    Output (Return value):
+        An unsigned long size_t number indicating the array size inside the queue
+
+    Brief description of the task:
+        Gets the size of this queue's array as a size_t number
+*/
 size_t getQueueSize(Queue* thisQueue)
 {
     size_t thisSize = thisQueue->arraySize;
     return thisSize;
 }
 
+/*
+    Function Name: getRear
+
+    Input to Method:
+        thisQueue - The queue structure whose rear/back index will be fetched
+
+    Output (Return value):
+        An unsigned long size_t number indicating the index position of the queue's rear
+
+    Brief description of the task:
+        Gets the rear index of this passed queue
+*/
 size_t getRear(Queue* thisQueue)
 {
     size_t thisRear = thisQueue->rearIndex;
     return thisRear;
 }
 
+/*
+    Function Name: getFront
+
+    Input to Method:
+        thisQueue - The queue structure whose front index will be fetched
+
+    Output (Return value):
+        An unsigned long size_t number indicating the index position of the queue's front
+
+    Brief description of the task:
+        Gets the front index of this passed queue
+*/
 size_t getFront(Queue* thisQueue)
 {
     size_t thisFront = thisQueue->frontIndex;
     return thisFront;
 }
 
+/*
+    Function Name: getCount
+
+    Input to Method:
+        thisQueue - The queue structure whose count of items will be fetched
+
+    Output (Return value):
+        An unsigned long size_t number indicating the number of items in the queue's array
+
+    Brief description of the task:
+        Gets the count of array items in this passed queue
+*/
 size_t getCount(Queue* thisQueue)
 {
     size_t thisCount = thisQueue->currCount;
     return thisCount;
 }
 
+/*
+    Function Name: getElementAt
+
+    Input to Method:
+        thisQueue - The queue structure to fetch an indexed element from
+        index - The index indicating the position of the Datum item to get inside queue's array
+
+    Output (Return value):
+        The Datum item that was fetched at an index within this passed queue
+
+    Brief description of the task:
+        Gets a Datum item element at a valid index inside this queue's array
+*/
 Datum getElementAt(Queue* thisQueue, size_t index)
 {
     if (index < getQueueSize(thisQueue))
@@ -88,26 +201,92 @@ Datum getElementAt(Queue* thisQueue, size_t index)
     }
 }
 
+/*
+    Function Name: setQueueSize
+
+    Input to Method:
+        thisQueue - The queue structure whose array size will be assigned/re-assigned
+        newSize - The new size of the queue array
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Sets the queue's array size to a new specified size
+*/
 void setQueueSize(Queue* thisQueue, size_t newSize)
 {
     thisQueue->arraySize = newSize;
 }
 
+/*
+    Function Name: setFront
+
+    Input to Method:
+        thisQueue - The queue structure whose front index will be assigned/re-assigned
+        newFrontIndex - The new front index of the queue's array
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Sets the queue's array front index to a new specified front index
+*/
 void setFront(Queue* thisQueue, size_t newFrontIndex)
 {
     thisQueue->frontIndex = newFrontIndex;
 }
 
+/*
+    Function Name: setRear
+
+    Input to Method:
+        thisQueue - The queue structure whose rear index will be assigned/re-assigned
+        newRearIndex - The new rear index of the queue's array
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Sets the queue's array rear index to a new specified rear index
+*/
 void setRear(Queue* thisQueue, size_t newRearIndex)
 {
     thisQueue->rearIndex = newRearIndex;
 }
 
+/*
+    Function Name: setCount
+
+    Input to Method:
+        thisQueue - The queue structure whose array item count will be assigned/re-assigned
+        newCount - The new item count of the queue's array
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Sets the queue's array item count to a new specified count
+*/
 void setCount(Queue* thisQueue, size_t newCount)
 {
     thisQueue->currCount = newCount;
 }
 
+/*
+    Function Name: setElementAt
+
+    Input to Method:
+        thisQueue - The queue structure whose indexed array element will be assigned/re-assigned
+        newElement - The new Datum item to replace at the specified index position in this queue's array
+        index - The index position that specifies the Datum element to be replaced with the new element
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Sets the specified Datum element in the queue's array to the (new) passed Datum element
+*/
 void setElementAt(Queue* thisQueue, Datum newElement, size_t index)
 {
     if (index < getQueueSize(thisQueue)) // Can set elem. indices from 0 to size-1
@@ -116,19 +295,43 @@ void setElementAt(Queue* thisQueue, Datum newElement, size_t index)
     }
 }
 
+/*
+    Function Name: newQueue
+
+    Input to Method:
+        new_queue - The queue structure to fully construct with its own array
+        queueSize - The size of the queue's newly constructed array
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Constructs a new queue that has its array allocated and member variables setup
+*/
 void newQueue(Queue* new_queue, size_t queueSize)
 {
     new_queue->array = allocThisQueue(new_queue, queueSize);
-    //new_queue = allocThisQueue(new_queue, queueSize);
     setQueueSize(new_queue, queueSize);
     setFront(new_queue, 0);
     setRear(new_queue, getQueueSize(new_queue) - 1);
     setCount(new_queue, 0);
 }
 
+/*
+    Function Name: enqueue_Push
+
+    Input to Method:
+        queue - The queue structure to push a new (process) element onto
+        newProc - A Datum representation of a process that will be pushed onto the passed queue
+
+    Output (Return value):
+        None/void
+
+    Brief description of the task:
+        Pushes a new process Datum element in the rear of this queue (following FCFS)
+*/
 void enqueue_Push(Queue* queue, Datum newProc)
 {
-    //if (getRear(queue) == (getQueueSize(queue) - 1))
     if(isFull(queue))
     {
         printf("Queue: overflow! \n");
@@ -146,6 +349,18 @@ void enqueue_Push(Queue* queue, Datum newProc)
     }
 }
 
+/*
+    Function Name: dequeue_Pop
+
+    Input to Method:
+        queue - The queue structure to pop the existing front (process) element from
+
+    Output (Return value):
+        The Datum element that was the front item popped off the queue
+
+    Brief description of the task:
+        Pops a process Datum element at the front of this queue (following FCFS)
+*/
 Datum dequeue_Pop(Queue* queue)
 {
     if (isEmpty(queue))
@@ -157,10 +372,6 @@ Datum dequeue_Pop(Queue* queue)
     {
         Datum poppedItem = getElementAt(queue, getFront(queue));
 
-        // OPTIONAL STEP: I'm just cleaning this PID up, to a default value of 0...
-        //TODO: make new Datum default element instead of 0
-        //setElementAt(queue, 0, getFront(queue)); // 0 = NULL PID
-
         size_t newFront = getFront(queue);
         newFront = (newFront + 1) % getQueueSize(queue);
         setFront(queue, newFront);
@@ -171,6 +382,18 @@ Datum dequeue_Pop(Queue* queue)
     }
 }
 
+/*
+    Function Name: peek
+
+    Input to Method:
+        queue - The queue structure to which to peek into the current front (process) element
+
+    Output (Return value):
+        The Datum element that was peeked at in the queue
+
+    Brief description of the task:
+        Peeks into the passed queue to find out what the front item in the queue's array is (without popping)
+*/
 Datum peek(Queue* queue)
 {
     if (isEmpty(queue))

@@ -1,7 +1,7 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 2
-        Date of Submission: 7/24/2023
+        Date of Submission: 8/9/2023
         Name of this file: mlfScheduler.c
         Short Description of contents:
             This program runs a scheduler of child processes that process prime numbers. Processes first executed for a standard amount of time, then paused, then resumed for the remainder of their burst time
@@ -198,7 +198,14 @@ int main(int argc, char *argv[])
 
         // Push the new datum to the queue
         enqueue_Push(q1, *newDatum);
+
+        //Try to clean loop if it doesn't break program:
+        free(filePID);
+        free(fileBurstTime);
+        free(newDatum);
     }
+    // Close up file pointer to first argument; don't need it anymore:
+    fclose(fp);
 
     // Initialize Q2
     struct Queue *q2 = initQueueStruct(q2, M_SIZE);
@@ -330,7 +337,7 @@ int main(int argc, char *argv[])
     sleep(1);
 
     // Print message that we're switching to Q2
-    printf("\nNO MORE PROCESSES IN Q1, MOVING TO QUEUE 2\n");
+    printf("\nNO MORE PROCESSES IN QUEUE 1, MOVING TO QUEUE 2\n");
 
     // Reset first tracker
     first = true;
@@ -379,9 +386,10 @@ int main(int argc, char *argv[])
     printf("\nScheduler: No more processes to run. Bye\n");
 
     // Cleanup
-    // freeThisQueue(q2);
-    // free(q2);
-    // freeThisQueue(q1);
-    // free(q1);
+    freeThisQueue(q2);
+    free(q2);
+    freeThisQueue(q1);
+    free(q1);
+    free(line);
     return 0;
 }

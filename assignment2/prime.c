@@ -1,14 +1,14 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 2
-        Date of Submission: 7/24/2023
+        Date of Submission: 8/9/2023
         Name of this file: prime.c
         Short Description of contents:
             This file contains the functions for finding the next prime number and generating a random 10 digit number. These are used by the child processes
 */
 
 #include <stdio.h>
-#include <stdbool.h>
+#include "prime.h"
 #include <time.h>
 #include <stdlib.h>
 
@@ -21,7 +21,7 @@
     Output (Return value):
         Whether or not the number is prime
 
-    Breif description of the task:
+    Brief description of the task:
         Checks if the number is prime or not
 */
 bool isPrime(long unsigned int num)
