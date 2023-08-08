@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
@@ -218,6 +219,9 @@ int main(int argc, char *argv[])
         // Globally store current process
         currentProcess = line1.inputPID;
 
+        // Sleep calling thread just for a second, to mitigate race condition:
+        sleep(1);
+
         // Create a child process
         pid_t childPid = fork();
 
@@ -256,6 +260,7 @@ int main(int argc, char *argv[])
             beginRuntimeOfChild(slice);
 
             /* If we get here, timer has exited! */
+
 
             // Determine if we want to kill, or if we want to suspend process. If burst time is less than time slice, kill.
             if (line1.inputBurst <= timeSlice)
@@ -321,6 +326,9 @@ int main(int argc, char *argv[])
     // Free last header, as we're done with it
     free(nextHeader);
 
+    // Sleep calling thread just for a second, to mitigate race condition:
+    sleep(1);
+
     // Print message that we're switching to Q2
     printf("\nNO MORE PROCESSES IN Q1, MOVING TO QUEUE 2\n");
 
@@ -364,6 +372,9 @@ int main(int argc, char *argv[])
         // No longer the first time through
         first = false;
     }
+
+    // Sleep calling thread just for a second, to mitigate race condition:
+    sleep(1);
 
     printf("\nScheduler: No more processes to run. Bye\n");
 
