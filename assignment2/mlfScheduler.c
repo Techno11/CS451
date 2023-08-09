@@ -226,9 +226,6 @@ int main(int argc, char *argv[])
         // Globally store current process
         currentProcess = line1.inputPID;
 
-        // Sleep calling thread just for a second, to mitigate race condition:
-        sleep(1);
-
         // Create a child process
         pid_t childPid = fork();
 
@@ -333,9 +330,6 @@ int main(int argc, char *argv[])
     // Free last header, as we're done with it
     free(nextHeader);
 
-    // Sleep calling thread just for a second, to mitigate race condition:
-    sleep(1);
-
     // Print message that we're switching to Q2
     printf("\nNO MORE PROCESSES IN QUEUE 1, MOVING TO QUEUE 2\n");
 
@@ -379,9 +373,6 @@ int main(int argc, char *argv[])
         // No longer the first time through
         first = false;
     }
-
-    // Sleep calling thread just for a second, to mitigate race condition:
-    sleep(1);
 
     printf("\nScheduler: No more processes to run. Bye\n");
 

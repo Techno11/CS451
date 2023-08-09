@@ -310,6 +310,14 @@ void setElementAt(Queue* thisQueue, Datum newElement, size_t index)
 */
 void newQueue(Queue* new_queue, size_t queueSize)
 {
+    /*
+        To make/construct a new initialized queue:
+        -1. we allocate the proper memory to the array pointer inside the queue struct,
+        -2. we set the queue's (array) size to whatever was passed to this constructor,
+        -3. set the queue's stored front index (in its struct) to 0, representing the very front of queue's array,
+        -4. set the queue's stored rear index (in its struct) to [array size - 1] or last possible element position,
+        -5. and then just set the element count member variable to 0 since the queue just got constructed!
+    */
     new_queue->array = allocThisQueue(new_queue, queueSize);
     setQueueSize(new_queue, queueSize);
     setFront(new_queue, 0);
@@ -332,6 +340,7 @@ void newQueue(Queue* new_queue, size_t queueSize)
 */
 void enqueue_Push(Queue* queue, Datum newProc)
 {
+    // Make sure we have room to push before actually pushing:
     if(isFull(queue))
     {
         printf("Queue: overflow! \n");
@@ -339,6 +348,13 @@ void enqueue_Push(Queue* queue, Datum newProc)
     }
     else
     {
+        /*
+         To actually push onto the queue array:
+            -1. we get the rear index,
+            -2. calculate the new rear index by incrementing with remainder(%) to keep array circular
+            -3. set the queue's stored rear index (in its struct) to the new rear index calculated,
+            -4. and then update the count member variable inside queue to reflect that an item has been pushed!
+         */
         size_t newRear = getRear(queue);
         newRear = (newRear + 1) % getQueueSize(queue);
         setRear(queue, newRear);
@@ -363,6 +379,7 @@ void enqueue_Push(Queue* queue, Datum newProc)
 */
 Datum dequeue_Pop(Queue* queue)
 {
+    // Make sure there's actually something to pop before popping:
     if (isEmpty(queue))
     {
         printf("Queue: empty! \n");
@@ -370,8 +387,17 @@ Datum dequeue_Pop(Queue* queue)
     }
     else
     {
+        // We pop from the front of the queue in FCFS/FIFO, so the popped element is obtained at the front:
         Datum poppedItem = getElementAt(queue, getFront(queue));
 
+        /*
+         To actually pop off the queue array now:
+            -1. we get the front index,
+            -2. calculate the new front index by incrementing with remainder(%) to keep array circular
+            -3. set the queue's stored front index (in its struct) to the new front index calculated,
+            -4. update the count member variable inside queue to reflect that an item has been popped,
+            -5. and then just return the popped item from the queue's array!
+         */
         size_t newFront = getFront(queue);
         newFront = (newFront + 1) % getQueueSize(queue);
         setFront(queue, newFront);
