@@ -1,0 +1,276 @@
+DEMO RUNS:
+============
+
+-----------------------------------------------
+Run 1: using input.txt with a time slice of 10:
+-----------------------------------------------
+
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ gcc mlfScheduler.c
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ ./a.out input.txt 10
+
+Scheduler: Time Now: 0 seconds. Scheduling to Process 0 (PID 2489) for the time slice of 10 seconds.
+
+Process 0: my PID is 2489: I just got started. I am starting with the number 1624393856 to find the next prime number.
+
+Scheduler: Time Now: 10 seconds. Terminating Process 0 and scheduling Process 4 (Pid 2490) for the time slice of 4 seconds.
+
+Process 0: my PID is 2489: I am leaving the system. The largest prime I found was 1624643483 
+
+Process 4: my PID is 2490: I just got started. I am starting with the number 2160568957 to find the next prime number.
+
+Scheduler: Time Now: 14 seconds. Terminating Process 4 and scheduling Process 6 (Pid 2491) for the time slice of 10 seconds.
+
+Process 4: my PID is 2490: I am leaving the system. The largest prime I found was 2160650293 
+
+Process 6: my PID is 2491: I just got started. I am starting with the number 1576898860 to find the next prime number.
+
+Scheduler: Time Now: 24 seconds. Suspending Process 6 and moving it to FCFS queue and scheduling Process 10 (Pid 2492) for the time slice of 2 seconds.
+
+Process 6: my PID is 2491: I am about to be suspended...Highest prime number I found is 1577127359.
+
+Process 10: my PID is 2492: I just got started. I am starting with the number 1208337523 to find the next prime number.
+
+Scheduler: Time Now: 26 seconds. Terminating Process 10 and scheduling Process 17 (Pid 2493) for the time slice of 10 seconds.
+
+Process 17: my PID is 2493: I just got started. I am starting with the number 1891804921 to find the next prime number.
+
+Process 10: my PID is 2492: I am leaving the system. The largest prime I found was 1208375891 
+
+
+Process 17: my PID is 2493: I am about to be suspended...Highest prime number I found is 1891959973.
+Scheduler: Time Now: 36 seconds. Suspending Process 17 and moving it to FCFS queue and scheduling Process 28 (Pid 2494) for the time slice of 10 seconds.
+
+Process 28: my PID is 2494: I just got started. I am starting with the number 3042666800 to find the next prime number.
+
+Scheduler: Time Now: 46 seconds. Suspending Process 28 and moving it to FCFS queue and scheduling Process 74 (Pid 2495) for the time slice of 6 seconds.
+
+Process 28: my PID is 2494: I am about to be suspended...Highest prime number I found is 3042762263.
+
+Process 74: my PID is 2495: I just got started. I am starting with the number 1882320463 to find the next prime number.
+
+Scheduler: Time Now: 52 seconds. Terminating Process 74 and scheduling Process 88 (Pid 2497) for the time slice of 10 seconds.
+
+Process 88: my PID is 2497: I just got started. I am starting with the number 3022520448 to find the next prime number.
+
+Process 74: my PID is 2495: I am leaving the system. The largest prime I found was 1882374743 
+
+Scheduler: Time Now: 62 seconds. Suspending Process 88 and moving it to FCFS queue and scheduling Process 92 (Pid 2500) for the time slice of 10 seconds.
+
+Process 92: my PID is 2500: I just got started. I am starting with the number 1171358215 to find the next prime number.
+
+Process 88: my PID is 2497: I am about to be suspended...Highest prime number I found is 3022597769.
+
+Scheduler: Time Now: 72 seconds. Suspending Process 92 and moving it to FCFS queue and scheduling Process 99 (Pid 2501) for the time slice of 10 seconds.
+
+Process 99: my PID is 2501: I just got started. I am starting with the number 2893735004 to find the next prime number.
+
+Process 92: my PID is 2500: I am about to be suspended...Highest prime number I found is 1171454503.
+
+NO MORE PROCESSES IN QUEUE 1, MOVING TO QUEUE 2
+
+Resuming process 6
+
+Process 99: my PID is 2501: I am about to be suspended...Highest prime number I found is 2893783103.
+
+Scheduler: Time now is 84 seconds. Terminating Process 6 and resuming Process 17 
+
+Process 6: my PID is 2491: I am leaving the system. The largest prime I found was 1577772949 
+
+Scheduler: Time now is 99 seconds. Terminating Process 17 and resuming Process 28 
+
+Process 17: my PID is 2493: I am leaving the system. The largest prime I found was 1892478529 
+
+Scheduler: Time now is 128 seconds. Terminating Process 28 and resuming Process 88 
+
+Process 28: my PID is 2494: I am leaving the system. The largest prime I found was 3043267093 
+
+Scheduler: Time now is 129 seconds. Terminating Process 88 and resuming Process 92 
+
+Process 88: my PID is 2497: I am leaving the system. The largest prime I found was 3022994189 
+
+Scheduler: Time now is 176 seconds. Terminating Process 92 and resuming Process 99 
+
+Process 92: my PID is 2500: I am leaving the system. The largest prime I found was 1172664319 
+
+Scheduler: Time now is 294 seconds. Terminating process 99 
+
+Scheduler: No more processes to run. Bye
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ 
+Process 99: my PID is 2501: I am leaving the system. The largest prime I found was 2896443947
+
+-------------------------------------------
+Run 2: using in.txt with a time slice of 4:
+-------------------------------------------
+
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ gcc mlfScheduler.c
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ ./a.out in.txt 4
+
+Scheduler: Time Now: 0 seconds. Scheduling to Process 0 (PID 4197) for the time slice of 4 seconds.
+
+Process 0: my PID is 4197: I just got started. I am starting with the number 1492859849 to find the next prime number.
+
+Scheduler: Time Now: 4 seconds. Suspending Process 0 and moving it to FCFS queue and scheduling Process 1 (Pid 4198) for the time slice of 3 seconds.
+
+Process 0: my PID is 4197: I am about to be suspended...Highest prime number I found is 1492999951.
+
+Process 1: my PID is 4198: I just got started. I am starting with the number 2060866560 to find the next prime number.
+
+Scheduler: Time Now: 7 seconds. Terminating Process 1 and scheduling Process 8 (Pid 4199) for the time slice of 4 seconds.
+
+Process 8: my PID is 4199: I just got started. I am starting with the number 2050457128 to find the next prime number.
+
+Process 1: my PID is 4198: I am leaving the system. The largest prime I found was 2060928011 
+
+Scheduler: Time Now: 11 seconds. Suspending Process 8 and moving it to FCFS queue and scheduling Process 9 (Pid 4200) for the time slice of 2 seconds.
+
+Process 8: my PID is 4199: I am about to be suspended...Highest prime number I found is 2050539287.
+
+Process 9: my PID is 4200: I just got started. I am starting with the number 1082769882 to find the next prime number.
+
+Scheduler: Time Now: 13 seconds. Terminating Process 9 and scheduling Process 16 (Pid 4201) for the time slice of 4 seconds.
+
+Process 16: my PID is 4201: I just got started. I am starting with the number 1991914922 to find the next prime number.
+
+Process 9: my PID is 4200: I am leaving the system. The largest prime I found was 1082810471 
+
+Scheduler: Time Now: 17 seconds. Suspending Process 16 and moving it to FCFS queue and scheduling Process 23 (Pid 4202) for the time slice of 4 seconds.
+
+Process 23: my PID is 4202: I just got started. I am starting with the number 1491204748 to find the next prime number.
+
+Process 16: my PID is 4201: I am about to be suspended...Highest prime number I found is 1991977699.
+
+Scheduler: Time Now: 21 seconds. Suspending Process 23 and moving it to FCFS queue and scheduling Process 55 (Pid 4203) for the time slice of 4 seconds.
+
+Process 23: my PID is 4202: I am about to be suspended...Highest prime number I found is 1491261257.
+
+Process 55: my PID is 4203: I just got started. I am starting with the number 1480961363 to find the next prime number.
+
+Scheduler: Time Now: 25 seconds. Terminating Process 55 and scheduling Process 96 (Pid 4204) for the time slice of 4 seconds.
+
+Process 96: my PID is 4204: I just got started. I am starting with the number 1227115198 to find the next prime number.
+
+Process 55: my PID is 4203: I am leaving the system. The largest prime I found was 1481008817 
+
+NO MORE PROCESSES IN QUEUE 1, MOVING TO QUEUE 2
+
+Resuming process 0
+
+Process 96: my PID is 4204: I am about to be suspended...Highest prime number I found is 1227167527.
+
+Scheduler: Time now is 30 seconds. Terminating Process 0 and resuming Process 8 
+
+Process 0: my PID is 4197: I am leaving the system. The largest prime I found was 1493436059 
+
+Scheduler: Time now is 39 seconds. Terminating Process 8 and resuming Process 16 
+
+Process 8: my PID is 4199: I am leaving the system. The largest prime I found was 2050881619 
+
+Scheduler: Time now is 45 seconds. Terminating Process 16 and resuming Process 23 
+
+Process 16: my PID is 4201: I am leaving the system. The largest prime I found was 1992323107 
+
+Scheduler: Time now is 56 seconds. Terminating Process 23 and resuming Process 96 
+
+Process 23: my PID is 4202: I am leaving the system. The largest prime I found was 1491862049 
+
+Scheduler: Time now is 59 seconds. Terminating process 96 
+
+Scheduler: No more processes to run. Bye
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ 
+Process 96: my PID is 4204: I am leaving the system. The largest prime I found was 1227830693 
+
+---------------------------------------------
+Run 3: using inp.txt with a time slice of 25:
+---------------------------------------------
+
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ gcc mlfScheduler.c
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$ ./a.out inp.txt 25
+
+Scheduler: Time Now: 0 seconds. Scheduling to Process 0 (PID 4326) for the time slice of 8 seconds.
+
+Process 0: my PID is 4326: I just got started. I am starting with the number 2898519815 to find the next prime number.
+
+Scheduler: Time Now: 8 seconds. Terminating Process 0 and scheduling Process 2 (Pid 4327) for the time slice of 5 seconds.
+
+Process 0: my PID is 4326: I am leaving the system. The largest prime I found was 2898732959 
+
+Process 2: my PID is 4327: I just got started. I am starting with the number 2820832231 to find the next prime number.
+
+Scheduler: Time Now: 13 seconds. Terminating Process 2 and scheduling Process 7 (Pid 4329) for the time slice of 25 seconds.
+
+Process 2: my PID is 4327: I am leaving the system. The largest prime I found was 2820950813 
+
+Process 7: my PID is 4329: I just got started. I am starting with the number 1286952388 to find the next prime number.
+
+Scheduler: Time Now: 38 seconds. Suspending Process 7 and moving it to FCFS queue and scheduling Process 12 (Pid 4331) for the time slice of 13 seconds.
+
+Process 7: my PID is 4329: I am about to be suspended...Highest prime number I found is 1287889261.
+
+Process 12: my PID is 4331: I just got started. I am starting with the number 1980620212 to find the next prime number.
+
+Scheduler: Time Now: 51 seconds. Terminating Process 12 and scheduling Process 14 (Pid 4332) for the time slice of 25 seconds.
+
+Process 12: my PID is 4331: I am leaving the system. The largest prime I found was 1980890281 
+
+Process 14: my PID is 4332: I just got started. I am starting with the number 2978410924 to find the next prime number.
+
+Scheduler: Time Now: 76 seconds. Terminating Process 14 and scheduling Process 35 (Pid 4334) for the time slice of 7 seconds.
+
+Process 35: my PID is 4334: I just got started. I am starting with the number 2366829001 to find the next prime number.
+
+Process 14: my PID is 4332: I am leaving the system. The largest prime I found was 2978846473 
+
+Scheduler: Time Now: 83 seconds. Terminating Process 35 and scheduling Process 41 (Pid 4335) for the time slice of 2 seconds.
+
+Process 41: my PID is 4335: I just got started. I am starting with the number 1878764764 to find the next prime number.
+
+Process 35: my PID is 4334: I am leaving the system. The largest prime I found was 2366963597 
+
+Scheduler: Time Now: 85 seconds. Terminating Process 41 and scheduling Process 88 (Pid 4336) for the time slice of 25 seconds.
+
+Process 88: my PID is 4336: I just got started. I am starting with the number 1006933244 to find the next prime number.
+
+Process 41: my PID is 4335: I am leaving the system. The largest prime I found was 1878806939 
+
+Scheduler: Time Now: 110 seconds. Suspending Process 88 and moving it to FCFS queue and scheduling Process 90 (Pid 4338) for the time slice of 25 seconds.
+
+Process 88: my PID is 4336: I am about to be suspended...Highest prime number I found is 1007628703.
+
+Process 90: my PID is 4338: I just got started. I am starting with the number 3000153095 to find the next prime number.
+
+Scheduler: Time Now: 135 seconds. Suspending Process 90 and moving it to FCFS queue and scheduling Process 96 (Pid 4339) for the time slice of 3 seconds.
+
+Process 90: my PID is 4338: I am about to be suspended...Highest prime number I found is 3000475679.
+
+Process 96: my PID is 4339: I just got started. I am starting with the number 1547090449 to find the next prime number.
+
+Scheduler: Time Now: 138 seconds. Terminating Process 96 and scheduling Process 99 (Pid 4340) for the time slice of 25 seconds.
+
+Process 99: my PID is 4340: I just got started. I am starting with the number 1920844228 to find the next prime number.
+
+Process 96: my PID is 4339: I am leaving the system. The largest prime I found was 1547132009 
+
+NO MORE PROCESSES IN QUEUE 1, MOVING TO QUEUE 2
+
+Resuming process 7
+
+Process 99: my PID is 4340: I am about to be suspended...Highest prime number I found is 1921161287.
+
+Scheduler: Time now is 164 seconds. Terminating Process 7 and resuming Process 88 
+
+Process 7: my PID is 4329: I am leaving the system. The largest prime I found was 1290604943 
+
+Scheduler: Time now is 169 seconds. Terminating Process 88 and resuming Process 90 
+
+Process 88: my PID is 4336: I am leaving the system. The largest prime I found was 1008752149 
+
+Scheduler: Time now is 172 seconds. Terminating Process 90 and resuming Process 99 
+
+Process 90: my PID is 4338: I am leaving the system. The largest prime I found was 3000893437 
+
+Scheduler: Time now is 182 seconds. Terminating process 99 
+
+
+Scheduler: No more processes to run. Bye
+Process 99: my PID is 4340: I am leaving the system. The largest prime I found was 1921633169 
+bsting@bsting-VirtualBox:~/CLionProjects/CS451/CS451/assignment2$
