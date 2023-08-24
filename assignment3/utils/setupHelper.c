@@ -24,21 +24,23 @@ void parseParameters(int *storage, int argc, char *argv[])
     int wanderingTime = 10;
     int floorCount = 10;
 
+    // NOTE: THE PDF USES THE WRONG "-" ("–") so we check for both
+
     // Iterate over arguments and parse them
     for (int i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "-p") == 0)
+        if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "–p") == 0)
         {
             // Parse the next argument as an int
             passengerCount = atoi(argv[i + 1]);
             i++;
         }
-        else if (strcmp(argv[i], "-w") == 0)
+        else if (strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "–w") == 0)
         {
             wanderingTime = atoi(argv[i + 1]);
             i++;
         }
-        else if (strcmp(argv[i], "-f") == 0)
+        else if (strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "–f") == 0)
         {
             floorCount = atoi(argv[i + 1]);
             i++;
@@ -74,8 +76,11 @@ void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passe
 
     // Parse lines from standard input. Each line is a passenger
     char *line = malloc(100 * sizeof(char));
-    while (fgets(line, 100, stdin) != NULL)
+    while (currentPassenger < passengerCount)
     {
+        // Read line
+        fgets(line, 100, stdin);
+
         // Extract 1st number, which is the number of pairs to follow
         int numPairs = atoi(strtok(line, " "));
 
@@ -97,10 +102,6 @@ void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passe
 
         // Increment current passenger
         currentPassenger++;
-
-        // If we've reached the end of our passenger count, stop
-        if (currentPassenger >= passengerCount)
-            break;
     }
     free(line);
 }
