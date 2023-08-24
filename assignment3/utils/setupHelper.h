@@ -11,8 +11,8 @@
 #define SETUP_HELPER_H
 
 #include <stdio.h>
-#include "../floor.h"
-#include "../person.h"
+#include "../structs/floor.h"
+#include "../structs/person.h"
 
 /*======== SEE 'setupHelper.c' FOR FUNCTION HEADER COMMENTS ========*/
 void parseParameters(int* storage, int argc, char *argv[]);

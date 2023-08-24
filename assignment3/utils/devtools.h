@@ -11,8 +11,8 @@
 #define DEVTOOLS_H
 
 #include <stdio.h>
-#include "../floor.h"
-#include "../person.h"
+#include "../structs/floor.h"
+#include "../structs/person.h"
 
 /*======== SEE 'setupHelper.c' FOR FUNCTION HEADER COMMENTS ========*/
 void printFloors(Floor *floors[], int floorCount);

@@ -4,14 +4,14 @@
         Date of Submission: 8/99/2023
         Name of this file: elevator.c
         Short Description of contents:
-            blah blah blah
+            Main part of elevator program, reads input and kicks off all child threads
 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "floor.c"
-#include "person.c"
-#include "itinerary.c"
+#include "structs/floor.c"
+#include "structs/person.c"
+#include "structs/itinerary.c"
 #include "utils/setupHelper.c"
 #include "utils/devtools.c"
 

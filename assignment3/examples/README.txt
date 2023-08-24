@@ -3,10 +3,10 @@ The Deterministic examples must be run with the following parameters:
 ./elevator.o -p 1 -f 11 < ./examples/deterministic_example_1.txt
 
 
-./elevator.o –p 5 –f 11 –w 10 < ./examples/deterministic_example_2.txt
+./elevator.o -p 5 -f 11 –w 10 < ./examples/deterministic_example_2.txt
 
 
-./elevator.o -p 5 -f 12 –w 10 < ./examples/deterministic_example_3.txt
+./elevator.o -p 5 -f 12 -w 10 < ./examples/deterministic_example_3.txt
 
 
 AS A SANITY CHECK... The following commands should work (standalone) IDENTICAL to above....
