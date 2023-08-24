@@ -2,7 +2,7 @@
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
         Date of Submission: 8/99/2023
-        Name of this file: floor.c
+        Name of this file: person.c
         Short Description of contents:
             This file contains the person data structure
 */
@@ -10,13 +10,13 @@
 #include <stdlib.h>
 
 /*
-    Struct: Floor
+    Struct: Person
 
     Member variables:
         person - person to be initialized
 
     Brief description of the structure:
-        A representation of the theorhetical floor
+        A representation of a person and their itenerary
 */
 Person* initPersonStruct(Person* person, int itinerarySize)
 {

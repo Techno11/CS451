@@ -9,19 +9,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "floor.c"
 #include "person.c"
 #include "itinerary.c"
 
 void printPeople(Person *people[], int count)
 {
-    for(int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
-        if(people[i] == NULL)
+        if (people[i] == NULL)
             continue;
         printf("Person %d\n", i);
         printf("    Itinerary Size: %d\n", people[i]->itinerarySize);
         printf("    Current Itinerary Item: %d\n", people[i]->currentItenerayItem);
-        for(int j = 0; j < people[i]->itinerarySize; j++)
+        for (int j = 0; j < people[i]->itinerarySize; j++)
         {
             printf("        Itinerary Item %d\n", j);
             printf("            Floor: %d\n", people[i]->itinerary[j]->floor);
@@ -30,14 +31,15 @@ void printPeople(Person *people[], int count)
     }
 }
 
-void printFloors(int floors[][10], int floorCount, int passengerCount) {
+void printFloors(Floor *floors[], int floorCount)
+{
     printf("Floors:\n");
     for (int i = 0; i < floorCount; i++)
     {
         printf("    Floor %d: ", i);
-        for (int j = 0; j < passengerCount; j++)
+        for (int j = 0; j < floors[i]->floorSize; j++)
         {
-            printf("%d ", floors[i][j]);
+            printf("%d ", floors[i]->peopleOnFloor[j]);
         }
         printf("\n");
     }
@@ -83,21 +85,19 @@ int main(int argc, char *argv[])
     printf("Floor Count: %d\n", floorCount);
 
     // Create our "Building"
-    int floors[floorCount][passengerCount];
-    memset( floors, 0, floorCount*passengerCount*sizeof(int) );
+    Floor *floors[floorCount];
+    memset(floors, 0, sizeof(Floor) * floorCount);
 
-    // Initilize all floors to be null
+    // Initilize all floors
     for (int i = 0; i < floorCount; i++)
     {
-        for (int j = 0; j < passengerCount; j++)
-        {
-            floors[i][j] = -1;
-        }
+        floors[i] = malloc(sizeof(Floor*) + (sizeof(int) * passengerCount));
+        floors[i] = initFloorStruct(floors[i], i, passengerCount);
     }
 
     // Create our people lookup
     Person *people[passengerCount];
-    memset( people, 0, sizeof(Person*) * passengerCount );
+    memset(people, 0, sizeof(Person *) * passengerCount);
 
     // Initilize all people to be null
     for (int i = 0; i < passengerCount; i++)
@@ -116,29 +116,29 @@ int main(int argc, char *argv[])
         int numPairs = atoi(strtok(line, " "));
 
         // Create our passenger
-        people[currentPassenger] = malloc(sizeof(Person*) + (sizeof(Itinerary*) * numPairs));
+        people[currentPassenger] = malloc(sizeof(Person *) + (sizeof(Itinerary *) * numPairs));
         people[currentPassenger] = initPersonStruct(people[currentPassenger], numPairs);
 
         // Extract pairs. Each pair is an itinerary item
         for (int i = 0; i < numPairs; i++)
         {
             // Create itenaray item
-            people[currentPassenger]->itinerary[i] = malloc(sizeof(Itinerary*));
+            people[currentPassenger]->itinerary[i] = malloc(sizeof(Itinerary *));
             people[currentPassenger]->itinerary[i]->floor = atoi(strtok(NULL, " "));
             people[currentPassenger]->itinerary[i]->wanderTime = atoi(strtok(NULL, " "));
         }
 
         // Add person to floor
-        floors[0][currentPassenger] = currentPassenger;
+        floors[0]->peopleOnFloor[currentPassenger] = currentPassenger;
 
         // Increment current passenger
         currentPassenger++;
 
         // If we've reached the end of our passenger count, stop
-        if(currentPassenger >= passengerCount)
+        if (currentPassenger >= passengerCount)
             break;
     }
 
     printPeople(people, passengerCount);
-    printFloors(floors, floorCount, passengerCount);
+    printFloors(floors, floorCount);
 }
