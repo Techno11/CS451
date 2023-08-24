@@ -12,19 +12,36 @@
 
 void printPeople(Person *people[], int count)
 {
+    // Iterate through people
     for (int i = 0; i < count; i++)
     {
+        // If person is null, skip
         if (people[i] == NULL)
             continue;
-        printf("Person %d\n", i);
-        printf("    Itinerary Size: %d\n", people[i]->itinerarySize);
-        printf("    Current Itinerary Item: %d\n", people[i]->currentItenerayItem);
+
+        // Print personand their floors to visit
+        printf("Person %d: Floors To Visit ", i);
         for (int j = 0; j < people[i]->itinerarySize; j++)
         {
-            printf("        Itinerary Item %d\n", j);
-            printf("            Floor: %d\n", people[i]->itinerary[j]->floor);
-            printf("            Wander Time: %d\n", people[i]->itinerary[j]->wanderTime);
+            // If last floor, don't print comma
+            if (j == people[i]->itinerarySize - 1)
+                printf("%d", people[i]->itinerary[j]->floor);
+            else // Print comma
+                printf("%d,", people[i]->itinerary[j]->floor);
         }
+        printf("\n");
+
+        // Print person and their time to spend
+        printf("Person %d: Time To Spend ", i);
+        for (int j = 0; j < people[i]->itinerarySize; j++)
+        {
+            // If last floor, don't print comma
+            if (j == people[i]->itinerarySize - 1)
+                printf("%d", people[i]->itinerary[j]->wanderTime);
+            else // Print comma
+                printf("%d,", people[i]->itinerary[j]->wanderTime);
+        }
+        printf("\n");
     }
 }
 

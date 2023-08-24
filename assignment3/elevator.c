@@ -35,8 +35,10 @@ int main(int argc, char *argv[])
     // Read standard input
     readSetupStdin(floors, people, floorCount, passengerCount);
 
-    // Sanity Checks
+    // First thing program does is print input from stdin
     printPeople(people, passengerCount);
+
+    // Sanity Checks
     printFloors(floors, floorCount);
 
     // Cleanup
