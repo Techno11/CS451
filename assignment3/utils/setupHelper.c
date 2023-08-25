@@ -100,6 +100,9 @@ void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passe
         // Add person to floor
         floors[0]->peopleOnFloor[currentPassenger] = currentPassenger;
 
+        // Key their array ID:
+        setPersonKey(people[currentPassenger], currentPassenger);
+
         // Increment current passenger
         currentPassenger++;
     }

@@ -13,7 +13,9 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdbool.h>
-#include "datum.c"
+
+//We will be using an integer array to represent people in the elevator queue instead:
+//#include "structs/person.c" //OBS for A3 Queue: #include "datum.c"
 
 /*
     Struct: Queue
@@ -34,20 +36,20 @@ typedef struct Queue
     size_t currCount;
     size_t rearIndex;
     size_t frontIndex;
-    Datum* array; // Dynamic array to accept various sizes
+    int* array; // Dynamic array to accept various sizes
 
 } Queue;
 
 /*======== SEE 'queue.c' FOR FUNCTION HEADER COMMENTS ========*/
-Datum* allocThisQueue(Queue* queue, size_t arraySize);
+int* allocThisQueue(Queue* queue, size_t arraySize); //A2 ver: Datum* allocThisQueue(Queue* queue, size_t arraySize);
 Queue* initQueueStruct(Queue* queue, size_t arraySize);
 void freeThisQueue(Queue* queue);
 
 void newQueue(Queue* new_queue, size_t queueSize);
 
-void enqueue_Push(Queue* queue, Datum newProc);
-Datum dequeue_Pop(Queue* queue);
-Datum peek(Queue* queue);
+void enqueue_Push(Queue* queue, int newKeyPerson); //A2 ver: void enqueue_Push(Queue* queue, Datum newProc);
+int dequeue_Pop(Queue* queue); //A2 ver: Datum dequeue_Pop(Queue* queue);
+int peek(Queue* queue); //A2 ver: Datum peek(Queue* queue);
 bool isEmpty(Queue* thisQueue);
 bool isFull(Queue* thisQueue);
 
@@ -55,12 +57,12 @@ size_t getQueueSize(Queue* thisQueue);
 size_t getRear(Queue* thisQueue);
 size_t getFront(Queue* thisQueue);
 size_t getCount(Queue* thisQueue);
-Datum getElementAt(Queue* thisQueue, size_t index);
+int getElementAt(Queue* thisQueue, size_t index); //A2 ver: Datum getElementAt(Queue* thisQueue, size_t index);
 
 void setQueueSize(Queue* thisQueue, size_t newSize);
 void setFront(Queue* thisQueue, size_t newFrontIndex);
 void setRear(Queue* thisQueue, size_t newRearIndex);
 void setCount(Queue* thisQueue, size_t newCount);
-void setElementAt(Queue* thisQueue, Datum newElement, size_t index);
+void setElementAt(Queue* thisQueue, int newElement, size_t index); //A2 ver: void setElementAt(Queue* thisQueue, Datum newElement, size_t index);
 
 #endif // QUEUE_H

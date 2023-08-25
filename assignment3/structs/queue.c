@@ -18,14 +18,14 @@
         arraySize - The length of the queue's array
 
     Output (Return value):
-        The new reference to the allocated queue array, of type Datum
+        The new reference to the allocated queue array, of type int
 
     Brief description of the task:
         Allocates memory to the queue's array
 */
-Datum* allocThisQueue(Queue* queue, size_t arraySize)
+int* allocThisQueue(Queue* queue, size_t arraySize)
 {
-    queue->array = (Datum*)malloc(sizeof(Datum) * arraySize);
+    queue->array = (int*)malloc(sizeof(int) * arraySize);
 
     return queue->array;
 }
@@ -179,19 +179,19 @@ size_t getCount(Queue* thisQueue)
 
     Input to Method:
         thisQueue - The queue structure to fetch an indexed element from
-        index - The index indicating the position of the Datum item to get inside queue's array
+        index - The index indicating the position of the int item to get inside queue's array
 
     Output (Return value):
-        The Datum item that was fetched at an index within this passed queue
+        The int item that was fetched at an index within this passed queue
 
     Brief description of the task:
-        Gets a Datum item element at a valid index inside this queue's array
+        Gets an int item element at a valid index inside this queue's array
 */
-Datum getElementAt(Queue* thisQueue, size_t index)
+int getElementAt(Queue* thisQueue, size_t index)
 {
     if (index < getQueueSize(thisQueue))
     {
-        Datum reqElement = thisQueue->array[index];
+        int reqElement = thisQueue->array[index];
         return reqElement;
     }
     else
@@ -278,16 +278,16 @@ void setCount(Queue* thisQueue, size_t newCount)
 
     Input to Method:
         thisQueue - The queue structure whose indexed array element will be assigned/re-assigned
-        newElement - The new Datum item to replace at the specified index position in this queue's array
+        newElement - The new int item to replace at the specified index position in this queue's array
         index - The index position that specifies the Datum element to be replaced with the new element
 
     Output (Return value):
         None/void
 
     Brief description of the task:
-        Sets the specified Datum element in the queue's array to the (new) passed Datum element
+        Sets the specified Datum element in the queue's array to the (new) passed int element
 */
-void setElementAt(Queue* thisQueue, Datum newElement, size_t index)
+void setElementAt(Queue* thisQueue, int newElement, size_t index)
 {
     if (index < getQueueSize(thisQueue)) // Can set elem. indices from 0 to size-1
     {
@@ -330,15 +330,15 @@ void newQueue(Queue* new_queue, size_t queueSize)
 
     Input to Method:
         queue - The queue structure to push a new (process) element onto
-        newProc - A Datum representation of a process that will be pushed onto the passed queue
+        newProc - An int representation of a process that will be pushed onto the passed queue
 
     Output (Return value):
         None/void
 
     Brief description of the task:
-        Pushes a new process Datum element in the rear of this queue (following FCFS)
+        Pushes a new process int element in the rear of this queue (following FCFS)
 */
-void enqueue_Push(Queue* queue, Datum newProc)
+void enqueue_Push(Queue* queue, int newKeyPerson)
 {
     // Make sure we have room to push before actually pushing:
     if(isFull(queue))
@@ -358,7 +358,7 @@ void enqueue_Push(Queue* queue, Datum newProc)
         size_t newRear = getRear(queue);
         newRear = (newRear + 1) % getQueueSize(queue);
         setRear(queue, newRear);
-        setElementAt(queue, newProc, newRear);
+        setElementAt(queue, newKeyPerson, newRear);
         size_t newCount = getCount(queue);
         newCount = newCount + 1; // Update number of items in this queue
         setCount(queue, newCount);
@@ -372,12 +372,12 @@ void enqueue_Push(Queue* queue, Datum newProc)
         queue - The queue structure to pop the existing front (process) element from
 
     Output (Return value):
-        The Datum element that was the front item popped off the queue
+        The person key int element that was the front item popped off the queue
 
     Brief description of the task:
-        Pops a process Datum element at the front of this queue (following FCFS)
+        Pops a person key int element at the front of this queue (following FCFS)
 */
-Datum dequeue_Pop(Queue* queue)
+int dequeue_Pop(Queue* queue)
 {
     // Make sure there's actually something to pop before popping:
     if (isEmpty(queue))
@@ -388,7 +388,7 @@ Datum dequeue_Pop(Queue* queue)
     else
     {
         // We pop from the front of the queue in FCFS/FIFO, so the popped element is obtained at the front:
-        Datum poppedItem = getElementAt(queue, getFront(queue));
+        int poppedItem = getElementAt(queue, getFront(queue));
 
         /*
          To actually pop off the queue array now:
@@ -415,12 +415,12 @@ Datum dequeue_Pop(Queue* queue)
         queue - The queue structure to which to peek into the current front (process) element
 
     Output (Return value):
-        The Datum element that was peeked at in the queue
+        The int element that was peeked at in the queue
 
     Brief description of the task:
         Peeks into the passed queue to find out what the front item in the queue's array is (without popping)
 */
-Datum peek(Queue* queue)
+int peek(Queue* queue)
 {
     if (isEmpty(queue))
     {

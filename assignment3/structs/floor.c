@@ -16,7 +16,7 @@
         person - person to be initialized
 
     Brief description of the structure:
-        A representation of the theorhetical floor
+        A representation of the theoretical floor
 */
 Floor* initFloorStruct(Floor* floor, int floorNumber, int floorSize)
 {

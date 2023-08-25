@@ -21,6 +21,7 @@
 Person* initPersonStruct(Person* person, int itinerarySize)
 {
     person->currentItenerayItem = 0;
+    person->keyID = -1;
     person->itinerarySize = itinerarySize;
     for(int i = 0; i < itinerarySize; i++)
     {
@@ -28,4 +29,15 @@ Person* initPersonStruct(Person* person, int itinerarySize)
     }
 
     return person;
+}
+
+void setPersonKey(Person* person, int newKeyID)
+{
+    person->keyID = newKeyID;
+}
+
+int getPersonKey(Person* person)
+{
+    int key = person->keyID;
+    return key;
 }

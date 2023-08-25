@@ -23,16 +23,19 @@
         currentItenerayItem - The current itinerary item the person is on
 
     Brief description of the structure:
-        A representation of the theorhetical person
+        A representation of the theoretical person
 */
 typedef struct Person
 {
     int currentItenerayItem;
+    int keyID;
     int itinerarySize;
     Itinerary *itinerary[];
 } Person;
 
 /*======== SEE 'person.c' FOR FUNCTION HEADER COMMENTS ========*/
 Person* initPersonStruct(Person* person, int itinerarySize);
+void setPersonKey(Person* person, int newKeyID);
+int getPersonKey(Person* person);
 
 #endif // PERSON_H

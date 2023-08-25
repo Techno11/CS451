@@ -10,13 +10,14 @@
 #include <stdlib.h>
 
 /*
-    Struct: Floor
+    Struct: Itinerary
 
     Member variables:
-        person - person to be initialized
+        floor - the floor to go to (?)
+        wanderTime - the amount of time a person should idle on that floor (?)
 
     Brief description of the structure:
-        A representation of the theorhetical floor
+        A representation of the person's itinerary
 */
 Itinerary* initItineraryStruct(Itinerary* itinerary, int floor, int wanderTime)
 {

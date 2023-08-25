@@ -4,7 +4,7 @@
 void thread_task(int i)
 {
     // ...
-    printf("A thread has been made!\n");
+    printf("A thread of %d i-id has been made!\n", i);
     pthread_exit(0); // this code returns to the corresponding pthread_join issue in main()
 }
 
@@ -17,7 +17,7 @@ int main() {
     for (int i=0; i<5; i++)
     {
         // Will create a thread:
-        pthread_create(&thread_id[i], NULL, thread_task,  (void*)i);
+        pthread_create(&thread_id[i], NULL, (void *(*)(void *))thread_task,  (void *)i);
     }
 
     //The following code makes sure the main program waits until all threads have finished execution

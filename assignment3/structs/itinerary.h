@@ -32,4 +32,4 @@ typedef struct Itinerary
 /*======== SEE 'person.c' FOR FUNCTION HEADER COMMENTS ========*/
 Itinerary* initItineraryStruct(Itinerary* itinerary, int floor, int wanderTime);
 
-#endif // PERSON_H
+#endif // ITENERARY_H
