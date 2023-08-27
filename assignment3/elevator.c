@@ -10,106 +10,34 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <semaphore.h>
+#include <pthread.h>
+#include <unistd.h> // for sleep()
 #include "structs/floor.c"
 #include "structs/person.c"
 #include "structs/itinerary.c"
 #include "structs/queue.c"
 #include "utils/setupHelper.c"
 #include "utils/elevatorTools.c"
-#include <semaphore.h>
-#include <pthread.h>
-#include <unistd.h> // for sleep()
+#include "utils/mutexes.c" // Includes mutexes and global variables
 
-// Constants
+// Macros
 #define ELEVATOR_GOING_UP 1
 #define ELEVATOR_GOING_DOWN 0
 
-// GLOBAL VARIABLES:
-sem_t mutex; // a semaphore global variable called mutex, a binary semaphore used for locking
-long currentFloorNum;
-
-sem_t directionMutex;
-int elevatorDirection;
-
-sem_t openDoorsMutex;
-bool openDoors;
-
-int wanderingTime;
+// GLOBAL VARIABLES
 // Set of global queues to use for directing which groups of Persons get off on next floor:
 //  -NOTE: Some people might not all disembark from the disembark queue; only got 1 second...
 struct Queue *elevatorQueue; // this is the overall group of people riding the elevator
 struct Queue *toKeepOnElevator; // this is the group who WON'T be getting off on next floor
 struct Queue *disembarkFromElevator; // this is the group who WILL be getting off on next floor
 
-void setElevatorDirection(int direction) 
-{
-    // Wait for access to elevatorDirection
-    sem_wait(&directionMutex);
-    // Update elevatorDirection
-    elevatorDirection = direction;
-    // Release access to elevatorDirection
-    sem_post(&directionMutex);
-}
-
-int getElvatorDirection() 
-{
-    // Wait for access to elevatorDirection
-    sem_wait(&directionMutex);
-    // Get elevatorDirection
-    int direction = elevatorDirection;
-    // Release access to elevatorDirection
-    sem_post(&directionMutex);
-    return direction;
-}
-
-void setCurrentFloor(long newFloor) 
-{
-    // Wait for access to currentFloor
-    sem_wait(&mutex);
-    // Update currentFloor
-    currentFloorNum = newFloor;
-    // Release access to currentFloor
-    sem_post(&mutex);
-}
-
-long getCurrentFloor() 
-{
-    // Wait for access to currentFloor
-    sem_wait(&mutex);
-    // Get currentFloor
-    long currentFloor = currentFloorNum;
-    // Release access to currentFloor
-    sem_post(&mutex);
-    return currentFloor;
-}
-
-void setDoorsOpen(bool open) 
-{
-    // Wait for access to openDoors
-    sem_wait(&openDoorsMutex);
-    // Update openDoors
-    openDoors = open;
-    // Release access to openDoors
-    sem_post(&openDoorsMutex);
-}
-
-bool getDoorsOpen()
-{
-    // Wait for access to openDoors
-    sem_wait(&openDoorsMutex);
-    // Get openDoors
-    bool open = openDoors;
-    // Release access to openDoors
-    sem_post(&openDoorsMutex);
-    return open;
-}
-
 void elevator(long currentFloor)
 {   
     // Variable to track things locally, so we don't have to read them from the global variables every time:
     long currentFloorLocal = getCurrentFloor();
-    bool openDoorsLocal = getDoorsOpen();
-    int elevatorDirectionLocal = getElvatorDirection();
+    bool openDoorsGlobalLocal = getDoorsOpen();
+    int elevatorDirectionGlobalLocal = getElvatorDirection();
 
     // The "currentFloor" currently says the top floor, so we need to record that and then reset it to 0:
     long maxFloor = currentFloorLocal - 1;
@@ -126,8 +54,8 @@ void elevator(long currentFloor)
             // Print where we're at
             printf("    Elevator: At floor %ld.\n", currentFloorLocal);
             printf("    Elevator: Heading to max Floor %ld\n", maxFloor);
-            setElevatorDirection(ELEVATOR_GOING_UP);
-            elevatorDirectionLocal = ELEVATOR_GOING_UP;
+            setelevatorDirectionGlobal(ELEVATOR_GOING_UP);
+            elevatorDirectionGlobalLocal = ELEVATOR_GOING_UP;
             
         }
         // If we're at the max floor, change direction and print
@@ -136,24 +64,30 @@ void elevator(long currentFloor)
             // Print where we're at
             printf("    Elevator: At floor %ld.\n", currentFloorLocal);
             printf("    Elevator: Heading to min Floor %d\n", 0);
-            setElevatorDirection(ELEVATOR_GOING_DOWN);
-            elevatorDirectionLocal = ELEVATOR_GOING_DOWN;
+            setelevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
+            elevatorDirectionGlobalLocal = ELEVATOR_GOING_DOWN;
         }
 
         // If someone is waiting on this floor, we need to open the doors
         if (false) // TODO:
         {
+            // Open the doors
             setDoorsOpen(true);
-            openDoorsLocal = true;
+            openDoorsGlobalLocal = true;
+            // Print that we've stopped
             printf("    Elevator: Opening the doors at %ld\n", currentFloorLocal);
-            // TODO: Get on the elevator
-            
+            // Wait for people to get on
+            sleep(1);
+            // Close the doors
+            setDoorsOpen(false);
+            openDoorsGlobalLocal = false;
         }
 
+        // Transition between floors
         sleep(1);
 
         // Go up (or down) a floor
-        if (elevatorDirectionLocal == ELEVATOR_GOING_UP)
+        if (elevatorDirectionGlobalLocal == ELEVATOR_GOING_UP)
         {
             currentFloorLocal++;
             setCurrentFloor(currentFloorLocal);
@@ -200,21 +134,37 @@ void person(Person* thisPerson)
 
         int currToDoItemIndex = getCurrentItineraryItemInd(thisPerson);
         Itinerary* currentToDoItem = getCurrentItineraryItem(thisPerson);
+        Itinerary* nextToDoItem = getNextItineraryItem(thisPerson);
 
-        // If you are done waiting && you are going up && elevator is going up then "get on"
+        // If you are done waiting && you are going up && elevator is going up then "get on" && the doors are open
         //  -Use defined constants (#'s) at the top
         //  -Current itinerary item is where the Person is AT
         //  -NEXT itinerary item is where the Person is GOING (destination floor)
-        if (currentFloorNum == currentToDoItem->floor)
+        int currentFloor = getCurrentFloor();
+        int elevatorDirection = getElvatorDirection();
+
+        // Calculate keys to getting on/off the elevator
+        bool doWeNeedToGoUp = nextToDoItem->floor > currentFloor;                   // Do we need to go up
+        bool elevatorAtOurFloor = currentFloor == currentToDoItem->floor;           // Is the elevator at our floor?
+        bool elevatorGoingUp = elevatorDirectionGlobal == ELEVATOR_GOING_UP;        // Is the elevator going up?
+        bool doorsOpen = getDoorsOpen();                                            // Are the doors open?
+        bool elevatorUpAndWeNeedToGoUp = elevatorGoingUp && doWeNeedToGoUp;         // Is the elevator going up and we need to go up?
+        bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp;   // Is the elevator going down and we need to go down?
+        bool onElevator = true; // TODO                                             // Are we on the elevator?
+
+        // If these keys are all true, then we can get on the elevator
+        if (elevatorAtOurFloor && doorsOpen && !onElevator && (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown))
         {
-            // If you are done waiting && you are going up && elevator is going up then "get on"
-
-            // Else If you are done waiting && you are going down && elevator is going down then "get on"
-
-            // Else "get off" the elevator
+            // TODO: Step 1: Elevator is at our floor. Update itinerary index to next item
+            // TODO: Step 2: Get on the elevator
         }
-        // Figure out next floor to go to (update itinerary index)
-
+        // If we're on the elevator and we're at our destination floor, then we can get off the elevator
+        // This works because we update the itinerary index to the next item when we get on the elevator
+        // -So if we're on the elevator and we're at our destination floor, then we know we're at the correct floor
+        else if (elevatorAtOurFloor && doorsOpen && onElevator)
+        {
+            // TODO: Get Off Elevator
+        }
     }
     // When done print goodbye message and exit thread:
     printf("Person Number %d: Leaving the system, goodbye!\n", getPersonKey(thisPerson));
@@ -231,15 +181,15 @@ void person(Person* thisPerson)
 int main(int argc, char *argv[])
 {
     // Initialize any global variables at the start:
-    currentFloorNum = 0;
+    currentFloorGlobal = 0;
     sem_init(&mutex, 0, 1); // Initialize semaphore mutex to 1
 
     // Initialize the directionMutex to 1:
-    elevatorDirection = ELEVATOR_GOING_UP;
+    elevatorDirectionGlobal = ELEVATOR_GOING_UP;
     sem_init(&directionMutex, 0, 1);
 
     // Initialize the openDoorsMutex to 1:
-    openDoors = false;
+    openDoorsGlobal = false;
     sem_init(&openDoorsMutex, 0, 1);
 
     // Parse input parameters
@@ -274,7 +224,7 @@ int main(int argc, char *argv[])
 
     // Create the elevator thread:
     pthread_t elevatorThread;
-    pthread_create(&elevatorThread, NULL, (void *(*)(void *)) elevator, (void *)currentFloorNum);
+    pthread_create(&elevatorThread, NULL, (void *(*)(void *)) elevator, (void *)currentFloorGlobal);
 
     // Create a person thread for each Person:
     pthread_t personThreads[passengerCount];

@@ -18,12 +18,12 @@
     Brief description of the structure:
         A representation of a person and their itenerary
 */
-Person* initPersonStruct(Person* person, int itinerarySize)
+Person *initPersonStruct(Person *person, int itinerarySize)
 {
     person->currentItenerayItem = 0;
     person->keyID = -1;
     person->itinerarySize = itinerarySize;
-    for(int i = 0; i < itinerarySize; i++)
+    for (int i = 0; i < itinerarySize; i++)
     {
         person->itinerary[i] = NULL;
     }
@@ -31,37 +31,51 @@ Person* initPersonStruct(Person* person, int itinerarySize)
     return person;
 }
 
-void setPersonKey(Person* person, int newKeyID)
+void setPersonKey(Person *person, int newKeyID)
 {
     person->keyID = newKeyID;
 }
 
-int getPersonKey(Person* person)
+int getPersonKey(Person *person)
 {
     int key = person->keyID;
     return key;
 }
 
-int getItinerarySize(Person* person)
+int getItinerarySize(Person *person)
 {
     int fetchedSize = person->itinerarySize;
     return fetchedSize;
 }
 
-int getCurrentItineraryItemInd(Person* person)
+int getCurrentItineraryItemInd(Person *person)
 {
     int currItemIndex = person->currentItenerayItem;
     return currItemIndex;
 }
 
-Itinerary* getCurrentItineraryItem(Person* person)
+Itinerary *getCurrentItineraryItem(Person *person)
 {
     int currItemIndex = getCurrentItineraryItemInd(person);
-    Itinerary* currItineraryItem = person->itinerary[currItemIndex];
+    Itinerary *currItineraryItem = person->itinerary[currItemIndex];
     return currItineraryItem;
 }
 
-bool isItineraryDone(Person* forThisPerson)
+Itinerary *getNextItineraryItem(Person *person)
+{
+    int nextItemIndex = getCurrentItineraryItemInd(person) + 1;
+    if (nextItemIndex >= getItinerarySize(person))
+    {
+        return NULL;
+    }
+    else
+    {
+        Itinerary *currItineraryItem = person->itinerary[nextItemIndex];
+        return currItineraryItem;
+    }
+}
+
+bool isItineraryDone(Person *forThisPerson)
 {
     // If currentItineraryItem is at the itinerarySize then Person's itinerary is empty/done:
     int currentSize = getItinerarySize(forThisPerson);
@@ -74,5 +88,4 @@ bool isItineraryDone(Person* forThisPerson)
     {
         return false;
     }
-
 }

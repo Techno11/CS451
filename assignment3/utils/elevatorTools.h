@@ -14,7 +14,7 @@
 #include "../structs/floor.h"
 #include "../structs/person.h"
 
-/*======== SEE 'setupHelper.c' FOR FUNCTION HEADER COMMENTS ========*/
+/*======== SEE 'elevatorTools.c' FOR FUNCTION HEADER COMMENTS ========*/
 void printFloors(Floor *floors[], int floorCount);
 
 void printPeople(Person *people[], int count);

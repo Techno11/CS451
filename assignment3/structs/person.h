@@ -34,12 +34,13 @@ typedef struct Person
 } Person;
 
 /*======== SEE 'person.c' FOR FUNCTION HEADER COMMENTS ========*/
-Person* initPersonStruct(Person* person, int itinerarySize);
-void setPersonKey(Person* person, int newKeyID);
-int getPersonKey(Person* person);
-int getItinerarySize(Person* person);
-int getCurrentItineraryItemInd(Person* person);
-Itinerary* getCurrentItineraryItem(Person* person);
-bool isItineraryDone(Person* person);
+Person *initPersonStruct(Person *person, int itinerarySize);
+void setPersonKey(Person *person, int newKeyID);
+int getPersonKey(Person *person);
+int getItinerarySize(Person *person);
+int getCurrentItineraryItemInd(Person *person);
+Itinerary *getCurrentItineraryItem(Person *person);
+Itinerary *getNextItineraryItem(Person *person);
+bool isItineraryDone(Person *person);
 
 #endif // PERSON_H
