@@ -68,6 +68,8 @@ void person(Person* thisPerson)
 
         // If you are done waiting && you are going up && elevator is going up then "get on"
         //  -Use defined constants (#'s) at the top
+        //  -Current itinerary item is where the Person is AT
+        //  -NEXT itinerary item is where the Person is GOING (destination floor)
         if (currentFloorNum == currentToDoItem->floor)
         {
             // If you are done waiting && you are going up && elevator is going up then "get on"
