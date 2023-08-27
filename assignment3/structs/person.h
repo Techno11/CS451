@@ -20,14 +20,14 @@
 
     Member variables:
         itinerary - Array of itinerary objects for the person
-        currentItenerayItem - The current itinerary item the person is on
+        currentItenerayItem - The current itinerary item the person is on (represented as an int index)
 
     Brief description of the structure:
         A representation of the theoretical person
 */
 typedef struct Person
 {
-    int currentItenerayItem;
+    int currentItenerayItem; // if currentIterneraryItem == itinerarySize then itinerary is empty/done
     int keyID;
     int itinerarySize;
     Itinerary *itinerary[];
@@ -37,5 +37,9 @@ typedef struct Person
 Person* initPersonStruct(Person* person, int itinerarySize);
 void setPersonKey(Person* person, int newKeyID);
 int getPersonKey(Person* person);
+int getItinerarySize(Person* person);
+int getCurrentItineraryItemInd(Person* person);
+Itinerary* getCurrentItineraryItem(Person* person);
+bool isItineraryDone(Person* person);
 
 #endif // PERSON_H
