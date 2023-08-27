@@ -19,6 +19,7 @@
 #include "utils/elevatorTools.c"
 #include <semaphore.h>
 #include <pthread.h>
+#include <unistd.h> // for sleep()
 
 // Constants
 #define ELEVATOR_GOING_UP 1
@@ -34,6 +35,7 @@ int elevatorDirection;
 sem_t openDoorsMutex;
 bool openDoors;
 
+int wanderingTime;
 // Set of global queues to use for directing which groups of Persons get off on next floor:
 //  -NOTE: Some people might not all disembark from the disembark queue; only got 1 second...
 struct Queue *elevatorQueue; // this is the overall group of people riding the elevator
@@ -182,7 +184,7 @@ void person(Person* thisPerson)
 {
     printf("Person Number %d: I have entered the building.\n", getPersonKey(thisPerson));
 
-    // ...
+    // Professor's person psuedocode:
     /* while(notDone) {
      *  sleep(wanderTime);
      *  wait for the elevator to come to current floor
@@ -192,6 +194,29 @@ void person(Person* thisPerson)
      *  get off the elevator;
      * }
     */
+    // The "notDone" can be a method to check that Person's itinerary is not completed
+    while (!isItineraryDone(thisPerson))
+    {
+        sleep(wanderingTime);
+
+        int currToDoItemIndex = getCurrentItineraryItemInd(thisPerson);
+        Itinerary* currentToDoItem = getCurrentItineraryItem(thisPerson);
+
+        // If you are done waiting && you are going up && elevator is going up then "get on"
+        //  -Use defined constants (#'s) at the top
+        //  -Current itinerary item is where the Person is AT
+        //  -NEXT itinerary item is where the Person is GOING (destination floor)
+        if (currentFloorNum == currentToDoItem->floor)
+        {
+            // If you are done waiting && you are going up && elevator is going up then "get on"
+
+            // Else If you are done waiting && you are going down && elevator is going down then "get on"
+
+            // Else "get off" the elevator
+        }
+        // Figure out next floor to go to (update itinerary index)
+
+    }
     // When done print goodbye message and exit thread:
     printf("Person Number %d: Leaving the system, goodbye!\n", getPersonKey(thisPerson));
     pthread_exit(0);
@@ -222,7 +247,7 @@ int main(int argc, char *argv[])
     int *parsed = malloc(sizeof(int) * 3);
     parseParameters(parsed, argc, argv);
     int passengerCount = parsed[0];
-    int wanderingTime = parsed[1];
+    wanderingTime = parsed[1];
     int floorCount = parsed[2];
     free(parsed);
 

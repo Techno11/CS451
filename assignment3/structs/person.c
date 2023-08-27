@@ -41,3 +41,38 @@ int getPersonKey(Person* person)
     int key = person->keyID;
     return key;
 }
+
+int getItinerarySize(Person* person)
+{
+    int fetchedSize = person->itinerarySize;
+    return fetchedSize;
+}
+
+int getCurrentItineraryItemInd(Person* person)
+{
+    int currItemIndex = person->currentItenerayItem;
+    return currItemIndex;
+}
+
+Itinerary* getCurrentItineraryItem(Person* person)
+{
+    int currItemIndex = getCurrentItineraryItemInd(person);
+    Itinerary* currItineraryItem = person->itinerary[currItemIndex];
+    return currItineraryItem;
+}
+
+bool isItineraryDone(Person* forThisPerson)
+{
+    // If currentItineraryItem is at the itinerarySize then Person's itinerary is empty/done:
+    int currentSize = getItinerarySize(forThisPerson);
+    int currentItineraryItemIndex = getCurrentItineraryItemInd(forThisPerson);
+    if (currentItineraryItemIndex == currentSize)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+
+}
