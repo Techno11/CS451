@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "person.h": "c"
+        "person.h": "c",
+        "semaphore.h": "c",
+        "unistd.h": "c"
     }
 }

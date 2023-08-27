@@ -4,11 +4,11 @@
         Date of Submission: 8/99/2023
         Name of this file: devtools.c
         Short Description of contents:
-            This file contains the devtools methods, methods to aid in development
+            This file contains the elevatorTools methods, methods to help the elevator
 */
 
 #include <stdio.h>
-#include "devtools.h"
+#include "elevatorTools.h"
 
 void printPeople(Person *people[], int count)
 {

@@ -2,13 +2,13 @@
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
         Date of Submission: 8/99/2023
-        Name of this file: devtools.h
+        Name of this file: elevatorTools.h
         Short Description of contents:
-            This file contains the prototypes for the devtools methods
+            This file contains the prototypes for the elevatorTools methods
 */
 
-#ifndef DEVTOOLS_H
-#define DEVTOOLS_H
+#ifndef ELEVATOR_TOOLS_H
+#define ELEVATOR_TOOLS_H
 
 #include <stdio.h>
 #include "../structs/floor.h"
@@ -19,4 +19,4 @@ void printFloors(Floor *floors[], int floorCount);
 
 void printPeople(Person *people[], int count);
 
-#endif // DEVTOOLS_H
+#endif // ELEVATOR_TOOLS_H
