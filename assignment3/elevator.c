@@ -130,7 +130,8 @@ void person(Person* thisPerson)
     // The "notDone" can be a method to check that Person's itinerary is not completed
     while (!isItineraryDone(thisPerson))
     {
-        sleep(wanderingTime);
+        int wanderTime = getWanderingTime();
+        sleep(wanderTime);
 
         int currToDoItemIndex = getCurrentItineraryItemInd(thisPerson);
         Itinerary* currentToDoItem = getCurrentItineraryItem(thisPerson);
@@ -192,11 +193,14 @@ int main(int argc, char *argv[])
     openDoorsGlobal = false;
     sem_init(&openDoorsMutex, 0, 1);
 
+    // Initialize the wanderingTimeMutex to 1:
+    sem_init(&wanterTimeMutex, 0, 1);
+
     // Parse input parameters
     int *parsed = malloc(sizeof(int) * 3);
     parseParameters(parsed, argc, argv);
     int passengerCount = parsed[0];
-    wanderingTime = parsed[1];
+    setWanderingTime(parsed[1]);
     int floorCount = parsed[2];
     free(parsed);
 

@@ -4,7 +4,7 @@
         Date of Submission: 8/99/2023
         Name of this file: mutexes.h
         Short Description of contents:
-            This file contains the prototypes for the mutexes functions
+            This file contains the prototypes for the mutexes methods
 */
 
 #include <stdbool.h>
@@ -23,7 +23,8 @@ int elevatorDirectionGlobal;
 sem_t openDoorsMutex;
 bool openDoorsGlobal;
 
-int wanderingTime;
+sem_t wanterTimeMutex;
+int wanderingTimeGlobal;
 
 /*======== SEE 'mutexes.c' FOR FUNCTION HEADER COMMENTS ========*/
 void setelevatorDirectionGlobal(int direction);
@@ -37,6 +38,10 @@ long getCurrentFloor();
 void setDoorsOpen(bool open);
 
 bool getDoorsOpen();
+
+void setWanderingTime(int time);
+
+int getWanderingTime();
 
 
 #endif // MUTEXES_H

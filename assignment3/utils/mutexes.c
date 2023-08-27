@@ -2,9 +2,9 @@
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
         Date of Submission: 8/99/2023
-        Name of this file: person.c
+        Name of this file: mutexes.c
         Short Description of contents:
-            This file contains the person data structure
+            This file contains the getters/setters for the global variables that require semaphore protection
 */
 
 #include <semaphore.h>
@@ -72,4 +72,25 @@ bool getDoorsOpen()
     // Release access to openDoorsGlobal
     sem_post(&openDoorsMutex);
     return open;
+}
+
+void setWanderingTime(int time) 
+{
+    // Wait for access to wanderingTimeGlobal
+    sem_wait(&wanterTimeMutex);
+    // Update wanderingTimeGlobal
+    wanderingTimeGlobal = time;
+    // Release access to wanderingTimeGlobal
+    sem_post(&wanterTimeMutex);
+}
+
+int getWanderingTime() 
+{
+    // Wait for access to wanderingTimeGlobal
+    sem_wait(&wanterTimeMutex);
+    // Get wanderingTimeGlobal
+    int time = wanderingTimeGlobal;
+    // Release access to wanderingTimeGlobal
+    sem_post(&wanterTimeMutex);
+    return time;
 }
