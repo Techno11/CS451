@@ -25,6 +25,9 @@
 #define ELEVATOR_GOING_UP 1
 #define ELEVATOR_GOING_DOWN 0
 
+// Toggles the extra credit functionality
+#define ENABLE_EXTRA_CREDIT false
+
 // GLOBAL VARIABLES
 // Set of global queues to use for directing which groups of Persons get off on next floor:
 //  -NOTE: Some people might not all disembark from the disembark queue; only got 1 second...
@@ -181,14 +184,22 @@ void person(Person *thisPerson)
         bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp; // Is the elevator going down and we need to go down?
         bool onElevator = getIsOnElevator(getPersonKey(thisPerson));              // Are we on the elevator?
 
-        if ((elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && !onElevator)
+
+        // Request elevator to stop at our floor if it's going the correct direction and extra credit is enabled
+        if ((elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && !onElevator && ENABLE_EXTRA_CREDIT)
         {
-            // Request elevator to stop at our floor if it's going the correct direction
+            requestFloor(theFloorWeAreOn);
+        }
+        // Request elevator to stop at our floor regardless of direction if extra credit is disabled
+        else if (!onElevator && !ENABLE_EXTRA_CREDIT)
+        {
             requestFloor(theFloorWeAreOn);
         }
 
         // If these keys are all true, then we can get on the elevator
-        if (elevatorAtOurFloor && doorsOpen && !onElevator && (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown))
+        bool extraCreditCondition = elevatorAtOurFloor && doorsOpen && !onElevator && (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && ENABLE_EXTRA_CREDIT;
+        bool nonExtraCreditCondition = elevatorAtOurFloor && doorsOpen && !onElevator && !ENABLE_EXTRA_CREDIT;
+        if (extraCreditCondition || nonExtraCreditCondition)
         {
             if (!firstMove)
             {
