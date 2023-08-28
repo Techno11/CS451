@@ -26,7 +26,7 @@
 #define ELEVATOR_GOING_DOWN 0
 
 // Toggles the extra credit functionality
-#define ENABLE_EXTRA_CREDIT false
+#define ENABLE_EXTRA_CREDIT true
 
 // GLOBAL VARIABLES
 // Set of global queues to use for directing which groups of Persons get off on next floor:
@@ -49,14 +49,18 @@ void elevator(long currentFloor)
     setCurrentFloor(0);
     currentFloorLocal = 0;
 
+    // Wait for people to enter the building
+    sleep(1);
+
     while (true)
     {
         // If we're at the min floor, change direction and print
         if (currentFloorLocal == 0)
         {
             // Print where we're at
-            printf("    Elevator: At floor %ld.\n", currentFloorLocal);
-            printf("    Elevator: Heading to max Floor %ld\n", maxFloor);
+            printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
+            printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
+            printf("                                                        Elevator: Heading to max Floor %ld\n", maxFloor);
             setElevatorDirectionGlobal(ELEVATOR_GOING_UP);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_UP;
         }
@@ -64,8 +68,9 @@ void elevator(long currentFloor)
         else if (currentFloorLocal == maxFloor)
         {
             // Print where we're at
-            printf("    Elevator: At floor %ld.\n", currentFloorLocal);
-            printf("    Elevator: Heading to min Floor %d\n", 0);
+            printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
+            printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
+            printf("                                                        Elevator: Heading to min Floor %d\n", 0);
             setElevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_DOWN;
         }
@@ -77,7 +82,7 @@ void elevator(long currentFloor)
             setDoorsOpen(true);
             openDoorsGlobalLocal = true;
             // Print that we've stopped
-            printf("    Elevator: Opening the doors at %ld\n", currentFloorLocal);
+            printf("                                                        Elevator: Opening the doors at %ld\n", currentFloorLocal);
             // Wait for people to get on
             sleep(1);
             // Close the doors
@@ -102,7 +107,7 @@ void elevator(long currentFloor)
         }
     }
 
-    printf("    Elevator: I am about to stop, with a current floor of %ld.\n", currentFloor);
+    printf("                                                        Elevator: I am about to stop, with a current floor of %ld.\n", currentFloor);
 
     // ...
 
@@ -130,6 +135,8 @@ void person(Person *thisPerson)
      * }
      */
     // The "notDone" can be a method to check that Person's itinerary is not completed
+    // Get max floor
+    int maxFloor = getNumFloors();
 
     // Track whether or not we've wandered the current floor or itenerary item
     bool wanderedCurrentFloor = false;
@@ -162,10 +169,20 @@ void person(Person *thisPerson)
                 int wanderTime = currentToDoItem->wanderTime;
                 printf("Person Number %d: Wandering for %d seconds\n", getPersonKey(thisPerson), wanderTime);
                 sleep(wanderTime);
+
+                // Set that we're waiting at this floor
+                incrementWaitingCount(theFloorWeAreOn);
             }
 
             // We've wandered this floor
             wanderedCurrentFloor = true;
+
+            // If next item is null, then we're done
+            if (nextToDoItem == NULL)
+            {
+                decrementWaitingCount(theFloorWeAreOn);
+                break;
+            }
 
             // Print that we're waiting for the elevator
             printf("Person Number %d: Waiting for elevator at floor %d\n", getPersonKey(thisPerson), theFloorWeAreOn);
@@ -179,18 +196,26 @@ void person(Person *thisPerson)
         int elevatorDirection = getElevatorDirection();
 
         // Calculate keys to getting on/off the elevator
-        bool doWeNeedToGoUp = nextToDoItem->floor > currentFloor;                 // Do we need to go up
-        bool elevatorAtOurFloor = currentFloor == theFloorWeAreOn;                // Is the elevator at our floor?
-        bool elevatorGoingUp = elevatorDirectionGlobal == ELEVATOR_GOING_UP;      // Is the elevator going up?
-        bool doorsOpen = getDoorsOpen();                                          // Are the doors open?
-        bool elevatorUpAndWeNeedToGoUp = elevatorGoingUp && doWeNeedToGoUp;       // Is the elevator going up and we need to go up?
-        bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp; // Is the elevator going down and we need to go down?
-        bool onElevator = getIsOnElevator(getPersonKey(thisPerson));              // Are we on the elevator?
+        bool doWeNeedToGoUp = nextToDoItem != NULL && nextToDoItem->floor > theFloorWeAreOn; // Do we need to go up
+        bool elevatorAtOurFloor = currentFloor == theFloorWeAreOn;                           // Is the elevator at our floor?
+        bool elevatorGoingUp = elevatorDirection == ELEVATOR_GOING_UP;                       // Is the elevator going up?
+        bool doorsOpen = getDoorsOpen();                                                     // Are the doors open?
+        bool elevatorUpAndWeNeedToGoUp = elevatorGoingUp && doWeNeedToGoUp;                  // Is the elevator going up and we need to go up?
+        bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp;            // Is the elevator going down and we need to go down?
+        bool onElevator = getIsOnElevator(getPersonKey(thisPerson));                         // Are we on the elevator?
 
-        // Request elevator to stop at our floor if it's going the correct direction and extra credit is enabled
+        // Request elevator to stop at our floor if it's going the correct direction and hasn't passed, and extra credit is enabled
         if ((elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && !onElevator && ENABLE_EXTRA_CREDIT)
         {
-            requestFloor(theFloorWeAreOn);
+            // Don't request the elevator if it's already passed our floor
+            bool passedGoingUp = elevatorGoingUp && currentFloor > theFloorWeAreOn;         // Has the elevator passed our floor going up?
+            bool passedGoingDown = !elevatorGoingUp && currentFloor < theFloorWeAreOn;      // Has the elevator passed our floor going down?
+            bool doorsCloosedAtOurFloor = !doorsOpen && currentFloor == theFloorWeAreOn;    // Are the doors closed at our floor?
+            bool topFloorException = theFloorWeAreOn == maxFloor - 1;                       // Are we on the top floor?
+            if ((!passedGoingUp && !passedGoingDown && !doorsCloosedAtOurFloor) || topFloorException)
+            {
+                requestFloor(theFloorWeAreOn);
+            }
         }
         // Request elevator to stop at our floor regardless of direction if extra credit is disabled
         else if (!onElevator && !ENABLE_EXTRA_CREDIT)
@@ -214,6 +239,8 @@ void person(Person *thisPerson)
             }
             // Board the elevator
             boardElevator(getPersonKey(thisPerson));
+            // Decrement waiting at floor count
+            decrementWaitingCount(theFloorWeAreOn);
             // Request the next floor
             requestFloor(nextToDoItem->floor);
             // Print that we're getting on the elevator
@@ -266,6 +293,7 @@ int main(int argc, char *argv[])
     int passengerCount = parsed[0];
     setWanderingTime(parsed[1]);
     int floorCount = parsed[2];
+    setNumFloors(parsed[2]);
 
     // Free the parsed array
     free(parsed);
@@ -279,9 +307,19 @@ int main(int argc, char *argv[])
 
     // Initialize the requestFloorGlobal array to the size of the floorCount
     requestFloorGlobal = malloc(sizeof(bool) * floorCount);
-    for (int i = 0; i < floorCount; i++)
+    // Elevator starts at beginning of day with doors open
+    requestFloorGlobal[0] = true;
+    for (int i = 1; i < floorCount; i++)
     {
         requestFloorGlobal[i] = false;
+    }
+
+    // Initialize the waitingAtFloorGlobal array to the size of the floorCount, and set floor 0 to have passengerCount waiting
+    waitingAtFloorGlobal = malloc(sizeof(int) * floorCount);
+    waitingAtFloorGlobal[0] = passengerCount;
+    for (int i = 1; i < floorCount; i++)
+    {
+        waitingAtFloorGlobal[i] = 0;
     }
 
     // Create our "Building"
@@ -293,15 +331,14 @@ int main(int argc, char *argv[])
     // Read standard input
     readSetupStdin(floors, people, floorCount, passengerCount, getWanderingTime());
 
-    // First thing program does is print input from stdin
-    printPeople(people, passengerCount);
-
-    // Sanity Checks
-    printFloors(floors, floorCount);
-
     // Create the elevator queue-array (this time, the queues will be global):
     elevatorQueue = initQueueStruct(elevatorQueue, passengerCount);
     newQueue(elevatorQueue, passengerCount);
+
+    /***** GLOBAL INIILIZATION COMPLETE *****/
+
+    // First thing program does is print input from stdin
+    printPeople(people, passengerCount);
 
     // Set the current floor the the max floor.  The elevator pthread then knows what the max floor is, and will reset it to 0
     setCurrentFloor(floorCount - 1);

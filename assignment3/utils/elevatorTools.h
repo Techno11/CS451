@@ -19,4 +19,6 @@ void printFloors(Floor *floors[], int floorCount);
 
 void printPeople(Person *people[], int count);
 
+void printWaitingAtFloor(int *waitingAtFloor, int floorCount);
+
 #endif // ELEVATOR_TOOLS_H

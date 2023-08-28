@@ -14,13 +14,15 @@
 void initializeMutexes()
 {
     // Initialize all mutexes to 1
-    sem_init(&mutex, 0, 1);
+    sem_init(&currentFloorMutex, 0, 1);
     sem_init(&peopleCountMutex, 0, 1);
+    sem_init(&numFloorsMutex, 0, 1);
     sem_init(&directionMutex, 0, 1);
     sem_init(&openDoorsMutex, 0, 1);
-    sem_init(&wanterTimeMutex, 0, 1);
+    sem_init(&wanderTimeMutex, 0, 1);
     sem_init(&elevatorRosterMutex, 0, 1);
     sem_init(&requestFloorMutex, 0, 1);
+    sem_init(&waitingAtFloorMutex, 0, 1);
 }
 
 void setElevatorDirectionGlobal(int direction) 
@@ -42,6 +44,27 @@ int getElevatorDirection()
     // Release access to elevatorDirectionGlobal
     sem_post(&directionMutex);
     return direction;
+}
+
+void setNumFloors(int numFloors) 
+{
+    // Wait for access to numFloorsGlobal
+    sem_wait(&numFloorsMutex);
+    // Update numFloorsGlobal
+    numFloorsGlobal = numFloors;
+    // Release access to numFloorsGlobal
+    sem_post(&numFloorsMutex);
+}
+
+int getNumFloors() 
+{
+    // Wait for access to numFloorsGlobal
+    sem_wait(&numFloorsMutex);
+    // Get numFloorsGlobal
+    int numFloors = numFloorsGlobal;
+    // Release access to numFloorsGlobal
+    sem_post(&numFloorsMutex);
+    return numFloors;
 }
 
 void setPeopleCount(int count) 
@@ -68,21 +91,21 @@ int getPeopleCount()
 void setCurrentFloor(long newFloor) 
 {
     // Wait for access to currentFloor
-    sem_wait(&mutex);
+    sem_wait(&currentFloorMutex);
     // Update currentFloor
     currentFloorGlobal = newFloor;
     // Release access to currentFloor
-    sem_post(&mutex);
+    sem_post(&currentFloorMutex);
 }
 
 long getCurrentFloor() 
 {
     // Wait for access to currentFloor
-    sem_wait(&mutex);
+    sem_wait(&currentFloorMutex);
     // Get currentFloor
     long currentFloor = currentFloorGlobal;
     // Release access to currentFloor
-    sem_post(&mutex);
+    sem_post(&currentFloorMutex);
     return currentFloor;
 }
 
@@ -110,21 +133,21 @@ bool getDoorsOpen()
 void setWanderingTime(int time) 
 {
     // Wait for access to wanderingTimeGlobal
-    sem_wait(&wanterTimeMutex);
+    sem_wait(&wanderTimeMutex);
     // Update wanderingTimeGlobal
     wanderingTimeGlobal = time;
     // Release access to wanderingTimeGlobal
-    sem_post(&wanterTimeMutex);
+    sem_post(&wanderTimeMutex);
 }
 
 int getWanderingTime() 
 {
     // Wait for access to wanderingTimeGlobal
-    sem_wait(&wanterTimeMutex);
+    sem_wait(&wanderTimeMutex);
     // Get wanderingTimeGlobal
     int time = wanderingTimeGlobal;
     // Release access to wanderingTimeGlobal
-    sem_post(&wanterTimeMutex);
+    sem_post(&wanderTimeMutex);
     return time;
 }
 
@@ -235,4 +258,35 @@ void clearFloorRequest(int floor)
     requestFloorGlobal[floor] = false;
     // Release access to requestFloorGlobal
     sem_post(&requestFloorMutex);
+}
+
+int *getWaitingAtAllFloors()
+{
+    // Wait for access to waitingAtFloorGlobal
+    sem_wait(&waitingAtFloorMutex);
+    // Get waitingAtFloorGlobal
+    int *waiting = waitingAtFloorGlobal;
+    // Release access to waitingAtFloorGlobal
+    sem_post(&waitingAtFloorMutex);
+    return waiting;
+}
+
+void incrementWaitingCount(int floor)
+{
+    // Wait for access to waitingAtFloorGlobal
+    sem_wait(&waitingAtFloorMutex);
+    // Update waitingAtFloorGlobal
+    waitingAtFloorGlobal[floor]++;
+    // Release access to waitingAtFloorGlobal
+    sem_post(&waitingAtFloorMutex);
+}
+
+void decrementWaitingCount(int floor)
+{
+    // Wait for access to waitingAtFloorGlobal
+    sem_wait(&waitingAtFloorMutex);
+    // Update waitingAtFloorGlobal
+    waitingAtFloorGlobal[floor]--;
+    // Release access to waitingAtFloorGlobal
+    sem_post(&waitingAtFloorMutex);
 }

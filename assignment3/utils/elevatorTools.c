@@ -58,3 +58,13 @@ void printFloors(Floor *floors[], int floorCount)
         printf("\n");
     }
 }
+
+void printWaitingAtFloor(int *waitingAtFloor, int floorCount)
+{
+    printf("Number of people waiting at floor:\n");
+    printf("Floor Number Number of People\n");
+    for (int i = 0; i < floorCount; i++)
+    {
+        printf("%-12d %d\n", i, waitingAtFloor[i]);
+    }
+}

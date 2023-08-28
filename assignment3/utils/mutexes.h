@@ -14,11 +14,14 @@
 #define MUTEXES_H
 
 // GLOBAL MUTEXES VARIABLES:
-sem_t mutex; // a semaphore global variable called mutex, a binary semaphore used for locking
+sem_t currentFloorMutex; // a semaphore global variable called currentFloorMutex, a binary semaphore used for locking
 long currentFloorGlobal;
 
 sem_t peopleCountMutex;
 int peopleCountGlobal;
+
+sem_t numFloorsMutex;
+int numFloorsGlobal;
 
 sem_t directionMutex;
 int elevatorDirectionGlobal;
@@ -26,7 +29,7 @@ int elevatorDirectionGlobal;
 sem_t openDoorsMutex;
 bool openDoorsGlobal;
 
-sem_t wanterTimeMutex;
+sem_t wanderTimeMutex;
 int wanderingTimeGlobal;
 
 sem_t elevatorRosterMutex;
@@ -35,12 +38,19 @@ int *elevatorRosterGlobal;
 sem_t requestFloorMutex;
 bool *requestFloorGlobal;
 
+sem_t waitingAtFloorMutex;
+int *waitingAtFloorGlobal;
+
 /*======== SEE 'mutexes.c' FOR FUNCTION HEADER COMMENTS ========*/
 void initializeMutexes();
 
 void setElevatorDirectionGlobal(int direction);
 
 int getElevatorDirection();
+
+int getNumFloors();
+
+void setNumFloors(int numFloors);
 
 void setCurrentFloor(long newFloor);
 
@@ -67,5 +77,12 @@ bool isFloorRequested(int floor);
 void requestFloor(int floor);
 
 void clearFloorRequest(int floor);
+
+// "Custom" getters and setters for accessing floor waiting counts
+int *getWaitingAtAllFloors();
+
+void incrementWaitingCount(int floor);
+
+void decrementWaitingCount(int floor);
 
 #endif // MUTEXES_H
