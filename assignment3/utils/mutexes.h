@@ -72,11 +72,11 @@ bool boardElevator(int personId);
 bool leaveElevator(int personId);
 
 // "Custom" getters and setters for requesting floors
-bool isFloorRequested(int floor);
+bool isFloorRequested(long floor);
 
 void requestFloor(int floor);
 
-void clearFloorRequest(int floor);
+void clearFloorRequest(long floor);
 
 // "Custom" getters and setters for accessing floor waiting counts
 int *getWaitingAtAllFloors();

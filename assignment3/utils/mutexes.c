@@ -229,7 +229,7 @@ bool leaveElevator(int personId)
     return false; // Failed
 }
 
-bool isFloorRequested(int floor)
+bool isFloorRequested(long floor)
 {
     // Wait for access to requestFloorGlobal
     sem_wait(&requestFloorMutex);
@@ -250,7 +250,7 @@ void requestFloor(int floor)
     sem_post(&requestFloorMutex);
 }
 
-void clearFloorRequest(int floor)
+void clearFloorRequest(long floor)
 {
     // Wait for access to requestFloorGlobal
     sem_wait(&requestFloorMutex);

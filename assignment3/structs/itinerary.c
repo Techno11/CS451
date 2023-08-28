@@ -7,7 +7,6 @@
             This file contains the itinerary data structure
 */
 #include "person.h"
-#include <stdlib.h>
 
 /*
     Struct: Itinerary

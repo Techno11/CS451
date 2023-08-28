@@ -7,8 +7,8 @@
             This file contains the prototypes for the itinerary data structure
 */
 
-#ifndef ITENERARY_H
-#define ITENERARY_H
+#ifndef ITINERARY_H
+#define ITINERARY_H
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -21,7 +21,7 @@
         itinerary - Array of itinerary objects for the person
 
     Brief description of the structure:
-        A representation of the theorhetical person
+        A representation of the theoretical person
 */
 typedef struct Itinerary
 {
@@ -32,4 +32,4 @@ typedef struct Itinerary
 /*======== SEE 'person.c' FOR FUNCTION HEADER COMMENTS ========*/
 Itinerary* initItineraryStruct(Itinerary* itinerary, int floor, int wanderTime);
 
-#endif // ITENERARY_H
+#endif // ITINERARY_H

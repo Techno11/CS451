@@ -45,21 +45,7 @@ void printPeople(Person *people[], int count)
     }
 }
 
-void printFloors(Floor *floors[], int floorCount)
-{
-    printf("Floors:\n");
-    for (int i = 0; i < floorCount; i++)
-    {
-        printf("    Floor %d: ", i);
-        for (int j = 0; j < floors[i]->floorSize; j++)
-        {
-            printf("%d ", floors[i]->peopleOnFloor[j]);
-        }
-        printf("\n");
-    }
-}
-
-void printWaitingAtFloor(int *waitingAtFloor, int floorCount)
+void printWaitingAtFloor(int *waitingAtFloor, long floorCount)
 {
     printf("Number of people waiting at floor:\n");
     printf("Floor Number Number of People\n");

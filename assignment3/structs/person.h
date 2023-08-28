@@ -20,14 +20,14 @@
 
     Member variables:
         itinerary - Array of itinerary objects for the person
-        currentItenerayItem - The current itinerary item the person is on (represented as an int index)
+        currentItineraryItem - The current itinerary item the person is on (represented as an int index)
 
     Brief description of the structure:
         A representation of the theoretical person
 */
 typedef struct Person
 {
-    int currentItenerayItem; // if currentIterneraryItem == itinerarySize then itinerary is empty/done
+    int currentItineraryItem; // if currentItineraryItem == itinerarySize then itinerary is empty/done
     int keyID;
     int itinerarySize;
     Itinerary *itinerary[];

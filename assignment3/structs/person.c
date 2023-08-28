@@ -16,11 +16,11 @@
         person - person to be initialized
 
     Brief description of the structure:
-        A representation of a person and their itenerary
+        A representation of a person and their itinerary
 */
 Person *initPersonStruct(Person *person, int itinerarySize)
 {
-    person->currentItenerayItem = 0;
+    person->currentItineraryItem = 0;
     person->keyID = -1;
     person->itinerarySize = itinerarySize;
     for (int i = 0; i < itinerarySize; i++)
@@ -50,7 +50,7 @@ int getItinerarySize(Person *person)
 
 int getCurrentItineraryItemInd(Person *person)
 {
-    int currItemIndex = person->currentItenerayItem;
+    int currItemIndex = person->currentItineraryItem;
     return currItemIndex;
 }
 
@@ -92,7 +92,7 @@ bool isItineraryDone(Person *forThisPerson)
 
 bool advanceItinerary(Person *person)
 {
-    int currentItineraryItemIndex = person->currentItenerayItem;
+    int currentItineraryItemIndex = person->currentItineraryItem;
     int itinerarySize = person->itinerarySize;
     if (currentItineraryItemIndex == itinerarySize)
     {
@@ -100,7 +100,7 @@ bool advanceItinerary(Person *person)
     }
     else
     {
-        person->currentItenerayItem++;
+        person->currentItineraryItem++;
         return true;
     }
 }

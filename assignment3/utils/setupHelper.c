@@ -52,18 +52,10 @@ void parseParameters(int *storage, int argc, char *argv[])
     storage[2] = floorCount;
 }
 
-void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount, int maxWanderTime)
+void readSetupStdin(Person *people[], int floorCount, int passengerCount, int maxWanderTime)
 {
-    // Allocate memory to Floors and People
-    memset(floors, 0, sizeof(Floor) * floorCount);
+    // Allocate memory to People
     memset(people, 0, sizeof(Person *) * passengerCount);
-
-    // Initilize all floors
-    for (int i = 0; i < floorCount; i++)
-    {
-        floors[i] = malloc(sizeof(Floor *) + (sizeof(int) * passengerCount));
-        floors[i] = initFloorStruct(floors[i], i, passengerCount);
-    }
 
     // Initilize all people to be null
     for (int i = 0; i < passengerCount; i++)
@@ -103,9 +95,6 @@ void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passe
             }
         }
 
-        // Add person to floor
-        floors[0]->peopleOnFloor[currentPassenger] = currentPassenger;
-
         // Key their array ID:
         setPersonKey(people[currentPassenger], currentPassenger);
 
@@ -126,15 +115,5 @@ void freePeople(Person *people[], int passengerCount)
             //     free(people[i]->itinerary);
             free(people[i]);
         }
-    }
-}
-
-void freeFloors(Floor *floors[], int floorCount)
-{
-    // Free up memory
-    for (int i = 0; i < floorCount; i++)
-    {
-        if (floors[i] != NULL)
-            free(floors[i]);
     }
 }

@@ -11,16 +11,14 @@
 #define SETUP_HELPER_H
 
 #include <stdio.h>
-#include "../structs/floor.h"
 #include "../structs/person.h"
 
 /*======== SEE 'setupHelper.c' FOR FUNCTION HEADER COMMENTS ========*/
 void parseParameters(int* storage, int argc, char *argv[]);
 
-void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount, int maxWanderTime);
+void readSetupStdin(Person *people[], int floorCount, int passengerCount, int maxWanderTime);
 
 void freePeople(Person *people[], int passengerCount);
 
-void freeFloors(Floor *floors[], int floorCount);
 
 #endif // SETUP_HELPER_H
