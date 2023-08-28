@@ -25,7 +25,7 @@ Person *initPersonStruct(Person *person, int itinerarySize)
     person->itinerarySize = itinerarySize;
     for (int i = 0; i < itinerarySize; i++)
     {
-        person->itinerary[i] = NULL;
+        person->itinerary[i] = malloc(sizeof(Itinerary));
     }
 
     return person;

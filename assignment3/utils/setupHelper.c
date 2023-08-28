@@ -97,11 +97,11 @@ void readSetupStdin(Person *people[], int floorCount, int passengerCount, int ma
     int currentPassenger = 0;
 
     // Parse lines from standard input. Each line is a passenger
-    char *line = malloc(100 * sizeof(char));
+    char *line = malloc(500 * sizeof(char));
     while (currentPassenger < passengerCount)
     {
         // Read line
-        fgets(line, 100, stdin);
+        fgets(line, 500, stdin);
 
         // Extract 1st number, which is the number of pairs to follow
         int numPairs = atoi(strtok(line, " "));
@@ -114,7 +114,6 @@ void readSetupStdin(Person *people[], int floorCount, int passengerCount, int ma
         for (int i = 0; i < numPairs; i++)
         {
             // Create itenaray item
-            people[currentPassenger]->itinerary[i] = malloc(sizeof(Itinerary *));
             people[currentPassenger]->itinerary[i]->floor = atoi(strtok(NULL, " "));
             people[currentPassenger]->itinerary[i]->wanderTime = atoi(strtok(NULL, " "));
 
