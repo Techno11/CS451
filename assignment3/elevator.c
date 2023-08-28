@@ -37,7 +37,7 @@ void elevator(long currentFloor)
     // Variable to track things locally, so we don't have to read them from the global variables every time:
     long currentFloorLocal = getCurrentFloor();
     bool openDoorsGlobalLocal = getDoorsOpen();
-    int elevatorDirectionGlobalLocal = getElvatorDirection();
+    int elevatorDirectionGlobalLocal = getElevatorDirection();
 
     // The "currentFloor" currently says the top floor, so we need to record that and then reset it to 0:
     long maxFloor = currentFloorLocal - 1;
@@ -54,7 +54,7 @@ void elevator(long currentFloor)
             // Print where we're at
             printf("    Elevator: At floor %ld.\n", currentFloorLocal);
             printf("    Elevator: Heading to max Floor %ld\n", maxFloor);
-            setelevatorDirectionGlobal(ELEVATOR_GOING_UP);
+            setElevatorDirectionGlobal(ELEVATOR_GOING_UP);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_UP;
             
         }
@@ -64,12 +64,12 @@ void elevator(long currentFloor)
             // Print where we're at
             printf("    Elevator: At floor %ld.\n", currentFloorLocal);
             printf("    Elevator: Heading to min Floor %d\n", 0);
-            setelevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
+            setElevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_DOWN;
         }
 
         // If someone is waiting on this floor, we need to open the doors
-        if (false) // TODO:
+        if (isFloorRequested(currentFloorLocal))
         {
             // Open the doors
             setDoorsOpen(true);
@@ -80,6 +80,7 @@ void elevator(long currentFloor)
             sleep(1);
             // Close the doors
             setDoorsOpen(false);
+            clearFloorRequest(currentFloorLocal);
             openDoorsGlobalLocal = false;
         }
 
@@ -130,19 +131,28 @@ void person(Person* thisPerson)
     // The "notDone" can be a method to check that Person's itinerary is not completed
     while (!isItineraryDone(thisPerson))
     {
+        // Get, print, and wait for wandering time:
         int wanderTime = getWanderingTime();
+        printf("Person Number %d: Wandering for %d seconds\n", getPersonKey(thisPerson), wanderTime);
         sleep(wanderTime);
 
+        // Fetch the current itinerary item and the next itinerary item:
         int currToDoItemIndex = getCurrentItineraryItemInd(thisPerson);
         Itinerary* currentToDoItem = getCurrentItineraryItem(thisPerson);
         Itinerary* nextToDoItem = getNextItineraryItem(thisPerson);
+
+        // Print that we're waiting for the elevator
+        printf("Person Number %d: Waiting for elevator at floor %d\n", getPersonKey(thisPerson), currentToDoItem->floor);
+
+        // Request elevator to stop at
+        requestFloor(currentToDoItem->floor);
 
         // If you are done waiting && you are going up && elevator is going up then "get on" && the doors are open
         //  -Use defined constants (#'s) at the top
         //  -Current itinerary item is where the Person is AT
         //  -NEXT itinerary item is where the Person is GOING (destination floor)
         int currentFloor = getCurrentFloor();
-        int elevatorDirection = getElvatorDirection();
+        int elevatorDirection = getElevatorDirection();
 
         // Calculate keys to getting on/off the elevator
         bool doWeNeedToGoUp = nextToDoItem->floor > currentFloor;                   // Do we need to go up
@@ -151,20 +161,23 @@ void person(Person* thisPerson)
         bool doorsOpen = getDoorsOpen();                                            // Are the doors open?
         bool elevatorUpAndWeNeedToGoUp = elevatorGoingUp && doWeNeedToGoUp;         // Is the elevator going up and we need to go up?
         bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp;   // Is the elevator going down and we need to go down?
-        bool onElevator = true; // TODO                                             // Are we on the elevator?
+        bool onElevator = getIsOnElevator(getPersonKey(thisPerson));                // Are we on the elevator?
 
         // If these keys are all true, then we can get on the elevator
         if (elevatorAtOurFloor && doorsOpen && !onElevator && (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown))
         {
-            // TODO: Step 1: Elevator is at our floor. Update itinerary index to next item
-            // TODO: Step 2: Get on the elevator
+            advanceItinerary(thisPerson);
+            boardElevator(getPersonKey(thisPerson));
+            requestFloor(nextToDoItem->floor);
+            printf("Person Number %d: Taking elevator to floor %d\n", getPersonKey(thisPerson), nextToDoItem->floor);
         }
         // If we're on the elevator and we're at our destination floor, then we can get off the elevator
         // This works because we update the itinerary index to the next item when we get on the elevator
         // -So if we're on the elevator and we're at our destination floor, then we know we're at the correct floor
         else if (elevatorAtOurFloor && doorsOpen && onElevator)
         {
-            // TODO: Get Off Elevator
+            leaveElevator(getPersonKey(thisPerson));
+            printf("Person Number %d: Got off at floor %d\n", getPersonKey(thisPerson), currentToDoItem->floor);
         }
     }
     // When done print goodbye message and exit thread:
@@ -181,28 +194,44 @@ void person(Person* thisPerson)
 
 int main(int argc, char *argv[])
 {
+    // Initialize the mutexes:
+    initializeMutexes();
+
     // Initialize any global variables at the start:
     currentFloorGlobal = 0;
-    sem_init(&mutex, 0, 1); // Initialize semaphore mutex to 1
 
     // Initialize the directionMutex to 1:
     elevatorDirectionGlobal = ELEVATOR_GOING_UP;
-    sem_init(&directionMutex, 0, 1);
 
-    // Initialize the openDoorsMutex to 1:
+    // Initialize the openDoorsMutex to closed:
     openDoorsGlobal = false;
-    sem_init(&openDoorsMutex, 0, 1);
-
-    // Initialize the wanderingTimeMutex to 1:
-    sem_init(&wanterTimeMutex, 0, 1);
 
     // Parse input parameters
     int *parsed = malloc(sizeof(int) * 3);
     parseParameters(parsed, argc, argv);
+
+    // Parse parameters returns an array pointer, where 0 is the number of people, 1 is the wandering time, and 2 is the number of floors
+    setPeopleCount(parsed[0]);
     int passengerCount = parsed[0];
     setWanderingTime(parsed[1]);
     int floorCount = parsed[2];
+    
+    // Free the parsed array
     free(parsed);
+
+    // Initilize the elevatorRosterGlobal array to the size of the passengerCount
+    elevatorRosterGlobal = malloc(sizeof(int) * passengerCount);
+    for(int i = 0; i < passengerCount; i++)
+    {
+        elevatorRosterGlobal[i] = -1;
+    }
+
+    // Initialize the requestFloorGlobal array to the size of the floorCount
+    requestFloorGlobal = malloc(sizeof(bool) * floorCount);
+    for(int i = 0; i < floorCount; i++)
+    {
+        requestFloorGlobal[i] = false;
+    }
 
     // Create our "Building"
     Floor *floors[floorCount];

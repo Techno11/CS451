@@ -89,3 +89,18 @@ bool isItineraryDone(Person *forThisPerson)
         return false;
     }
 }
+
+bool advanceItinerary(Person *person)
+{
+    int currentItineraryItemIndex = person->currentItenerayItem;
+    int itinerarySize = person->itinerarySize;
+    if (currentItineraryItemIndex == itinerarySize)
+    {
+        return false;
+    }
+    else
+    {
+        person->currentItenerayItem++;
+        return true;
+    }
+}
