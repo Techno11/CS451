@@ -52,7 +52,7 @@ void parseParameters(int *storage, int argc, char *argv[])
     storage[2] = floorCount;
 }
 
-void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount)
+void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount, int maxWanderTime)
 {
     // Allocate memory to Floors and People
     memset(floors, 0, sizeof(Floor) * floorCount);
@@ -95,6 +95,12 @@ void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passe
             people[currentPassenger]->itinerary[i] = malloc(sizeof(Itinerary *));
             people[currentPassenger]->itinerary[i]->floor = atoi(strtok(NULL, " "));
             people[currentPassenger]->itinerary[i]->wanderTime = atoi(strtok(NULL, " "));
+
+            // If the wander time is greater than the max, set it to the max
+            if (people[currentPassenger]->itinerary[i]->wanderTime > maxWanderTime)
+            {
+                people[currentPassenger]->itinerary[i]->wanderTime = maxWanderTime;
+            }
         }
 
         // Add person to floor
@@ -114,7 +120,8 @@ void freePeople(Person *people[], int passengerCount)
     // Free up memory
     for (int i = 0; i < passengerCount; i++)
     {
-        if (people[i] != NULL) {
+        if (people[i] != NULL)
+        {
             // if (people[i]->itinerary != NULL)
             //     free(people[i]->itinerary);
             free(people[i]);

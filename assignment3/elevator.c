@@ -43,7 +43,7 @@ void elevator(long currentFloor)
     int elevatorDirectionGlobalLocal = getElevatorDirection();
 
     // The "currentFloor" currently says the top floor, so we need to record that and then reset it to 0:
-    long maxFloor = currentFloorLocal - 1;
+    long maxFloor = currentFloorLocal;
 
     // Set the current floor to 0:
     setCurrentFloor(0);
@@ -159,7 +159,7 @@ void person(Person *thisPerson)
             if (!firstMove)
             {
                 // Get, print, and wait for wandering time:
-                int wanderTime = getWanderingTime();
+                int wanderTime = currentToDoItem->wanderTime;
                 printf("Person Number %d: Wandering for %d seconds\n", getPersonKey(thisPerson), wanderTime);
                 sleep(wanderTime);
             }
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
     Person *people[passengerCount];
 
     // Read standard input
-    readSetupStdin(floors, people, floorCount, passengerCount);
+    readSetupStdin(floors, people, floorCount, passengerCount, getWanderingTime());
 
     // First thing program does is print input from stdin
     printPeople(people, passengerCount);

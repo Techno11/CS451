@@ -17,7 +17,7 @@
 /*======== SEE 'setupHelper.c' FOR FUNCTION HEADER COMMENTS ========*/
 void parseParameters(int* storage, int argc, char *argv[]);
 
-void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount);
+void readSetupStdin(Floor *floors[], Person *people[], int floorCount, int passengerCount, int maxWanderTime);
 
 void freePeople(Person *people[], int passengerCount);
 
