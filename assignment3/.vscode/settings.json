@@ -3,6 +3,7 @@
         "person.h": "c",
         "semaphore.h": "c",
         "unistd.h": "c",
-        "mutexes.h": "c"
+        "mutexes.h": "c",
+        "setuphelper.h": "c"
     }
 }

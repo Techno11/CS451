@@ -1,15 +1,30 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
-        Date of Submission: 8/99/2023
+        Date of Submission: 8/29/2023
         Name of this file: setupHelper.h
         Short Description of contents:
-            This file contains the prototypes for the setupHelpers methods
+            This file contains the methods that help during the application setup
 */
 
 #include <stdio.h>
 #include "setupHelper.h"
 
+
+/*
+    Function Name: parseParameters
+
+    Input to Method:
+        int *storage - An array of size 3 to store the parsed parameters
+        int argc - The number of arguments (passed directly from the main method)
+        char *argv[] - The arguments (passed directly from the main method)
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        Parse the command line arguments and store them in the storage array
+*/
 void parseParameters(int *storage, int argc, char *argv[])
 {
     // Possible Arguments to read in:
@@ -52,6 +67,21 @@ void parseParameters(int *storage, int argc, char *argv[])
     storage[2] = floorCount;
 }
 
+/*
+    Function Name: readSetupStdin
+
+    Input to Method:
+        Person *people[] - An array of people to store the parsed passengers
+        int floorCount - The number of floors
+        int passengerCount - The number of passengers
+        int maxWanderTime - The maximum wander time
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        Parse the standard input that contains the passenger's itineraries
+*/
 void readSetupStdin(Person *people[], int floorCount, int passengerCount, int maxWanderTime)
 {
     // Allocate memory to People
@@ -104,6 +134,19 @@ void readSetupStdin(Person *people[], int floorCount, int passengerCount, int ma
     free(line);
 }
 
+/*
+    Function Name: freePeople
+
+    Input to Method:
+        Person *people[] - An array of people to store the parsed passengers
+        int passengerCount - The number of passengers
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        Free up the memory allocated to the people array
+*/
 void freePeople(Person *people[], int passengerCount)
 {
     // Free up memory

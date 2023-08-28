@@ -1,8 +1,8 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
-        Date of Submission: 8/99/2023
-        Name of this file: devtools.c
+        Date of Submission: 8/29/2023
+        Name of this file: elevatorTools.c
         Short Description of contents:
             This file contains the elevatorTools methods, methods to help the elevator
 */
@@ -10,6 +10,20 @@
 #include <stdio.h>
 #include "elevatorTools.h"
 
+
+/*
+    Function Name: printPeople
+
+    Input to Method:
+        Person *people[] - An array of people
+        int count - The number of people in the array
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        Print the people and their iteneraries for the beginning of the program
+*/
 void printPeople(Person *people[], int count)
 {
     // Iterate through people
@@ -45,6 +59,19 @@ void printPeople(Person *people[], int count)
     }
 }
 
+/*
+    Function Name: printWaitingAtFloor
+
+    Input to Method:
+        int *waitingAtFloor - An array of people waiting at each floor
+        long floorCount - The number of floors
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        Print the number of people waiting at each floor
+*/
 void printWaitingAtFloor(int *waitingAtFloor, long floorCount)
 {
     printf("Number of people waiting at floor:\n");

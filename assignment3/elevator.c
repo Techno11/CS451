@@ -79,7 +79,7 @@ void elevator(long currentFloor)
             printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
             printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
             printf("                                                        Elevator: Heading to max Floor %ld\n", maxFloor);
-            setElevatorDirectionGlobal(ELEVATOR_GOING_UP);
+            setElevatorDirection(ELEVATOR_GOING_UP);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_UP;
         }
         // If we're at the max floor, change direction and print
@@ -89,7 +89,7 @@ void elevator(long currentFloor)
             printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
             printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
             printf("                                                        Elevator: Heading to min Floor %d\n", 0);
-            setElevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
+            setElevatorDirection(ELEVATOR_GOING_DOWN);
             elevatorDirectionGlobalLocal = ELEVATOR_GOING_DOWN;
         }
 
@@ -354,6 +354,7 @@ void shouldIGetOnOrOffTheElevator(Person *myself, bool *justEntered, int theFloo
         requestFloor(nextToDoItem->floor);
         // Print that we're getting on the elevator
         printf("Person Number %d: Taking elevator to floor %d\n", getPersonKey(myself), nextToDoItem->floor);
+        printf("Person Number %d: Waiting to get off at floor %d\n", getPersonKey(myself), nextToDoItem->floor);
         // We're no longer on the first move anymore
         *justEntered = false;
     }

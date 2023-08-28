@@ -1,7 +1,7 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
-        Date of Submission: 8/99/2023
+        Date of Submission: 8/29/2023
         Name of this file: person.h
         Short Description of contents:
             This file contains the prototypes for the person data structure
@@ -21,9 +21,11 @@
     Member variables:
         itinerary - Array of itinerary objects for the person
         currentItineraryItem - The current itinerary item the person is on (represented as an int index)
+        keyID - The id of the person
+        itinerarySize - The size of the itinerary array
 
     Brief description of the structure:
-        A representation of the theoretical person
+        A representation of the theoretical person and their itinerary
 */
 typedef struct Person
 {

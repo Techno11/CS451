@@ -9,16 +9,19 @@
 #include "person.h"
 
 /*
-    Struct: Itinerary
+    Function Name: initItineraryStruct
 
-    Member variables:
-        floor - the floor to go to (?)
-        wanderTime - the amount of time a person should idle on that floor (?)
+    Input to Method:
+        Itinerary *itinerary - The itinerary to get the floor for
+        int floor - The floor to set for the itinerary item
+        int wanderTime - The wander time to set for the itinerary item
 
-    Brief description of the structure:
-        A representation of the person's itinerary
+    Output (Return value):
+        Itinerary* - The itinerary with the floor and wander time set
+
+    Brief description of the task:
+        Initilize an itinerary struct with a floor and wander time
 */
-
 Itinerary* initItineraryStruct(Itinerary* itinerary, int floor, int wanderTime)
 {
     itinerary->floor = floor;
@@ -26,6 +29,18 @@ Itinerary* initItineraryStruct(Itinerary* itinerary, int floor, int wanderTime)
     return itinerary;
 }
 
+/*
+    Function Name: getItineraryFloor
+
+    Input to Method:
+        Itinerary *itinerary - The itinerary to get the floor for
+
+    Output (Return value):
+        int - the floor of the itinerary item
+
+    Brief description of the task:
+        Get the floor of an itinerary item
+*/
 int getItineraryFloor(Itinerary* itinerary)
 {
     int floorVal = itinerary->floor;

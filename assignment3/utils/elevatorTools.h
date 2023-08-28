@@ -1,7 +1,7 @@
 /*
         Author: Brendan Sting, Soren Zaiser
         Assignment Number: 3
-        Date of Submission: 8/99/2023
+        Date of Submission: 8/29/2023
         Name of this file: elevatorTools.h
         Short Description of contents:
             This file contains the prototypes for the elevatorTools methods
