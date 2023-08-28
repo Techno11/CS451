@@ -26,7 +26,7 @@
 #define ELEVATOR_GOING_DOWN 0
 
 // Toggles the extra credit functionality
-#define ENABLE_EXTRA_CREDIT true
+#define ENABLE_EXTRA_CREDIT false //true
 
 // GLOBAL VARIABLES
 // Set of global queues to use for directing which groups of Persons get off on next floor:
@@ -52,8 +52,24 @@ void elevator(long currentFloor)
     // Wait for people to enter the building
     sleep(1);
 
+    int emptyPassSets = 0 + 1; // To offset for floor 1 to N (instead of 0 to N-1)
+
     while (true)
     {
+        if ((emptyPassSets >= (maxFloor * 2)) && (currentFloorLocal == 0)) { //emptyPassSets = 2 * N floors traveled by elevator
+            printf("Waiting for max waiting time. No one is waiting for the elevator.\n");
+            sleep(getWanderingTime()); // get max wander time for elevator sleepy-sleep
+            int *waitingArray = getWaitingAtAllFloors();
+            int totalWaitingCount = 0;
+            for (int floorInd = 0; floorInd < maxFloor; floorInd++) {
+                totalWaitingCount += waitingArray[floorInd];
+            }
+            if (totalWaitingCount == 0) {
+                printf("Elevator Leaving The System.\n");
+                pthread_exit(0);
+            }
+        }
+
         // If we're at the min floor, change direction and print
         if (currentFloorLocal == 0)
         {
@@ -78,6 +94,8 @@ void elevator(long currentFloor)
         // If someone is waiting on this floor, we need to open the doors
         if (isFloorRequested(currentFloorLocal))
         {
+            emptyPassSets = 0 + 1; // reset back to starting Floor 1 (0th floor)
+
             // Open the doors
             setDoorsOpen(true);
             openDoorsGlobalLocal = true;
@@ -89,6 +107,10 @@ void elevator(long currentFloor)
             setDoorsOpen(false);
             clearFloorRequest(currentFloorLocal);
             openDoorsGlobalLocal = false;
+        }
+        else
+        {
+            emptyPassSets++;
         }
 
         // Transition between floors

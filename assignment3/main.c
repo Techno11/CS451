@@ -20,6 +20,8 @@ int main() {
         pthread_create(&thread_id[i], NULL, (void *(*)(void *))thread_task,  (void *)i);
     }
 
+    printf("Joining the process threads now...");
+
     //The following code makes sure the main program waits until all threads have finished execution
     for (int i=0; i<5;i++)
     {
