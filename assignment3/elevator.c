@@ -156,10 +156,13 @@ void person(Person *thisPerson)
         // If we haven't wandered the current floor, then wander it:
         if (!wanderedCurrentFloor)
         {
-            // Get, print, and wait for wandering time:
-            int wanderTime = getWanderingTime();
-            printf("Person Number %d: Wandering for %d seconds\n", getPersonKey(thisPerson), wanderTime);
-            sleep(wanderTime);
+            if (!firstMove)
+            {
+                // Get, print, and wait for wandering time:
+                int wanderTime = getWanderingTime();
+                printf("Person Number %d: Wandering for %d seconds\n", getPersonKey(thisPerson), wanderTime);
+                sleep(wanderTime);
+            }
 
             // We've wandered this floor
             wanderedCurrentFloor = true;
@@ -184,7 +187,6 @@ void person(Person *thisPerson)
         bool elevatorDownAndWeNeedToGoDown = !elevatorGoingUp && !doWeNeedToGoUp; // Is the elevator going down and we need to go down?
         bool onElevator = getIsOnElevator(getPersonKey(thisPerson));              // Are we on the elevator?
 
-
         // Request elevator to stop at our floor if it's going the correct direction and extra credit is enabled
         if ((elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && !onElevator && ENABLE_EXTRA_CREDIT)
         {
@@ -196,18 +198,27 @@ void person(Person *thisPerson)
             requestFloor(theFloorWeAreOn);
         }
 
-        // If these keys are all true, then we can get on the elevator
+        // If the elevator is at our floor, the doors are open, we're not already on the elevator, the elevator is going the correct direction, and extra credit is enabled
         bool extraCreditCondition = elevatorAtOurFloor && doorsOpen && !onElevator && (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && ENABLE_EXTRA_CREDIT;
+
+        // If the elevator is at our floor, the doors are open, we're not already on the elevator, and extra credit is disabled
         bool nonExtraCreditCondition = elevatorAtOurFloor && doorsOpen && !onElevator && !ENABLE_EXTRA_CREDIT;
+
+        // If either the extra credit condition or the non-extra credit condition is true, then we can get on the elevator
         if (extraCreditCondition || nonExtraCreditCondition)
         {
+            // If this is not the first move, we need to advance the itinerary index
             if (!firstMove)
             {
                 advanceItinerary(thisPerson);
             }
+            // Board the elevator
             boardElevator(getPersonKey(thisPerson));
+            // Request the next floor
             requestFloor(nextToDoItem->floor);
-            printf("Person Number %d: Taking elevator to floor %d\n", getPersonKey(thisPerson), currentToDoItem->floor);
+            // Print that we're getting on the elevator
+            printf("Person Number %d: Taking elevator to floor %d\n", getPersonKey(thisPerson), nextToDoItem->floor);
+            // We're no longer on the first move anymore
             firstMove = false;
         }
         // If we're on the elevator and we're at our destination floor, then we can get off the elevator
