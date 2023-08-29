@@ -21,7 +21,7 @@
         N/A (void)
 
     Brief description of the task:
-        Initilize all mutexes to 1
+        Initialize all mutexes to 1
 */
 void initializeMutexes()
 {
@@ -49,7 +49,7 @@ void initializeMutexes()
     Brief description of the task:
         Semaphore protection to update the elevatorDirectionGlobal variable
 */
-void setElevatorDirection(int direction) 
+void setElevatorDirectionGlobal(int direction)
 {
     // Wait for access to elevatorDirectionGlobal
     sem_wait(&directionMutex);
