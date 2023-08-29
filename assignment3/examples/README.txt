@@ -1,13 +1,22 @@
+NOTE: To run the current code from terminal, using the 2nd example ($ are CMD tokens, do not type $ in the command):
+-----------------------------------------------------------------------------------------------------
+   $ gcc elevator.c -o elevator.o -lpthread
+   $ ./elevator.o -p 5 -f 11 -w 10 < ./examples/deterministic_example_2.txt
+-----------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------------------------------------------
 The Deterministic examples must be run with the following parameters:
 
-./elevator.o -p 1 -f 11 < ./examples/deterministic_example_1.txt
+    $ ./elevator.o -p 1 -f 11 < ./examples/deterministic_example_1.txt
 
 
-./elevator.o -p 5 -f 11 –w 10 < ./examples/deterministic_example_2.txt
+    $ ./elevator.o -p 5 -f 11 –w 10 < ./examples/deterministic_example_2.txt
 
 
-./elevator.o -p 5 -f 12 -w 10 < ./examples/deterministic_example_3.txt
+    $ ./elevator.o -p 5 -f 12 -w 10 < ./examples/deterministic_example_3.txt
 
+WHERE -p = number of people, -f = number of floors, -w = maximum wandering time, and < is the file to read stdin from.
+-----------------------------------------------------------------------------------------------------------------------
 
 AS A SANITY CHECK... The following commands should work (standalone) IDENTICAL to above....
 To run, First, copy and run the command portion. (Copy the command, paste, and press enter. Nothing should happen...)
