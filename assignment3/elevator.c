@@ -26,6 +26,206 @@
 #define ENABLE_EXTRA_CREDIT true // false
 
 /*
+    Function Name: safetyNetForBadElevatorExit
+
+    Input to Method:
+        long lastFloorSeen - value that details what floor number the elevator just saw before exiting
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        A helper function that provides a sanity output check if elevator thread process dropped out badly.
+
+*/
+void safetyNetForBadElevatorExit(long lastFloorSeen)
+{
+    printf("                                                        Elevator: I am about to incorrectly stop, with a current floor of %ld.\n", lastFloorSeen);
+
+    // ...
+
+    /* This is one of the ways to exit a thread:
+        -Here, it specifies an exit status value of 0
+        which is available to another thread in the same
+        process that called pthread_join().
+            -AKA, just as a fun fact, the main() can be
+            given the elevator's thread exit status.
+    */
+    pthread_exit(0);
+}
+
+/*
+    Function Name: checkIfElevatorCanGoIdle
+
+    Input to Method:
+        int numOfEmptyFloorsSeen - empty floors counter to initially tell how many people are not waiting
+        (then use the empty floors count to iterate through and see how many floors are literally empty)
+        long maxAmountOfFloors - the max amount of floors in the building
+        long currentFloor - used for passing any current floor global variable to the elevator thread
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        A helper function that communicates if the elevator can sleep for the time being, and perhaps exit.
+
+*/
+void checkIfElevatorCanGoIdle(int numOfEmptyFloorsSeen, long maxAmountOfFloors, long currentFloor)
+{
+    if ((numOfEmptyFloorsSeen >= (maxAmountOfFloors * 2)) && (currentFloor == 0)) { //emptyPassSets = 2 * N floors traveled by elevator
+        printf("Waiting for max waiting time. No one is waiting for the elevator.\n");
+        sleep(getWanderingTime()); // get max wander time for elevator sleepy-sleep
+        int *waitingArray = getWaitingAtAllFloors();
+        int totalWaitingCount = 0;
+        for (int floorInd = 0; floorInd < maxAmountOfFloors; floorInd++) {
+            totalWaitingCount += waitingArray[floorInd];
+        }
+        if (totalWaitingCount == 0) {
+            printf("Elevator Leaving The System.\n");
+            pthread_exit(0);
+        }
+    }
+}
+
+/*
+    Function Name: hasElevatorReachedTheBottom
+
+    Input to Method:
+        int* elevatorDirection - directional vector value of this elevator which is compared to macros
+        long maxAmountOfFloors - the max amount of floors in the building
+        long currentFloor - used for passing any current floor global variable to the elevator thread
+
+    Output (Return value):
+        bool - true/false describing if this elevator is at the bottom floor or not
+
+    Brief description of the task:
+        A helper function that communicates with true/false return if elevator is at the bottom floor or not.
+
+*/
+bool hasElevatorReachedTheBottom(int *elevatorDirection, long maxAmountOfFloors, long currentFloor)
+{
+    // If we're at the min floor, change direction and print
+    if (currentFloor == 0)
+    {
+        // Print where we're at
+        printWaitingAtFloor(getWaitingAtAllFloors(), maxAmountOfFloors + 1);
+        printf("                                                        Elevator: At floor %ld.\n", currentFloor);
+        printf("                                                        Elevator: Heading to max Floor %ld\n", maxAmountOfFloors);
+        setElevatorDirectionGlobal(ELEVATOR_GOING_UP);
+        *elevatorDirection = ELEVATOR_GOING_UP;
+
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/*
+    Function Name: hasElevatorReachedTheTop
+
+    Input to Method:
+        bool isThisAtTheBottomFloor - true/false that communicates an if-elseif structure with top vs. bottom
+        int* elevatorDirection - directional vector value of this elevator which is compared to macros
+        long maxAmountOfFloors - the max amount of floors in the building
+        long currentFloor - used for passing any current floor global variable to the elevator thread
+
+    Output (Return value):
+        bool - true/false describing if this elevator has reached the top floor or not
+
+    Brief description of the task:
+        A helper function that communicates with a true/false return if elevator is at the top floor or not.
+
+*/
+bool hasElevatorReachedTheTop(bool isThisAtTheBottomFloor, int *elevatorDirection, long maxAmountOfFloors,
+                              long currentFloor)
+{
+    // If we're at the max floor, change direction and print
+    if (!isThisAtTheBottomFloor && (currentFloor == maxAmountOfFloors))
+    {
+        // Print where we're at
+        printWaitingAtFloor(getWaitingAtAllFloors(), maxAmountOfFloors + 1);
+        printf("                                                        Elevator: At floor %ld.\n", currentFloor);
+        printf("                                                        Elevator: Heading to min Floor %d\n", 0);
+        setElevatorDirectionGlobal(ELEVATOR_GOING_DOWN);
+        *elevatorDirection = ELEVATOR_GOING_DOWN;
+
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/*
+    Function Name: isCallButtonPushedOnThisFloor
+
+    Input to Method:
+        int *numOfEmptyFloorsSeen - empty floors counter to be updated if no one called to this floor
+        long currentFloor - used for passing any current floor global variable to the elevator thread
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        A helper function that checks if this elevator has been called to this current floor.
+
+*/
+void isCallButtonPushedOnThisFloor(int *numOfEmptyFloorsSeen, long currentFloor)
+{
+    // If someone is waiting on this floor, we need to open the doors
+    if (isFloorRequested(currentFloor))
+    {
+        *numOfEmptyFloorsSeen = 0 + 1; // reset back to starting Floor 1 (0th floor)
+
+        // Open the doors
+        setDoorsOpen(true);
+        // Print that we've stopped
+        printf("                                                        Elevator: Opening the doors at %ld\n", currentFloor);
+        // Wait for people to get on
+        sleep(1);
+        // Close the doors
+        setDoorsOpen(false);
+        clearFloorRequest(currentFloor);
+
+    }
+    else
+    {
+        *numOfEmptyFloorsSeen = *numOfEmptyFloorsSeen + 1;
+    }
+}
+
+/*
+    Function Name: hoistOrLowerThisElevator
+
+    Input to Method:
+        int elevatorDirection - directional vector value of this elevator which is compared to macros
+        long* currentFloor - used for passing and updating any current floor global variable to the elevator thread
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        A helper function that simply raises or lowers this elevator by one floor.
+
+*/
+void hoistOrLowerThisElevator(int elevatorDirection, long *currentFloor)
+{
+    // Go up a floor if the established direction is up:
+    if (elevatorDirection == ELEVATOR_GOING_UP)
+    {
+        *currentFloor = *currentFloor + 1;
+        setCurrentFloor(*currentFloor);
+    }
+    // Else, go down a floor (if the established direction is down):
+    else
+    {
+        *currentFloor = *currentFloor - 1;
+        setCurrentFloor(*currentFloor);
+    }
+}
+
+/*
     Function Name: elevator
 
     Input to Method:
@@ -58,90 +258,26 @@ void elevator(long currentFloor)
 
     while (true)
     {
-        if ((emptyPassSets >= (maxFloor * 2)) && (currentFloorLocal == 0)) { //emptyPassSets = 2 * N floors traveled by elevator
-            printf("Waiting for max waiting time. No one is waiting for the elevator.\n");
-            sleep(getWanderingTime()); // get max wander time for elevator sleepy-sleep
-            int *waitingArray = getWaitingAtAllFloors();
-            int totalWaitingCount = 0;
-            for (int floorInd = 0; floorInd < maxFloor; floorInd++) {
-                totalWaitingCount += waitingArray[floorInd];
-            }
-            if (totalWaitingCount == 0) {
-                printf("Elevator Leaving The System.\n");
-                pthread_exit(0);
-            }
-        }
+        // See if the elevator can sleep for maxWanderTime and possibly exit out:
+        checkIfElevatorCanGoIdle(emptyPassSets, maxFloor, currentFloorLocal);
 
-        // If we're at the min floor, change direction and print
-        if (currentFloorLocal == 0)
-        {
-            // Print where we're at
-            printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
-            printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
-            printf("                                                        Elevator: Heading to max Floor %ld\n", maxFloor);
-            setElevatorDirection(ELEVATOR_GOING_UP);
-            elevatorDirectionGlobalLocal = ELEVATOR_GOING_UP;
-        }
-        // If we're at the max floor, change direction and print
-        else if (currentFloorLocal == maxFloor)
-        {
-            // Print where we're at
-            printWaitingAtFloor(getWaitingAtAllFloors(), maxFloor + 1);
-            printf("                                                        Elevator: At floor %ld.\n", currentFloorLocal);
-            printf("                                                        Elevator: Heading to min Floor %d\n", 0);
-            setElevatorDirection(ELEVATOR_GOING_DOWN);
-            elevatorDirectionGlobalLocal = ELEVATOR_GOING_DOWN;
-        }
+        // See if this elevator is at the bottom floor, and if so, change direction and print:
+        bool isAtTheBottomFloor = hasElevatorReachedTheBottom(&elevatorDirectionGlobalLocal, maxFloor, currentFloorLocal);
 
-        // If someone is waiting on this floor, we need to open the doors
-        if (isFloorRequested(currentFloorLocal))
-        {
-            emptyPassSets = 0 + 1; // reset back to starting Floor 1 (0th floor)
+        // See if this elevator is at the top floor, and if so, change direction and print:
+        bool isAtTheTopFloor = hasElevatorReachedTheTop(isAtTheBottomFloor, &elevatorDirectionGlobalLocal, maxFloor, currentFloorLocal);
 
-            // Open the doors
-            setDoorsOpen(true);
-            // Print that we've stopped
-            printf("                                                        Elevator: Opening the doors at %ld\n", currentFloorLocal);
-            // Wait for people to get on
-            sleep(1);
-            // Close the doors
-            setDoorsOpen(false);
-            clearFloorRequest(currentFloorLocal);
-
-        }
-        else
-        {
-            emptyPassSets++;
-        }
+        // Check if someone called the elevator from this floor:
+        isCallButtonPushedOnThisFloor(&emptyPassSets, currentFloorLocal);
 
         // Transition between floors
         sleep(1);
 
-        // Go up (or down) a floor
-        if (elevatorDirectionGlobalLocal == ELEVATOR_GOING_UP)
-        {
-            currentFloorLocal++;
-            setCurrentFloor(currentFloorLocal);
-        }
-        else
-        {
-            currentFloorLocal--;
-            setCurrentFloor(currentFloorLocal);
-        }
+        // Go up (or down) a floor depending on this elevator's direction:
+        hoistOrLowerThisElevator(elevatorDirectionGlobalLocal, &currentFloorLocal);
     }
 
-    printf("                                                        Elevator: I am about to incorrectly stop, with a current floor of %ld.\n", currentFloor);
-
-    // ...
-
-    /* This is one of the ways to exit a thread:
-        -Here, it specifies an exit status value of 0
-        which is available to another thread in the same
-        process that called pthread_join().
-            -AKA, just as a fun fact, the main() can be
-            given the elevator's thread exit status.
-    */
-    pthread_exit(0);
+    safetyNetForBadElevatorExit(currentFloor);
 }
 
 /*
@@ -233,6 +369,45 @@ bool startWanderingAround(Person *myself, bool *didIWanderThisFloor, bool justEn
 }
 
 /*
+    Function Name: updateGetOnElevatorConditions
+
+    Input to Method:
+        bool* extraCreditCondition - an evaluated condition for elevator entry that factors in direction
+        bool* nonExtraCreditCondition - an evaluated condition for normal elevator entry
+        bool* elevatorAtOurFloor - an updated true/false describing pre req. that the elevator is on the same floor
+        bool* doorsOpen - an updated true/false describing pre req. that the elevator's doors are open for us
+        bool* onElevator - an updated true/false describing pre req. that we haven't been on the elevator already
+        bool elevatorUpAndWeNeedToGoUp - true/false to say if our directions are aligned upwards or not
+        bool elevatorDownAndWeNeedToGoDown - true/false to say if our directions are aligned downwards or not
+
+    Output (Return value):
+        N/A (void)
+
+    Brief description of the task:
+        A helper function to update whether the Person can (or even should) get on the elevator.
+*/
+void updateGetOnElevatorConditions(bool *extraCreditCondition, bool *nonExtraCreditCondition,
+                                   bool *elevatorAtOurFloor, bool *doorsOpen, bool *onElevator,
+                                   bool elevatorUpAndWeNeedToGoUp, bool elevatorDownAndWeNeedToGoDown)
+{
+    // If:
+    // -the elevator is at our floor,
+    // -the doors are open,
+    // -we're not already on the elevator,
+    // -the elevator is going the correct direction,
+    // -and extra credit is enabled, then determine the extra credit condition!
+    *extraCreditCondition = *elevatorAtOurFloor && *doorsOpen && !*onElevator &&
+                            (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && ENABLE_EXTRA_CREDIT;
+
+    // If:
+    // -the elevator is at our floor,
+    // -the doors are open,
+    // -we're not already on the elevator,
+    // -and extra credit is disabled, then just determine the condition normally:
+    *nonExtraCreditCondition = *elevatorAtOurFloor && *doorsOpen && !*onElevator && !ENABLE_EXTRA_CREDIT;
+}
+
+/*
     Function Name: decideWhetherToBecomeAwareOfElevatorDirection
 
     Input to Method:
@@ -288,26 +463,16 @@ void decideWhetherToBecomeAwareOfElevatorDirection(Person *forThisPerson, bool *
             requestFloor(theFloorWeAreOn);
         }
     }
-    // Request elevator to stop at our floor regardless of direction if extra credit is disabled
+        // Request elevator to stop at our floor regardless of direction if extra credit is disabled
     else if (!*onElevator && !ENABLE_EXTRA_CREDIT)
     {
         requestFloor(theFloorWeAreOn);
     }
-    // If:
-    // -the elevator is at our floor,
-    // -the doors are open,
-    // -we're not already on the elevator,
-    // -the elevator is going the correct direction,
-    // -and extra credit is enabled, then determine the extra credit condition!
-    *extraCreditCondition = *elevatorAtOurFloor && *doorsOpen && !*onElevator &&
-            (elevatorUpAndWeNeedToGoUp || elevatorDownAndWeNeedToGoDown) && ENABLE_EXTRA_CREDIT;
 
-    // If:
-    // -the elevator is at our floor,
-    // -the doors are open,
-    // -we're not already on the elevator,
-    // -and extra credit is disabled, then just determine the condition normally:
-    *nonExtraCreditCondition = *elevatorAtOurFloor && *doorsOpen && !*onElevator && !ENABLE_EXTRA_CREDIT;
+    // Evaluate if we can get on the elevator, so we can decide if we should later:
+    updateGetOnElevatorConditions(extraCreditCondition, nonExtraCreditCondition, elevatorAtOurFloor,
+                                  doorsOpen, onElevator, elevatorUpAndWeNeedToGoUp,
+                                  elevatorDownAndWeNeedToGoDown);
 }
 
 /*
@@ -354,14 +519,13 @@ void shouldIGetOnOrOffTheElevator(Person *myself, bool *justEntered, int theFloo
         requestFloor(nextToDoItem->floor);
         // Print that we're getting on the elevator
         printf("Person Number %d: Taking elevator to floor %d\n", getPersonKey(myself), nextToDoItem->floor);
-        printf("Person Number %d: Waiting to get off at floor %d\n", getPersonKey(myself), nextToDoItem->floor);
         // We're no longer on the first move anymore
         *justEntered = false;
     }
 
-    // If we're on the elevator, and we're at our destination floor, then we can get off the elevator
-    // This works because we update the itinerary index to the next item when we get on the elevator
-    // -So if we're on the elevator, and we're at our destination floor, then we know we're at the correct floor
+        // If we're on the elevator, and we're at our destination floor, then we can get off the elevator
+        // This works because we update the itinerary index to the next item when we get on the elevator
+        // -So if we're on the elevator, and we're at our destination floor, then we know we're at the correct floor
     else if (isElevatorAtOurFloor && areDoorsOpen && amIAlreadyOnTheElevator)
     {
         leaveElevator(getPersonKey(myself));
@@ -441,54 +605,8 @@ void person(Person *thisPerson)
     pthread_exit(0);
 }
 
-/*
-    Function Name: main
-
-    Input to Method:
-        int argc - the count/number of arguments entered from the command line
-        char* argv[] - the array holding character-array strings where each argument from CMD is an array element
-
-    Output (Return value):
-        An integer representing successful completion of the main method.
-
-    Brief description of the task:
-        The main method that starts everything going for the synchronization of created threads.
-
-*/
-int main(int argc, char *argv[])
+void initializeGlobalArrayElementsMemory(int passengerCount, int floorCount)
 {
-    /***** BEGIN INITIALIZATION OF GLOBAL VARIABLES AND MEMORY *****/
-
-    // Initialize the mutexes:
-    initializeMutexes();
-
-    // Initialize any global variables at the start:
-    currentFloorGlobal = 0;
-
-    // Initialize the directionMutex to 1:
-    elevatorDirectionGlobal = ELEVATOR_GOING_UP;
-
-    // Initialize the openDoorsMutex to closed:
-    openDoorsGlobal = false;
-
-    // Parse input parameters
-    int *parsed = malloc(sizeof(int) * 3);
-    parseParameters(parsed, argc, argv); // < convert and organize the parameters into parsed array
-
-    /* Parse parameters returns an array pointer, where inside parsed[]:
-     * 0th element is the number of people,
-     * 1st element is the wandering time,
-     * and 2nd element is the number of floors.
-    */
-    setPeopleCount(parsed[0]);
-    int passengerCount = parsed[0];
-    setWanderingTime(parsed[1]);
-    int floorCount = parsed[2];
-    setNumFloors(parsed[2]);
-
-    // Free the parsed array
-    free(parsed);
-
     // Initialize the elevatorRosterGlobal array to the size of the passengerCount
     elevatorRosterGlobal = malloc(sizeof(int) * passengerCount);
     for (int i = 0; i < passengerCount; i++)
@@ -517,6 +635,65 @@ int main(int argc, char *argv[])
         // At the start, there should no passengers waiting in the above floors since they all start at 0th floor:
         waitingAtFloorGlobal[i] = 0;
     }
+}
+
+void initializeGlobalMemory(int argc, char *argv[], int *passengerCount, int *floorCount)
+{
+    // Initialize the mutexes:
+    initializeMutexes();
+
+    // Initialize any global variables at the start:
+    currentFloorGlobal = 0;
+
+    // Initialize the directionMutex to 1:
+    elevatorDirectionGlobal = ELEVATOR_GOING_UP;
+
+    // Initialize the openDoorsMutex to closed:
+    openDoorsGlobal = false;
+
+    // Parse input parameters
+    int *parsed = malloc(sizeof(int) * 3);
+    parseParameters(parsed, argc, argv); // < convert and organize the parameters into parsed array
+
+    /* Parse parameters returns an array pointer, where inside parsed[]:
+     * 0th element is the number of people,
+     * 1st element is the wandering time,
+     * and 2nd element is the number of floors.
+    */
+    setPeopleCount(parsed[0]);
+    *passengerCount = parsed[0];
+    setWanderingTime(parsed[1]);
+    *floorCount = parsed[2];
+    setNumFloors(parsed[2]);
+
+    // Free the parsed array
+    free(parsed);
+
+    // Fill in all global arrays' elements with starting memory values:
+    initializeGlobalArrayElementsMemory(*passengerCount, *floorCount);
+}
+
+/*
+    Function Name: main
+
+    Input to Method:
+        int argc - the count/number of arguments entered from the command line
+        char* argv[] - the array holding character-array strings where each argument from CMD is an array element
+
+    Output (Return value):
+        An integer representing successful completion of the main method.
+
+    Brief description of the task:
+        The main method that gets/starts everything going for the synchronization of created threads.
+
+*/
+int main(int argc, char *argv[])
+{
+    /***** BEGIN INITIALIZATION OF GLOBAL VARIABLES AND MEMORY *****/
+    int passengerCount;
+    int floorCount;
+
+    initializeGlobalMemory(argc, argv, &passengerCount, &floorCount);
 
     // Create our people lookup
     Person *people[passengerCount];
