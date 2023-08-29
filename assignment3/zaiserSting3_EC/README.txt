@@ -7,6 +7,8 @@ Main Description - there are two versions of our Elevator Problem assignment sub
 	---zaiserSting3 is the normal version of the Elevator Problem with base requirements implemented.
 	---zaiserSting3_EC is the EXTRA-CREDIT version of the Elevator Problem with elevator directional awareness implemented.
 
+Regardless of which version you choose to compile and run, all features have been implemented. 
+
 NOTE: To run the current code from terminal, using the 2nd example ($ are CMD tokens, do not type $ in the command):
 -----------------------------------------------------------------------------------------------------
    $ gcc elevator.c -o elevator.o -lpthread
