@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include "DoublyLinkedList.c"
 
 #define FRAME_SIZE 16
 #define NUM_FRAMES 8
@@ -23,8 +24,78 @@ int currentFrame = 0;
 
 PageTableEntry pageTable[NUM_PAGES]; // Array with 32 entries
 
+// Search through a doubly linked list LRU-style:
+int searchLRUCache(DoublyLinkedList* LRUStack, int targetDatum)
+{
+    bool headEmpty = isHeadEmpty(LRUStack);
+    if (headEmpty)
+    {
+        printf("No available nodes to search through; please add one first.\n");
+        return -1;
+    }
+
+    // Store head temporarily:
+    setTempTo(LRUStack, getTheHeadOf(LRUStack));
+
+    // Traverse!
+    while (!isCurrTempEmpty(LRUStack))
+    {
+        if (getNodeDatum(LRUStack->temp) == targetDatum)
+        {
+            // Shift all values before the target spot to the right (towards tail):
+            while (LRUStack->temp != LRUStack->head)
+            {
+                setNodeDatum(LRUStack->temp, LRUStack->temp->prev->datum);
+                setTempTo(LRUStack, getThePrevNodeBefore(LRUStack->temp));
+            }
+
+            // Place target datum at the head (it was freshly used):
+            setNodeDatum(LRUStack->head, targetDatum);
+            return 0;
+        }
+        // Keep going until we find the target:
+        setTempTo(LRUStack, getTheNextNodeAfter(LRUStack->temp));
+    }
+
+    // For if we are adding elements at the start:
+    setTempTo(LRUStack, LRUStack->tail->prev);
+
+    // Shift all values to the right towards tail and overwrite the last guy (head):
+    while (!isCurrTempEmpty(LRUStack))
+    {
+        setNodeDatum(LRUStack->temp->next, getNodeDatum(LRUStack->temp));
+        setTempTo(LRUStack, LRUStack->temp->prev);
+    }
+    setNodeDatum(LRUStack->head, targetDatum);
+    return 0;
+}
+
+void LRUOperation(int array[], DoublyLinkedList* LRUList, int amountOfElements)
+{
+    for (int index = 0; index < amountOfElements; index++)
+    {
+        searchLRUCache(LRUList, array[index]);
+        displayDoublyLinkedList(LRUList);
+    }
+}
+
 int main()
 {
+    // TEST THE DOUBLY LINKED LIST:
+    printf("---TESTING LRU ALGORITHM:---\n");
+    int testSize = 5;
+    struct DoublyLinkedList* newLRU = malloc(sizeof(DoublyLinkedList) * (testSize * sizeof(DoublyLinkedNode)));
+    addThisManyEmptyNodes(newLRU, testSize);
+
+    int testArr[] = {1,2,3,4,5,2,10,7,11,1};
+
+    LRUOperation(testArr, newLRU, 10);
+
+    freeThisManyDoublyLinkedNodes(newLRU, testSize);
+    free(newLRU);
+
+    printf("\n---END OF LRU TESTING---\n\n");
+
     // Initialize RAM
     char ram[NUM_FRAMES * FRAME_SIZE];
 
@@ -78,7 +149,7 @@ int main()
         }
         else 
         {
-            // LRU ALROGITHM HERE!
+            // LRU ALGORITHM HERE!
 
             // time_t oldest time found
             // int oldest time index
