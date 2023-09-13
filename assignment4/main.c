@@ -176,17 +176,21 @@ int main()
         }
         else
         {
+            // Update page fault count
+            pageFaultCount++;
+
             // Get LRU Frame
             frameNumber = getNodeDatum(getTheTailOf(lruFrame));
+
+            // Set page to false
+            int pageNumToInvalidate = frameTable[frameNumber].pageNumber;
+            pageTable[pageNumToInvalidate].valid = false;
 
             // Update LRU
             searchLRUCache(lruFrame, frameNumber);
 
-            // Update frame table
+            // Update frame table 
             frameTable[frameNumber].pageNumber = pageNumber;
-
-            // Update page fault count
-            pageFaultCount++;
         }
 
         // Calculate physical address and retrieve data
