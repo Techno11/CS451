@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 #include "DoublyLinkedList.c"
+
 
 #define FRAME_SIZE 16
 #define NUM_FRAMES 8
@@ -12,9 +12,12 @@
 #define PROCESS_SIZE 512                             // 2^9 or 512 bytes
 #define PROCESS_PAGE_SIZE (PROCESS_SIZE / PAGE_SIZE) // 32
 
+#define MAX_ADDRESSES 300
+
 typedef struct
 {
     bool valid;
+    int frameNumber; // -1 if not loaded
 } PageTableEntry;
 
 typedef struct
@@ -30,6 +33,9 @@ PageTableEntry pageTable[NUM_PAGES]; // Array with 32 entries
 
 // Track which pages are loaded in which frames
 Frame frameTable[NUM_FRAMES];        // Array with 8 entries
+
+// Track faults
+int faults[MAX_ADDRESSES];
 
 // Search through a doubly linked list LRU-style:
 int searchLRUCache(DoublyLinkedList *LRUStack, int targetDatum)
@@ -119,6 +125,7 @@ int main()
     for (int i = 0; i < NUM_PAGES; i++)
     {
         pageTable[i].valid = false;
+        pageTable[i].frameNumber = -1;
     }
 
     // Initilize frame table with all entries as empty
@@ -140,6 +147,8 @@ int main()
 
     float totalAddresses = 0;
 
+    printf("Logical Address   Physical Address  Data\n");
+
     // Read addresses.txt line by line
     while (fscanf(addressesFile, "%d\n", &logicalAddress) != EOF)
     {
@@ -147,14 +156,8 @@ int main()
         int pageNumber = logicalAddress / PAGE_SIZE;
         int offset = logicalAddress % PAGE_SIZE;
 
-        // Check if the page is valid in the page table
-        if (pageTable[pageNumber].valid == false)
-        {
-            // Update page table
-            pageTable[pageNumber].valid = true;
-        }
-
-        int frameNumber = getFrameNumFromPageNum(pageNumber);
+        // Get frame number from page table (if it is -1, page is unloaded)
+        int frameNumber = pageTable[pageNumber].frameNumber;
 
         // Check if the page is loaded in a frame (frame number != -1)
         if (frameNumber != -1)
@@ -164,20 +167,33 @@ int main()
         }
         else
         {
+            // Add to page fault list
+            faults[pageFaultCount] = pageNumber;
+
             // Update page fault count
             pageFaultCount++;
 
-            // Get LRU Frame
+            // Get least-recently-used frame
             frameNumber = getNodeDatum(getTheTailOf(lruFrame));
 
-            // Set page to false
+            // Get page number thats at that current frame
             int pageNumToInvalidate = frameTable[frameNumber].pageNumber;
-            pageTable[pageNumToInvalidate].valid = false;
 
-            // Update LRU
+            // Invalidate least-recently-used page
+            pageTable[pageNumToInvalidate].valid = false;
+            pageTable[pageNumToInvalidate].frameNumber = -1;
+
+            // Update least-recently-used
             int rsp = searchLRUCache(lruFrame, frameNumber);
 
-            // Update frame table 
+            // Mark page as valid
+            pageTable[pageNumber].valid = true;
+
+            
+            // Update frame number in page table, as page is now loaded in frame
+            pageTable[pageNumber].frameNumber = frameNumber;
+
+            // Update frame number in frame table
             frameTable[frameNumber].pageNumber = pageNumber;
         }
 
@@ -210,7 +226,7 @@ int main()
         }
 
         // Print logical address, physical address, and data
-        printf("Logical Address: %d, Physical Address: %d, Data: %s \n", logicalAddress, physicalAddress, final);
+        printf("%-17d %-17d %s \n", logicalAddress, physicalAddress, final);
 
         // Free final
         free(final);
@@ -228,9 +244,20 @@ int main()
     // Calculate page fault rate
     double pageFaultRate = (pfc/totalAddresses) * 100;
 
+    // Print page fault list
+    printf("\nPage fault list (in order):\n");
+    for (int i = 0; i < pageFaultCount; i++)
+    {
+        printf("%d", faults[i]);
+        if (i != pageFaultCount - 1)
+        {
+            printf(", ");
+        }
+    }
+    printf("\n");
+
     // Print page fault rate
     printf("\nPage-fault rate: %.2f%%\n", pageFaultRate);
-    printf("Num page faults: %d out of %.0f total pages\n", pageFaultCount, totalAddresses);
 
     // Free linked list
     freeListV2(lruFrame->head);
