@@ -23,7 +23,7 @@
 #define ELEVATOR_GOING_DOWN 0
 
 // Toggles the extra credit functionality
-#define ENABLE_EXTRA_CREDIT true // false
+#define ENABLE_EXTRA_CREDIT false // true
 
 /*
     Function Name: safetyNetForBadElevatorExit

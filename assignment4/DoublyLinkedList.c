@@ -91,7 +91,8 @@ int insertToTailEnd(DoublyLinkedList* thisDblLinkedList, int thisDatum)
         }
 
         setNodeDatum(thisDblLinkedList->head, thisDatum); //change newHead to thisDblLinkedList->head if it doesn't work
-        setTailTo(thisDblLinkedList, getTheHeadOf(thisDblLinkedList));
+        //setTailTo(thisDblLinkedList, getTheHeadOf(thisDblLinkedList));
+        thisDblLinkedList->tail = thisDblLinkedList->head;
         setNodePrevTo(thisDblLinkedList->head, NULL);
     }
     else
@@ -151,4 +152,17 @@ void displayDoublyLinkedList(DoublyLinkedList* thisDblLinkedList)
         }
         printf("NULL\n");
     }
+}
+
+void freeListV2(struct DoublyLinkedNode* head)
+{
+    struct DoublyLinkedNode* temp;
+
+    while (head != NULL)
+    {
+        temp = head;
+        head = head->next;
+        free(temp);
+    }
+
 }

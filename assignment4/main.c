@@ -96,7 +96,8 @@ int main()
     // printf("\n---END OF LRU TESTING---\n\n");
 
     // Initialize page table
-    struct DoublyLinkedList* pageTableLRU = malloc(sizeof(DoublyLinkedList) * (NUM_PAGES * sizeof(DoublyLinkedNode)));
+    //struct DoublyLinkedList* pageTableLRU = malloc(sizeof(DoublyLinkedList) * (NUM_PAGES * sizeof(DoublyLinkedNode)));
+    struct DoublyLinkedList* pageTableLRU = malloc((sizeof(DoublyLinkedList)) * (NUM_PAGES));
     addThisManyEmptyNodes(pageTableLRU, NUM_PAGES);
 
     // Initialize RAM
@@ -194,8 +195,14 @@ int main()
     fclose(addressesFile);
 
     // Free linked list
-    // freeThisManyDoublyLinkedNodes(pageTableLRU, NUM_PAGES);
-    free(pageTableLRU);
+    //freeThisManyDoublyLinkedNodes(pageTableLRU, NUM_PAGES);
+
+    //free(pageTableLRU->head);
+    //free(pageTableLRU->temp);
+    //free(pageTableLRU->tail);
+
+    //free(pageTableLRU);
+    freeListV2(pageTableLRU->head);
 
     // Print page-fault rate
     float pageFaultRate = (float)pageFaultCount / NUM_PAGES * 100;

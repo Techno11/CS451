@@ -37,5 +37,6 @@ void freeThisManyDoublyLinkedNodes(DoublyLinkedList* thisDblLinkedList, int amou
 int insertToTailEnd(DoublyLinkedList* thisDblLinkedList, int thisDatum);
 void displayDoublyLinkedList(DoublyLinkedList* thisDblLinkedList);
 
+void freeListV2(struct DoublyLinkedNode* head);
 
 #endif //CS451_GITCLONEV2_DOUBLYLINKEDLIST_H
