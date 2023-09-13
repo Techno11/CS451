@@ -35,45 +35,57 @@ Frame frameTable[NUM_FRAMES];        // Array with 8 entries
 int searchLRUCache(DoublyLinkedList *LRUStack, int targetDatum)
 {
     bool headEmpty = isHeadEmpty(LRUStack);
-    if (headEmpty)
+    if (LRUStack->head == NULL)
     {
         printf("No available nodes to search through; please add one first.\n");
         return -1;
     }
 
     // Store head temporarily:
-    setTempTo(LRUStack, getTheHeadOf(LRUStack));
+    //setTempTo(LRUStack, getTheHeadOf(LRUStack));
+    LRUStack->temp = LRUStack->head;
 
     // Traverse!
-    while (!isCurrTempEmpty(LRUStack))
+    //while (!isCurrTempEmpty(LRUStack))
+    while(LRUStack->temp != NULL)
     {
-        if (getNodeDatum(LRUStack->temp) == targetDatum)
+        //if (getNodeDatum(LRUStack->temp) == targetDatum)
+        if (LRUStack->temp->datum == targetDatum)
         {
             // Shift all values before the target spot to the right (towards tail):
             while (LRUStack->temp != LRUStack->head)
             {
-                setNodeDatum(LRUStack->temp, LRUStack->temp->prev->datum);
-                setTempTo(LRUStack, getThePrevNodeBefore(LRUStack->temp));
+                //setNodeDatum(LRUStack->temp, LRUStack->temp->prev->datum);
+                LRUStack->temp->datum = LRUStack->temp->prev->datum;
+                //setTempTo(LRUStack, getThePrevNodeBefore(LRUStack->temp));
+                LRUStack->temp = LRUStack->temp->prev;
             }
 
             // Place target datum at the head (it was freshly used):
-            setNodeDatum(LRUStack->head, targetDatum);
+            //setNodeDatum(LRUStack->head, targetDatum);
+            LRUStack->head->datum = targetDatum;
             return 0;
         }
         // Keep going until we find the target:
-        setTempTo(LRUStack, getTheNextNodeAfter(LRUStack->temp));
+        //setTempTo(LRUStack, getTheNextNodeAfter(LRUStack->temp));
+        LRUStack->temp = LRUStack->temp->next;
     }
 
     // For if we are adding elements at the start:
-    setTempTo(LRUStack, LRUStack->tail->prev);
+    //setTempTo(LRUStack, LRUStack->tail->prev);
+    LRUStack->temp = LRUStack->tail->prev;
 
     // Shift all values to the right towards tail and overwrite the last guy (head):
-    while (!isCurrTempEmpty(LRUStack))
+    //while (!isCurrTempEmpty(LRUStack))
+    while (LRUStack->temp != NULL)
     {
-        setNodeDatum(LRUStack->temp->next, getNodeDatum(LRUStack->temp));
-        setTempTo(LRUStack, LRUStack->temp->prev);
+        //setNodeDatum(LRUStack->temp->next, getNodeDatum(LRUStack->temp));
+        LRUStack->temp->next->datum = LRUStack->temp->datum;
+        //setTempTo(LRUStack, LRUStack->temp->prev);
+        LRUStack->temp = LRUStack->temp->prev;
     }
-    setNodeDatum(LRUStack->head, targetDatum);
+    //setNodeDatum(LRUStack->head, targetDatum);
+    LRUStack->head->datum = targetDatum;
     return 0;
 }
 
