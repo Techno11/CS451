@@ -179,6 +179,8 @@ int main()
             // Update page fault count
             pageFaultCount++;
 
+            printf("Page fault: %d, frameNumber: %d\n", pageNumber, frameNumber);
+
             // Get LRU Frame
             frameNumber = getNodeDatum(getTheTailOf(lruFrame));
 
@@ -188,6 +190,10 @@ int main()
 
             // Update LRU
             searchLRUCache(lruFrame, frameNumber);
+
+            displayDoublyLinkedList(lruFrame);
+
+            printf("Updating frame %d with page %d\n", frameNumber, pageNumber);
 
             // Update frame table 
             frameTable[frameNumber].pageNumber = pageNumber;
@@ -211,7 +217,7 @@ int main()
         char data = ram[physicalAddress];
 
         // Print logical address, physical address, and data
-        printf("Logical Address: %d, Physical Address: %d, Data: %c\n", logicalAddress, physicalAddress, data);
+        // printf("Logical Address: %d, Physical Address: %d, Data: %c\n", logicalAddress, physicalAddress, data);
 
         totalAddresses++;
     }
