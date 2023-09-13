@@ -150,6 +150,8 @@ int main()
         return 1;
     }
 
+    float totalAddresses = 0;
+
     // Read addresses.txt line by line
     while (fscanf(addressesFile, "%d\n", &logicalAddress) != EOF)
     {
@@ -162,9 +164,6 @@ int main()
         {
             // Update page table
             pageTable[pageNumber].valid = true;
-
-            // Update page fault count
-            pageFaultCount++;
         }
 
         int frameNumber = getFrameNumFromPageNum(pageNumber);
@@ -185,6 +184,9 @@ int main()
 
             // Update frame table
             frameTable[frameNumber].pageNumber = pageNumber;
+
+            // Update page fault count
+            pageFaultCount++;
         }
 
         // Calculate physical address and retrieve data
@@ -206,23 +208,24 @@ int main()
 
         // Print logical address, physical address, and data
         printf("Logical Address: %d, Physical Address: %d, Data: %c\n", logicalAddress, physicalAddress, data);
+
+        totalAddresses++;
     }
 
     // Close addresses.txt
     fclose(addressesFile); 
 
     // Convert page fault count and num pages to floats
-    float pfc = pageFaultCount, np = NUM_PAGES;
+    float pfc = pageFaultCount;
 
     // Calculate page fault rate
-    double pageFaultRate = (pfc/np) * 100;
+    double pageFaultRate = (pfc/totalAddresses) * 100;
 
     // Print page fault rate
     printf("\nPage-fault rate: %.2f%%\n", pageFaultRate);
+    printf("Num page faults: %d out of %.0f total pages\n", pageFaultCount, totalAddresses);
 
     // Free linked list
-    // freeThisManyDoublyLinkedNodes(lruFrame, NUM_FRAMES);
-    //free(lruFrame);
     freeListV2(lruFrame->head);
     free(lruFrame);
 
