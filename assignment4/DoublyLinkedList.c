@@ -2,7 +2,6 @@
 // Created by bsting on 9/8/23.
 //
 #include "DoublyLinkedList.h"
-#include <stdint.h>
 
 bool isHeadEmpty(DoublyLinkedList* thisDblLinkedList)
 {
@@ -123,34 +122,6 @@ void addThisManyEmptyNodes(DoublyLinkedList* thisDblLinkedList, int amountOfNode
     for (int index = 0; index < amountOfNodes; index++)
     {
         status = insertToTailEnd(thisDblLinkedList, 0);
-    }
-}
-
-void freeThisManyDoublyLinkedNodes(DoublyLinkedList* thisDblLinkedList, int amountOfNodes)
-{
-    struct DoublyLinkedNode** freeingPointer = &thisDblLinkedList->head;
-    for (int index = 0; index < amountOfNodes; index++)
-    {
-        free(*freeingPointer);
-        *freeingPointer = NULL;
-        freeingPointer++;
-    }
-}
-
-void displayDoublyLinkedList(DoublyLinkedList* thisDblLinkedList)
-{
-    bool headEmpty = isHeadEmpty(thisDblLinkedList);
-    if (headEmpty)
-    {
-        printf("Please add a node first as there's no available output to read.\n");
-    }
-    else {
-        setTempTo(thisDblLinkedList, getTheHeadOf(thisDblLinkedList));
-        while (!isCurrTempEmpty(thisDblLinkedList)) {
-            printf("[%d]->", getNodeDatum(getTheTempNodeOf(thisDblLinkedList)));
-            setTempTo(thisDblLinkedList, getTheNextNodeAfter(getTheTempNodeOf(thisDblLinkedList)));
-        }
-        printf("NULL\n");
     }
 }
 

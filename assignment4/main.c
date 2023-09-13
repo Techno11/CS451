@@ -7,10 +7,7 @@
 #define FRAME_SIZE 16
 #define NUM_FRAMES 8
 #define PAGE_SIZE (FRAME_SIZE)
-#define NUM_PAGES 512 / 16 // 32
-
-#define PROCESS_SIZE 512                             // 2^9 or 512 bytes
-#define PROCESS_PAGE_SIZE (PROCESS_SIZE / PAGE_SIZE) // 32
+#define NUM_PAGES (512 / 16) // 32
 
 #define MAX_ADDRESSES 300
 
@@ -26,7 +23,6 @@ typedef struct
 } Frame;
 
 int pageFaultCount = 0;
-int currentFrame = 0;
 
 // Track which pages are valid
 PageTableEntry pageTable[NUM_PAGES]; // Array with 32 entries
@@ -83,27 +79,6 @@ int searchLRUCache(DoublyLinkedList *LRUStack, int targetDatum)
     return 0;
 }
 
-void LRUOperation(int array[], DoublyLinkedList *LRUList, int amountOfElements)
-{
-    for (int index = 0; index < amountOfElements; index++)
-    {
-        searchLRUCache(LRUList, array[index]);
-        displayDoublyLinkedList(LRUList);
-    }
-}
-
-int getFrameNumFromPageNum(int pageNum)
-{
-    for (int i = 0; i < NUM_FRAMES; i++)
-    {
-        if (frameTable[i].pageNumber == pageNum)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
 int main()
 {
     // Initialize page table
@@ -128,12 +103,12 @@ int main()
         pageTable[i].frameNumber = -1;
     }
 
-    // Initilize frame table with all entries as empty
+    // Initialize frame table with all entries as empty
     for (int i = 0; i < NUM_FRAMES; i++)
     {
         frameTable[i].pageNumber = -1;
 
-        // Add each avaliable frame to the LRU
+        // Add each available frame to the LRU
         searchLRUCache(lruFrame, i);
     }
 
@@ -176,7 +151,7 @@ int main()
             // Get least-recently-used frame
             frameNumber = getNodeDatum(getTheTailOf(lruFrame));
 
-            // Get page number thats at that current frame
+            // Get page number that's at that current frame
             int pageNumToInvalidate = frameTable[frameNumber].pageNumber;
 
             // Invalidate least-recently-used page

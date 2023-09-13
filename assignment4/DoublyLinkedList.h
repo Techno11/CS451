@@ -33,9 +33,7 @@ DoublyLinkedNode* getTheTempNodeOf(DoublyLinkedList* thisDblLinkedList);
 
 // Have a head pointer, tail pointer, and temp pointer (for tail swap) in main
 void addThisManyEmptyNodes(DoublyLinkedList* thisDblLinkedList, int amountOfNodes);
-void freeThisManyDoublyLinkedNodes(DoublyLinkedList* thisDblLinkedList, int amountOfNodes);
 int insertToTailEnd(DoublyLinkedList* thisDblLinkedList, int thisDatum);
-void displayDoublyLinkedList(DoublyLinkedList* thisDblLinkedList);
 
 void freeListV2(struct DoublyLinkedNode* head);
 
