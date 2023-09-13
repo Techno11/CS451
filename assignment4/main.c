@@ -222,6 +222,8 @@ int main()
 
     // Free linked list
     // freeThisManyDoublyLinkedNodes(lruFrame, NUM_FRAMES);
+    //free(lruFrame);
+    freeListV2(lruFrame->head);
     free(lruFrame);
 
     // Exit
