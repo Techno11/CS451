@@ -15,16 +15,24 @@
 typedef struct
 {
     bool valid;
-    int frameNumber;
 } PageTableEntry;
+
+typedef struct
+{
+    int pageNumber;
+} Frame;
 
 int pageFaultCount = 0;
 int currentFrame = 0;
 
+// Track which pages are valid
 PageTableEntry pageTable[NUM_PAGES]; // Array with 32 entries
 
+// Track which pages are loaded in which frames
+Frame frameTable[NUM_FRAMES];        // Array with 8 entries
+
 // Search through a doubly linked list LRU-style:
-int searchLRUCache(DoublyLinkedList* LRUStack, int targetDatum)
+int searchLRUCache(DoublyLinkedList *LRUStack, int targetDatum)
 {
     bool headEmpty = isHeadEmpty(LRUStack);
     if (headEmpty)
@@ -69,13 +77,25 @@ int searchLRUCache(DoublyLinkedList* LRUStack, int targetDatum)
     return 0;
 }
 
-void LRUOperation(int array[], DoublyLinkedList* LRUList, int amountOfElements)
+void LRUOperation(int array[], DoublyLinkedList *LRUList, int amountOfElements)
 {
     for (int index = 0; index < amountOfElements; index++)
     {
         searchLRUCache(LRUList, array[index]);
         displayDoublyLinkedList(LRUList);
     }
+}
+
+int getFrameNumFromPageNum(int pageNum)
+{
+    for (int i = 0; i < NUM_FRAMES; i++)
+    {
+        if (frameTable[i].pageNumber == pageNum)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 int main()
@@ -96,9 +116,8 @@ int main()
     // printf("\n---END OF LRU TESTING---\n\n");
 
     // Initialize page table
-    //struct DoublyLinkedList* pageTableLRU = malloc(sizeof(DoublyLinkedList) * (NUM_PAGES * sizeof(DoublyLinkedNode)));
-    struct DoublyLinkedList* pageTableLRU = malloc((sizeof(DoublyLinkedList)) * (NUM_PAGES));
-    addThisManyEmptyNodes(pageTableLRU, NUM_PAGES);
+    struct DoublyLinkedList *lruFrame = malloc(sizeof(DoublyLinkedList) * (NUM_FRAMES * sizeof(DoublyLinkedNode)));
+    addThisManyEmptyNodes(lruFrame, NUM_FRAMES);
 
     // Initialize RAM
     char ram[NUM_FRAMES * FRAME_SIZE];
@@ -117,6 +136,12 @@ int main()
         pageTable[i].valid = false;
     }
 
+    // Initilize frame table with all entries as empty
+    for (int i = 0; i < NUM_FRAMES; i++)
+    {
+        frameTable[i].pageNumber = -1;
+    }
+
     // Open addresses.txt
     FILE *addressesFile = fopen("addresses.txt", "r");
     if (!addressesFile)
@@ -128,12 +153,6 @@ int main()
     // Read addresses.txt line by line
     while (fscanf(addressesFile, "%d\n", &logicalAddress) != EOF)
     {
-
-        if (logicalAddress == 555)
-        {
-            break;
-        }
-
         // Calculate page number and offset
         int pageNumber = logicalAddress / PAGE_SIZE;
         int offset = logicalAddress % PAGE_SIZE;
@@ -143,33 +162,33 @@ int main()
         {
             // Update page table
             pageTable[pageNumber].valid = true;
-            pageTable[pageNumber].frameNumber = currentFrame;
 
-            // Update LRU with the page number we just accessed
-            searchLRUCache(pageTableLRU, pageNumber);
-
-            // Update current frame
-            currentFrame = (currentFrame + 1) % NUM_FRAMES;
-
+            // Update page fault count
             pageFaultCount++;
         }
-        else 
+
+        int frameNumber = getFrameNumFromPageNum(pageNumber);
+
+        // Check if the page is loaded in a frame (frame number != -1)
+        if (frameNumber != -1)
         {
-            // Get the LRU page number
-            pageNumber = (getTheTailOf(pageTableLRU))->datum;
+            // Update LRU
+            searchLRUCache(lruFrame, frameNumber);
+        }
+        else
+        {
+            // Get LRU Frame
+            frameNumber = getNodeDatum(getTheTailOf(lruFrame));
 
-            // Update page table
-            pageTable[pageNumber].frameNumber = currentFrame;
+            // Update LRU
+            searchLRUCache(lruFrame, frameNumber);
 
-            // Update current frame
-            currentFrame = (currentFrame + 1) % NUM_FRAMES;
-
-            // Update LRU with the page number we're accessing
-            searchLRUCache(pageTableLRU, pageNumber);
+            // Update frame table
+            frameTable[frameNumber].pageNumber = pageNumber;
         }
 
         // Calculate physical address and retrieve data
-        int physicalAddress = pageTable[pageNumber].frameNumber * FRAME_SIZE + offset;
+        int physicalAddress = frameNumber * FRAME_SIZE + offset;
 
         if (ram[physicalAddress] == '\0')
         {
@@ -189,24 +208,21 @@ int main()
         printf("Logical Address: %d, Physical Address: %d, Data: %c\n", logicalAddress, physicalAddress, data);
     }
 
-    printf("I've exited the loop, boss\n");
-
     // Close addresses.txt
-    fclose(addressesFile);
+    fclose(addressesFile); 
+
+    // Convert page fault count and num pages to floats
+    float pfc = pageFaultCount, np = NUM_PAGES;
+
+    // Calculate page fault rate
+    double pageFaultRate = (pfc/np) * 100;
+
+    // Print page fault rate
+    printf("\nPage-fault rate: %.2f%%\n", pageFaultRate);
 
     // Free linked list
-    //freeThisManyDoublyLinkedNodes(pageTableLRU, NUM_PAGES);
-
-    //free(pageTableLRU->head);
-    //free(pageTableLRU->temp);
-    //free(pageTableLRU->tail);
-
-    //free(pageTableLRU);
-    freeListV2(pageTableLRU->head);
-
-    // Print page-fault rate
-    float pageFaultRate = (float)pageFaultCount / NUM_PAGES * 100;
-    printf("\nPage-fault rate: %.2f%%\n", pageFaultRate);
+    // freeThisManyDoublyLinkedNodes(lruFrame, NUM_FRAMES);
+    free(lruFrame);
 
     // Exit
     return 0;
