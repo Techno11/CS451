@@ -42,50 +42,38 @@ int searchLRUCache(DoublyLinkedList *LRUStack, int targetDatum)
     }
 
     // Store head temporarily:
-    //setTempTo(LRUStack, getTheHeadOf(LRUStack));
-    LRUStack->temp = LRUStack->head;
+    setTempTo(LRUStack, getTheHeadOf(LRUStack));
 
     // Traverse!
-    //while (!isCurrTempEmpty(LRUStack))
-    while(LRUStack->temp != NULL)
+    while (!isCurrTempEmpty(LRUStack))
     {
-        //if (getNodeDatum(LRUStack->temp) == targetDatum)
-        if (LRUStack->temp->datum == targetDatum)
+        if (getNodeDatum(LRUStack->temp) == targetDatum)
         {
             // Shift all values before the target spot to the right (towards tail):
             while (LRUStack->temp != LRUStack->head)
             {
-                //setNodeDatum(LRUStack->temp, LRUStack->temp->prev->datum);
-                LRUStack->temp->datum = LRUStack->temp->prev->datum;
-                //setTempTo(LRUStack, getThePrevNodeBefore(LRUStack->temp));
-                LRUStack->temp = LRUStack->temp->prev;
+                setNodeDatum(LRUStack->temp, LRUStack->temp->prev->datum);
+                setTempTo(LRUStack, getThePrevNodeBefore(LRUStack->temp));
             }
 
             // Place target datum at the head (it was freshly used):
-            //setNodeDatum(LRUStack->head, targetDatum);
-            LRUStack->head->datum = targetDatum;
+            setNodeDatum(LRUStack->head, targetDatum);
             return 0;
         }
         // Keep going until we find the target:
-        //setTempTo(LRUStack, getTheNextNodeAfter(LRUStack->temp));
-        LRUStack->temp = LRUStack->temp->next;
+        setTempTo(LRUStack, getTheNextNodeAfter(LRUStack->temp));
     }
 
     // For if we are adding elements at the start:
-    //setTempTo(LRUStack, LRUStack->tail->prev);
-    LRUStack->temp = LRUStack->tail->prev;
+    setTempTo(LRUStack, LRUStack->tail->prev);
 
     // Shift all values to the right towards tail and overwrite the last guy (head):
-    //while (!isCurrTempEmpty(LRUStack))
-    while (LRUStack->temp != NULL)
+    while (!isCurrTempEmpty(LRUStack))
     {
-        //setNodeDatum(LRUStack->temp->next, getNodeDatum(LRUStack->temp));
-        LRUStack->temp->next->datum = LRUStack->temp->datum;
-        //setTempTo(LRUStack, LRUStack->temp->prev);
-        LRUStack->temp = LRUStack->temp->prev;
+        setNodeDatum(LRUStack->temp->next, getNodeDatum(LRUStack->temp));
+        setTempTo(LRUStack, LRUStack->temp->prev);
     }
-    //setNodeDatum(LRUStack->head, targetDatum);
-    LRUStack->head->datum = targetDatum;
+    setNodeDatum(LRUStack->head, targetDatum);
     return 0;
 }
 
@@ -112,21 +100,6 @@ int getFrameNumFromPageNum(int pageNum)
 
 int main()
 {
-    // TEST THE DOUBLY LINKED LIST:
-    // printf("---TESTING LRU ALGORITHM:---\n");
-    // int testSize = 5;
-    // struct DoublyLinkedList* newLRU = malloc(sizeof(DoublyLinkedList) * (testSize * sizeof(DoublyLinkedNode)));
-    // addThisManyEmptyNodes(newLRU, testSize);
-
-    // int testArr[] = {1,2,3,4,5,2,10,7,11,1};
-
-    // LRUOperation(testArr, newLRU, 10);
-
-    // freeThisManyDoublyLinkedNodes(newLRU, testSize);
-    // free(newLRU);
-
-    // printf("\n---END OF LRU TESTING---\n\n");
-
     // Initialize page table
     struct DoublyLinkedList *lruFrame = malloc(sizeof(DoublyLinkedList) * (NUM_FRAMES * sizeof(DoublyLinkedNode)));
     addThisManyEmptyNodes(lruFrame, NUM_FRAMES);
@@ -152,6 +125,9 @@ int main()
     for (int i = 0; i < NUM_FRAMES; i++)
     {
         frameTable[i].pageNumber = -1;
+
+        // Add each avaliable frame to the LRU
+        searchLRUCache(lruFrame, i);
     }
 
     // Open addresses.txt
@@ -191,8 +167,6 @@ int main()
             // Update page fault count
             pageFaultCount++;
 
-            printf("Page fault: %d, frameNumber: %d\n", pageNumber, frameNumber);
-
             // Get LRU Frame
             frameNumber = getNodeDatum(getTheTailOf(lruFrame));
 
@@ -201,11 +175,7 @@ int main()
             pageTable[pageNumToInvalidate].valid = false;
 
             // Update LRU
-            searchLRUCache(lruFrame, frameNumber);
-
-            displayDoublyLinkedList(lruFrame);
-
-            printf("Updating frame %d with page %d\n", frameNumber, pageNumber);
+            int rsp = searchLRUCache(lruFrame, frameNumber);
 
             // Update frame table 
             frameTable[frameNumber].pageNumber = pageNumber;
@@ -214,6 +184,7 @@ int main()
         // Calculate physical address and retrieve data
         int physicalAddress = frameNumber * FRAME_SIZE + offset;
 
+        // Load page from disk if it's not in RAM
         if (ram[physicalAddress] == '\0')
         {
             // Load page file from disk
@@ -226,11 +197,25 @@ int main()
             fclose(processFile);
         }
 
+        // Data is now in RAM
         char data = ram[physicalAddress];
 
-        // Print logical address, physical address, and data
-        // printf("Logical Address: %d, Physical Address: %d, Data: %c\n", logicalAddress, physicalAddress, data);
+        char* final = malloc(sizeof(char) * 3);
+        final[0] = data;
+        final[1] = '\0';
+        final[2] = '\0';
+        if(data == '\n') {
+            final[0] = '\\';
+            final[1] = 'n';
+        }
 
+        // Print logical address, physical address, and data
+        printf("Logical Address: %d, Physical Address: %d, Data: %s \n", logicalAddress, physicalAddress, final);
+
+        // Free final
+        free(final);
+
+        // Increment total addresses
         totalAddresses++;
     }
 
