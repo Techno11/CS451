@@ -1,6 +1,11 @@
-//
-// Created by bsting on 9/8/23.
-//
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 4 (Final Project)
+        Date of Submission: 9/13/2023
+        Name of this file: DoublyLinkedList.h
+        Short Description of contents:
+            This file contains the prototypes for the doublely-linked-list data structure and its methods 
+*/
 
 #ifndef CS451_GITCLONEV2_DOUBLYLINKEDLIST_H
 #define CS451_GITCLONEV2_DOUBLYLINKEDLIST_H

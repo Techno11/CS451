@@ -1,6 +1,11 @@
-//
-// Created by bsting on 9/8/23.
-//
+/*
+        Author: Brendan Sting, Soren Zaiser
+        Assignment Number: 4 (Final Project)
+        Date of Submission: 9/13/2023
+        Name of this file: DoublyLinkedList.c
+        Short Description of contents:
+            This file contains the doublely-linked-list data structure and its methods 
+*/
 #include "DoublyLinkedList.h"
 
 bool isHeadEmpty(DoublyLinkedList* thisDblLinkedList)
