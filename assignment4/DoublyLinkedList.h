@@ -4,11 +4,11 @@
         Date of Submission: 9/13/2023
         Name of this file: DoublyLinkedList.h
         Short Description of contents:
-            This file contains the prototypes for the doublely-linked-list data structure and its methods 
+            This file contains the prototypes for the doubly-linked-list data structure and its methods
 */
 
-#ifndef CS451_GITCLONEV2_DOUBLYLINKEDLIST_H
-#define CS451_GITCLONEV2_DOUBLYLINKEDLIST_H
+#ifndef DOUBLYLINKEDLIST_H
+#define DOUBLYLINKEDLIST_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +22,9 @@ typedef struct DoublyLinkedList {
     struct DoublyLinkedNode* temp;
 } DoublyLinkedList;
 
+/*======== SEE 'DoublyLinkedList.c' FOR FUNCTION HEADER COMMENTS ========*/
+
+// List of functional data structure checkers:
 bool isHeadEmpty(DoublyLinkedList* thisDblLinkedList);
 bool isTailEmpty(DoublyLinkedList* thisDblLinkedList);
 bool isCurrTempEmpty(DoublyLinkedList* thisDblLinkedList);
@@ -40,6 +43,7 @@ DoublyLinkedNode* getTheTempNodeOf(DoublyLinkedList* thisDblLinkedList);
 void addThisManyEmptyNodes(DoublyLinkedList* thisDblLinkedList, int amountOfNodes);
 int insertToTailEnd(DoublyLinkedList* thisDblLinkedList, int thisDatum);
 
+// Method to free linked list data structure by going through each node, starting at the head:
 void freeListV2(struct DoublyLinkedNode* head);
 
-#endif //CS451_GITCLONEV2_DOUBLYLINKEDLIST_H
+#endif //DOUBLYLINKEDLIST_H
